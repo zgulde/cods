@@ -1,0 +1,55 @@
+#!/bin/bash
+
+heading() {
+    echo '----------------------------------'
+    echo "> \$@"
+    echo '----------------------------------'
+}
+
+# add ssh key
+cat ~/.ssh/id_rsa.pub | ssh username@remote_host "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
+
+# add ssh key
+# cat ~/.ssh/id_rsa.pub | ssh user@hostname 'cat >> .ssh/authorized_keys'
+
+if [[ -e ./.env ]]; then
+    echo 'It looks like things are already setup, aborting...'
+    echo 'To redo the setup process, delete the ".env" file'
+    exit
+fi
+
+# get relevant info
+read -p 'Enter the servers ip address: ' ip
+read -p "Enter a username (default $USER): " username
+if [[ -z "$username" ]]; then
+    username=$USER
+fi
+read -sp 'Enter a password: ' password
+read -sp 'Confirm password: ' confirm_password
+
+if [[ "$password" != "$confirm_password" ]]; then
+    echo 'passwords do not match!'
+    exit 0
+fi
+
+cat > .env <<EOF
+ip=$ip
+username=$username
+EOF
+
+echo '".env" file created!'
+
+read -p 'Press enter to continue and setup the server'
+
+heading 'creating user'
+
+cat <<setup_user
+useradd --create-home --shell /bin/bash --groups sudo $username
+echo '$username:$password' | chpasswd
+# copy over ssh key config for the new user
+mkdir -p /home/$username/.ssh
+cp $HOME/.ssh/authorized_keys /home/$username/.ssh/
+chown --recursive $username:$username /home/$username/.ssh
+setup_user
+
+# ssh $user@$ip bash < provision.sh
