@@ -1,0 +1,40 @@
+#!/bin/bash
+
+read -p 'Enter the name of the database (example_db): ' db_name
+read -p 'Enter the name of the database user (example_user): ' db_user
+read -sp 'Choose a STRONG password for this database user: ' db_pass
+echo
+read -sp 'confirm password: ' confirm_pass
+echo
+echo
+
+if [[ "$db_pass" != "$confirm_pass" ]]; then
+    echo 'ERROR: passwords do not match!'
+    exit 1
+fi
+
+cat <<message
+creating database:
+
+    database: $db_name
+    user:     $db_user
+
+Enter your *database* password to continue, or
+press Ctrl-C to exit
+
+database password: 
+message
+
+read db_admin_pass
+
+. .env
+
+ssh -t $user@$ip mysql -u root -p"$db_admin_pass" <<<sql
+CREATE DATABASE $db_name;
+CREATE USER '$db_user'@'localhost' IDENTIFIED BY '$db_pass';
+GRANT ALL ON ${db_name}.* TO $db_user;
+FLUSH PRIVELEGES;
+sql
+
+echo 'Done!'
+

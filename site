@@ -1,0 +1,120 @@
+#!/bin/bash
+
+list_sites() {
+    ssh $user@$ip 'ls /etc/nginx/sites-available'
+}
+
+add_site() {
+    domain=$1
+
+    if [[ -z $domain ]]; then
+        read -p 'Enter the site name without the www: ' domain
+    fi
+
+
+    echo '--------------------------------------------------'
+    echo " > setting up nginx for ${domain}"
+    echo '--------------------------------------------------'
+
+    # TODO: redir tee to /dev/null here once it's working
+    ssh -t $user@$ip "
+    echo '$(sed -e "s/{{domain}}/${domain}/g" site.nginx.conf)' | sudo tee /etc/nginx/sites-available/${domain}
+    sudo ln -s /etc/nginx/sites-available/${domain} /etc/nginx/sites-enabled/${domain}
+    sudo systemctl restart nginx
+    "
+}
+
+remove_site() {
+    site=$1
+    if [[ -z "$site" ]]; then
+        read -p 'Enter the name of the site to remove: ' site
+    fi
+    ssh -t $user@$ip "
+    ls /etc/sites-available | grep $site >/dev/null 2>&1
+    if [[ \$? -ne 0 ]]; then
+        echo 'That site does not exist!'
+        exit 1
+    fi
+    sudo rm -f /etc/nginx/sites-available/${site}
+    sudo rm -f /etc/nginx/sites-enabled/${site}
+    sudo rm -f /opt/tomcat/webapps/${site}.war
+    sudo rm -rf /opt/tomcat/webapps/${site}
+    "
+
+    echo 'site removed!'
+}
+
+deploy_site() {
+    site=$1
+    war_filepath="$2"
+
+    if [[ -z "$site" ]]; then
+        read -p 'Enter the name of the site you want to deploy to: ' site
+    fi
+
+    if [[ -z "$war_filepath"  ]]; then
+        read -p 'Enter the path to the war file: ' war_filepath
+    fi
+
+    # ensure file exists and is a war (or at least has the extension)
+    if [[ ! -e $war_path ]]; then
+        echo 'It looks like that file does not exist!'
+        exit 1
+    fi
+    grep '\.war$' >/dev/null <<< $war_path
+    if [[ $? -ne 0 ]]; then
+        echo 'must be a valid .war file'
+        exit 1
+    fi
+
+    # ensure site exists
+    list_sites | grep $site >/dev/null 2>&1
+    if [[ $? -ne 0 ]]; then
+        echo 'That site does not exist!'
+        exit 1
+    fi
+
+    scp $war_filepath $user@$ip:/opt/tomcat/webapps/$site.war
+    
+}
+
+
+show_help() {
+    cat <<help
+site -- command for insteracting with different sites on your server
+
+commands
+
+    list
+    add    [sitename]
+    remove [sitename]
+    deploy [sitename] [/path/to/site.war]
+
+help
+}
+
+if [[ ! -f .env ]]; then
+    echo 'It looks like you do not have a server setup yet, please'
+    echo 'run the setup script first.'
+    exit 1
+fi
+
+source .env
+
+command=$1
+shift
+
+case $command in
+    add)
+        echo add_site
+        ;;
+    list)
+        list_sites
+        ;;
+    remove)
+        echo remove_site
+        ;;
+    *)
+        show_help
+        ;;
+esac

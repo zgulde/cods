@@ -1,21 +1,9 @@
 #!/bin/bash
 
-heading() {
-    echo '----------------------------------'
-    echo "> \$@"
-    echo '----------------------------------'
-}
-
-# add ssh key
-cat ~/.ssh/id_rsa.pub | ssh username@remote_host "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
-
-# add ssh key
-# cat ~/.ssh/id_rsa.pub | ssh user@hostname 'cat >> .ssh/authorized_keys'
-
 if [[ -e ./.env ]]; then
     echo 'It looks like things are already setup, aborting...'
     echo 'To redo the setup process, delete the ".env" file'
-    exit
+    exit 1
 fi
 
 # get relevant info
@@ -25,31 +13,42 @@ if [[ -z "$username" ]]; then
     username=$USER
 fi
 read -sp 'Enter a password: ' password
+echo
 read -sp 'Confirm password: ' confirm_password
+echo
 
 if [[ "$password" != "$confirm_password" ]]; then
     echo 'passwords do not match!'
-    exit 0
+    exit 1
 fi
 
 cat > .env <<EOF
 ip=$ip
-username=$username
+user=$username
 EOF
 
 echo '".env" file created!'
 
 read -p 'Press enter to continue and setup the server'
 
+heading 'running provision script'
+
+ssh root@$ip bash < provision.sh
+
 heading 'creating user'
 
-cat <<setup_user
+ssh root@$ip bash <<setup_user
+# create a user add add the ssh key
 useradd --create-home --shell /bin/bash --groups sudo $username
 echo '$username:$password' | chpasswd
 # copy over ssh key config for the new user
 mkdir -p /home/$username/.ssh
-cp $HOME/.ssh/authorized_keys /home/$username/.ssh/
+cp \$HOME/.ssh/authorized_keys /home/$username/.ssh/
 chown --recursive $username:$username /home/$username/.ssh
-setup_user
 
-# ssh $user@$ip bash < provision.sh
+# disable password login + root login
+perl -i -pe 's/(PasswordAuthentication\s*)yes/\1no/' /etc/ssh/sshd_config
+perl -i -pe 's/(PermitRootLogin\s*)yes/\1no/' /etc/ssh/sshd_config
+service sshd restart
+service ssh restart
+setup_user
