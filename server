@@ -69,7 +69,7 @@ help_message
 
 if [[ ! -f .env ]]; then
     echo 'It looks like you do not have a server setup yet, please'
-    echo 'tun the setup script first.'
+    echo 'run the setup script first.'
     exit 1
 fi
 
