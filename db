@@ -1,8 +1,10 @@
 #!/bin/bash
 
 create_db() {
-    read -p 'Enter the name of the database (example_db): ' db_name
-    read -p 'Enter the name of the database user (example_user): ' db_user
+    db_name=$1
+    [[ -z $db_name ]] && read -p 'database name: ' db_name
+    db_user=$2
+    [[ -z $db_user ]] && read -p 'database user: ' db_user
     read -sp 'Choose a STRONG password for this database user: ' db_pass
     echo
     read -sp 'confirm password: ' confirm_pass
@@ -18,18 +20,63 @@ create_db() {
 creating database:
     database: $db_name
     user:     $db_user
-Enter your *database* password to continue, or
-press Ctrl-C to exit
+When prompted, enter your *database* password to continue
 message
 
     ssh -t $user@$ip "mysql -p <<sql
     CREATE DATABASE $db_name;
     CREATE USER '$db_user'@'localhost' IDENTIFIED BY '$db_pass';
     GRANT ALL ON ${db_name}.* TO '$db_user'@'localhost';
-    FLUSH PRIVELEGES;
-    sql"
+    FLUSH PRIVILEGES;
+sql"
 
-    echo 'Database Created!'
+    [[ $? -eq 0 ]] && echo 'Database Created!'
+}
+
+backup_db() {
+    database=$1
+    outputfile=$2
+    if [[ -z $database ]]; then
+        read -p 'database name: ' database
+    fi
+    if [[ -z $outputfile ]]; then
+        outputfile="$(date +%Y-%m-%d)-${database}-backup.sql"
+    fi
+
+    read -sp 'Password: ' db_pass
+    echo -e "\nbacking up...."
+    ssh -t $user@$ip "mysqldump -p${db_pass} ${database} 2>/dev/null" > $outputfile
+    echo
+    echo "$outputfile created!"
+}
+
+run_migration() {
+    database=$1
+    migration_file=$2
+    if [[ -z $database ]]; then
+        read -p 'database name: ' database
+    fi
+    if [[ -z $migration_file ]]; then
+        read -p 'migration file: ' migration_file
+    fi
+
+    # ensure file exists and is a sql file (or at least has the extension)
+    if [[ ! -f $migration_file ]]; then
+        echo 'It looks like that file does not exist!'
+        exit 1
+    fi
+    grep '\.sql$' >/dev/null <<< $migration_file
+    if [[ $? -ne 0 ]]; then
+        echo 'must be a valid .sql file'
+        exit 1
+    fi
+
+    # make sure the nowdoc identifier doesnt clash with anything in the
+    # migration
+    ssh -t $user@$ip "mysql -p $database <<'xxxxxxxxxx_sql_migration_xxxxxxxxx'
+    $(cat $migration_file)
+xxxxxxxxxx_sql_migration_xxxxxxxxx"
+
 }
 
 remove_db() {
@@ -52,8 +99,10 @@ db -- command for interacting with databases on your server
 commands
 
     login
-    create [dbname [dbuser]]
-    remove [dbname]
+    create  [dbname [dbuser]]
+    backup  [dbanem [outputfile]]
+    migrate [dbname [migration.sql]]
+    remove  [dbname]
 
 help_message
 }
@@ -69,11 +118,15 @@ source .env
 command=$1
 shift
 
-echo 'Enter your *database* admin password when prompted.'
-
 case $command in
     create)
         create_db $@
+        ;;
+    backup)
+        backup_db $@
+        ;;
+    migrate)
+        run_migration $@
         ;;
     remove)
         remove_db $@
