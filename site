@@ -4,7 +4,7 @@ list_sites() {
     ssh $user@$ip 'ls /etc/nginx/sites-available'
 }
 
-add_site() {
+create_site() {
     domain=$1
 
     if [[ -z $domain ]]; then
@@ -17,10 +17,12 @@ add_site() {
 
     # TODO: redir tee to /dev/null here once it's working
     ssh -t $user@$ip "
-    echo '$(sed -e "s/{{domain}}/${domain}/g" site.nginx.conf)' | sudo tee /etc/nginx/sites-available/${domain}
+    echo '$(sed -e "s/{{domain}}/${domain}/g" site.nginx.conf)' | sudo tee /etc/nginx/sites-available/${domain} >/dev/null
     sudo ln -s /etc/nginx/sites-available/${domain} /etc/nginx/sites-enabled/${domain}
     sudo systemctl restart nginx
     "
+
+    [[ $? -eq 0 ]] && echo "${domain} created!"
 }
 
 remove_site() {
@@ -56,18 +58,18 @@ deploy_site() {
     fi
 
     # ensure file exists and is a war (or at least has the extension)
-    if [[ ! -e $war_path ]]; then
+    if [[ ! -f $war_filepath ]]; then
         echo 'It looks like that file does not exist!'
         exit 1
     fi
-    grep '\.war$' >/dev/null <<< $war_path
+    grep '\.war$' >/dev/null <<< $war_filepath
     if [[ $? -ne 0 ]]; then
         echo 'must be a valid .war file'
         exit 1
     fi
 
     # ensure site exists
-    list_sites | grep $site >/dev/null 2>&1
+    list_sites | grep "^$site$" >/dev/null 2>&1
     if [[ $? -ne 0 ]]; then
         echo 'That site does not exist!'
         exit 1
@@ -85,7 +87,7 @@ site -- command for insteracting with different sites on your server
 commands
 
     list
-    add    [sitename]
+    create [sitename]
     remove [sitename]
     deploy [sitename] [/path/to/site.war]
 
@@ -104,14 +106,17 @@ command=$1
 shift
 
 case $command in
-    add)
-        add_site $@
+    create)
+        create_site $@
         ;;
     list)
         list_sites
         ;;
     remove)
         remove_site $@
+        ;;
+    deploy)
+        deploy_site $@
         ;;
     *)
         show_help
