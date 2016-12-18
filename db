@@ -1,40 +1,87 @@
 #!/bin/bash
 
-read -p 'Enter the name of the database (example_db): ' db_name
-read -p 'Enter the name of the database user (example_user): ' db_user
-read -sp 'Choose a STRONG password for this database user: ' db_pass
-echo
-read -sp 'confirm password: ' confirm_pass
-echo
-echo
+create_db() {
+    read -p 'Enter the name of the database (example_db): ' db_name
+    read -p 'Enter the name of the database user (example_user): ' db_user
+    read -sp 'Choose a STRONG password for this database user: ' db_pass
+    echo
+    read -sp 'confirm password: ' confirm_pass
+    echo
+    echo
 
-if [[ "$db_pass" != "$confirm_pass" ]]; then
-    echo 'ERROR: passwords do not match!'
+    if [[ "$db_pass" != "$confirm_pass" ]]; then
+        echo 'ERROR: passwords do not match!'
+        exit 1
+    fi
+
+    cat <<message
+creating database:
+    database: $db_name
+    user:     $db_user
+Enter your *database* password to continue, or
+press Ctrl-C to exit
+message
+
+    ssh -t $user@$ip "mysql -p <<sql
+    CREATE DATABASE $db_name;
+    CREATE USER '$db_user'@'localhost' IDENTIFIED BY '$db_pass';
+    GRANT ALL ON ${db_name}.* TO '$db_user'@'localhost';
+    FLUSH PRIVELEGES;
+    sql"
+
+    echo 'Database Created!'
+}
+
+remove_db() {
+    db_name=$1
+    if [[ -z $db_name ]]; then
+        read -p 'Enter the name of the database to remove: ' db_name
+    fi
+    ssh -t $user@$ip "mysql -p <<< 'DROP DATABASE ${db_name};'"
+    [[ $? -eq 0 ]] && echo 'Database Removed!'
+}
+
+login() {
+    ssh -t $user@$ip mysql -p
+}
+
+show_usage() {
+    cat <<help_message
+db -- command for interacting with databases on your server
+
+commands
+
+    login
+    create [dbname [dbuser]]
+    remove [dbname]
+
+help_message
+}
+
+if [[ ! -f .env ]]; then
+    echo 'It looks like you do not have a server setup yet, please'
+    echo 'run the setup script first.'
     exit 1
 fi
 
-cat <<message
-creating database:
+source .env
 
-    database: $db_name
-    user:     $db_user
+command=$1
+shift
 
-Enter your *database* password to continue, or
-press Ctrl-C to exit
+echo 'Enter your *database* admin password when prompted.'
 
-database password: 
-message
-
-read db_admin_pass
-
-. .env
-
-ssh -t $user@$ip mysql -u root -p"$db_admin_pass" <<<sql
-CREATE DATABASE $db_name;
-CREATE USER '$db_user'@'localhost' IDENTIFIED BY '$db_pass';
-GRANT ALL ON ${db_name}.* TO $db_user;
-FLUSH PRIVELEGES;
-sql
-
-echo 'Done!'
-
+case $command in
+    create)
+        create_db $@
+        ;;
+    remove)
+        remove_db $@
+        ;;
+    login)
+        login
+        ;;
+    *)
+        show_usage
+        ;;
+esac
