@@ -11,7 +11,6 @@ add_site() {
         read -p 'Enter the site name without the www: ' domain
     fi
 
-
     echo '--------------------------------------------------'
     echo " > setting up nginx for ${domain}"
     echo '--------------------------------------------------'
@@ -30,7 +29,7 @@ remove_site() {
         read -p 'Enter the name of the site to remove: ' site
     fi
     ssh -t $user@$ip "
-    ls /etc/sites-available | grep $site >/dev/null 2>&1
+    ls /etc/nginx/sites-available | grep '^$site$' >/dev/null 2>&1
     if [[ \$? -ne 0 ]]; then
         echo 'That site does not exist!'
         exit 1
@@ -41,7 +40,7 @@ remove_site() {
     sudo rm -rf /opt/tomcat/webapps/${site}
     "
 
-    echo 'site removed!'
+    [[ $? -eq 0 ]] && echo 'site removed!'
 }
 
 deploy_site() {
@@ -106,13 +105,13 @@ shift
 
 case $command in
     add)
-        echo add_site
+        add_site $@
         ;;
     list)
         list_sites
         ;;
     remove)
-        echo remove_site
+        remove_site $@
         ;;
     *)
         show_help
