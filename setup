@@ -14,9 +14,9 @@ fi
 
 # get relevant info
 read -p 'Enter the servers ip address: ' ip
-read -p "Enter a username (default $USER): " username
-if [[ -z "$username" ]]; then
-    username=$USER
+read -p "Enter a username (default $USER): " user
+if [[ -z "$user" ]]; then
+    user=$USER
 fi
 
 # set the admin password
@@ -53,7 +53,7 @@ fi
 # create the .env file
 cat > .env <<EOF
 ip=$ip
-user=$username
+user=$user
 EOF
 
 echo '".env" file created!'
@@ -66,18 +66,31 @@ read -p 'Press enter to continue and setup the server'
 
 heading 'running provision script'
 
-ssh root@$ip bash < provision.sh
+ssh root@$ip bash < provision.sh | tee provision.log
+
+heading 'securing mysql installation...'
+
+# secure the mysql install
+ssh root@$ip 'mysql -u root' <<sql
+CREATE USER $user@localhost IDENTIFIED BY '$db_password';
+GRANT ALL ON *.* TO $user@localhost WITH GRANT OPTION;
+SET PASSWORD FOR 'root'@'localhost' = PASSWORD('$db_password');
+DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+DELETE FROM mysql.user WHERE User='';
+DELETE FROM mysql.db WHERE Db='test' OR Db='test\_%';
+FLUSH PRIVILEGES;
+sql
 
 heading 'creating user'
 
 ssh root@$ip bash <<setup_user
 # create a user add add the ssh key
-useradd --create-home --shell /bin/bash --groups sudo $username
-echo '$username:$password' | chpasswd
+useradd --create-home --shell /bin/bash --groups sudo,tomcat $user
+echo '$user:$password' | chpasswd
 # copy over ssh key config for the new user
-mkdir -p /home/$username/.ssh
-cp \$HOME/.ssh/authorized_keys /home/$username/.ssh/
-chown --recursive $username:$username /home/$username/.ssh
+mkdir -p /home/$user/.ssh
+cp \$HOME/.ssh/authorized_keys /home/$user/.ssh/
+chown --recursive $user:$user /home/$user/.ssh
 
 # disable password login + root login
 perl -i -pe 's/(PasswordAuthentication\s*)yes/\1no/' /etc/ssh/sshd_config
