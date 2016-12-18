@@ -9,7 +9,10 @@ heading 'updating + upgrading apt'
 apt-get update
 yes | apt-get upgrade
 
-heading 'installing nginx, java'
+heading 'installing packages'
+
+# otherwise mysql will try to prompt us for info
+export DEBIAN_FRONTEND=noninteractive
 
 apt-get install -y\
     nginx\
@@ -17,9 +20,7 @@ apt-get install -y\
     ufw\
     mysql-server
 
-# https://serversforhackers.com/video/installing-mysql-with-debconf
-
-heading "Installing tomcat."
+heading "Installing tomcat..."
 
 # download the tar from apache and extract it to /opt/tomcat
 mkdir -p /opt/tomcat
@@ -32,15 +33,17 @@ rm apache-tomcat-8.5.9.tar.gz
 groupadd tomcat
 useradd -g tomcat -s /bin/false -d /opt/tomcat tomcat
 
-# set permissions for the tomcat install
+# configure the tomcat install
 chown -R tomcat /opt/tomcat
-chmod a+w /opt/tomcat/webapps
+chown -R tomcat:tomcat /opt/tomcat/webapps
+rm -rf /opt/tomcat/webapps/*
+rm -rf /opt/tomcat/server/webapps/*
+rm -f /opt/tomcat/conf/Catalina/localhost/host-manager.xml
+rm -f /opt/tomcat/conf/Catalina/localhost/manager.xml
+chmod -R g+w /opt/tomcat/webapps/
 
-## Here we should create the tomcat service and start it
-nohup /opt/tomcat/bin/startup.sh &
-
-## find the java installation path
-java_home=$(update-java-alternatives | awk '{print $3}')/jre
+# find the java installation path
+java_home=$(update-java-alternatives -l | awk '{print $3}')/jre
 
 # create the tomcat service
 cat > /etc/systemd/system/tomcat.service <<tomcat.service 
@@ -55,7 +58,6 @@ Environment=JAVA_HOME=${java_home}
 Environment=CATALINA_PID=/opt/tomcat/temp/tomcat.pid
 Environment=CATALINA_HOME=/opt/tomcat
 Environment=CATALINA_BASE=/opt/tomcat
-Environment='CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC'
 Environment='JAVA_OPTS=-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom'
 
 ExecStart=/opt/tomcat/bin/startup.sh
@@ -76,3 +78,14 @@ systemctl daemon-reload
 # start tomcat now, and have it start automatically on boot
 systemctl enable tomcat
 systemctl start tomcat
+
+heading 'configuring firewall...'
+# firewall setup
+ufw default deny incoming
+ufw default allow outgoing
+ufw logging on
+ufw allow ssh
+ufw allow http
+ufw allow https
+echo y|ufw enable
+
