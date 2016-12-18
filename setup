@@ -1,5 +1,11 @@
 #!/bin/bash
 
+heading(){
+    echo '----------------------------------'
+    echo "> $@"
+    echo '----------------------------------'
+}
+
 if [[ -e ./.env ]]; then
     echo 'It looks like things are already setup, aborting...'
     echo 'To redo the setup process, delete the ".env" file'
@@ -12,23 +18,50 @@ read -p "Enter a username (default $USER): " username
 if [[ -z "$username" ]]; then
     username=$USER
 fi
+
+# set the admin password
+echo
+echo 'We are going to ask you for a password, this will be the password for'
+echo 'administrative access on your server. Make sure this is a strong password!'
+echo 'Make sure to remember this password.'
+echo
 read -sp 'Enter a password: ' password
 echo
 read -sp 'Confirm password: ' confirm_password
 echo
-
 if [[ "$password" != "$confirm_password" ]]; then
     echo 'passwords do not match!'
     exit 1
 fi
 
+# set database password
+echo
+echo 'We are going to ask for another password. This will be the password for'
+echo 'administrative access to your database. Be sure to remember this one as'
+echo 'well, and to choose a *strong* password.'
+echo
+read -sp 'Enter a password: ' db_password
+echo
+read -sp 'Confirm password: ' confirm_db_password
+echo
+echo
+if [[ "$db_password" != "$confirm_db_password" ]]; then
+    echo 'passwords do not match!'
+    exit 1
+fi
+
+# create the .env file
 cat > .env <<EOF
 ip=$ip
 user=$username
 EOF
 
 echo '".env" file created!'
-
+echo
+echo 'Since this will be the first time we will have connected to your server,'
+echo 'you will be prompted whether or not you trust the server. Type yes when'
+echo 'prompted.'
+echo
 read -p 'Press enter to continue and setup the server'
 
 heading 'running provision script'
@@ -52,3 +85,5 @@ perl -i -pe 's/(PermitRootLogin\s*)yes/\1no/' /etc/ssh/sshd_config
 service sshd restart
 service ssh restart
 setup_user
+
+heading 'all done!'
