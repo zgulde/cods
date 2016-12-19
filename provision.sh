@@ -79,6 +79,11 @@ systemctl daemon-reload
 systemctl enable tomcat
 systemctl start tomcat
 
+# remove the default nginx config
+rm /etc/nginx/sites-available/default
+rm /etc/nginx/sites-enabled/default
+systemctl restart nginx
+
 heading 'configuring firewall...'
 # firewall setup
 ufw default deny incoming
