@@ -12,8 +12,19 @@ if [[ -e ./.env ]]; then
     exit 1
 fi
 
-# get relevant info
 read -p 'Enter the servers ip address: ' ip
+echo
+echo 'Since this will be the first time we will have connected to your server,'
+echo 'you will be prompted whether or not you trust the server. Type yes when'
+echo 'prompted.'
+echo
+# make sure we can access that server
+ssh root@$ip ls > /dev/null
+if [[ $? -ne 0 ]]; then
+    echo "Cannot login to $ip!"
+    exit 1
+fi
+
 read -p "Enter a username (default $USER): " user
 if [[ -z "$user" ]]; then
     user=$USER
@@ -23,7 +34,6 @@ echo 'We will need an email address for obtaining a ssl certificate, while this'
 echo 'is optional, it is recommended so that you can be contacted if anything'
 echo 'goes wrong with your site.'
 read -p 'email: ' email
-echo
 echo
 
 # set the admin password
@@ -65,10 +75,6 @@ email=$email
 EOF
 
 echo '".env" file created!'
-echo
-echo 'Since this will be the first time we will have connected to your server,'
-echo 'you will be prompted whether or not you trust the server. Type yes when'
-echo 'prompted.'
 echo
 read -p 'Press enter to continue and setup the server'
 
