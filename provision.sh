@@ -18,7 +18,9 @@ apt-get install -y\
     nginx\
     default-jdk\
     ufw\
-    mysql-server
+    mysql-server\
+    unattended-upgrades\
+    letsencrypt
 
 heading "Installing tomcat..."
 
@@ -79,6 +81,8 @@ systemctl daemon-reload
 systemctl enable tomcat
 systemctl start tomcat
 
+heading 'remove default nginx config...'
+
 # remove the default nginx config
 rm /etc/nginx/sites-available/default
 rm /etc/nginx/sites-enabled/default
@@ -93,4 +97,3 @@ ufw allow ssh
 ufw allow http
 ufw allow https
 echo y|ufw enable
-
