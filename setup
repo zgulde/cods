@@ -19,6 +19,13 @@ if [[ -z "$user" ]]; then
     user=$USER
 fi
 
+echo 'We will need an email address for obtaining a ssl certificate, while this'
+echo 'is optional, it is recommended so that you can be contacted if anything'
+echo 'goes wrong with your site.'
+read -p 'email: ' email
+echo
+echo
+
 # set the admin password
 echo
 echo 'We are going to ask you for a password, this will be the password for'
@@ -54,6 +61,7 @@ fi
 cat > .env <<EOF
 ip=$ip
 user=$user
+email=$email
 EOF
 
 echo '".env" file created!'
