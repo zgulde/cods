@@ -1,5 +1,13 @@
 #!/bin/bash
 
+list_databases() {
+    ssh -t $user@$ip "mysql -p -e 'show databases'"
+}
+
+list_users() {
+    ssh -t $user@$ip "mysql -p -e 'select user from mysql.user'"
+}
+
 create_db() {
     db_name=$1
     [[ -z $db_name ]] && read -p 'database name: ' db_name
@@ -81,10 +89,17 @@ xxxxxxxxxx_sql_migration_xxxxxxxxx"
 
 remove_db() {
     db_name=$1
+    db_user=$2
     if [[ -z $db_name ]]; then
         read -p 'Enter the name of the database to remove: ' db_name
     fi
-    ssh -t $user@$ip "mysql -p <<< 'DROP DATABASE ${db_name};'"
+    if [[ -z $db_user ]]; then
+        read -p 'Enter the name of the user to remove: ' db_user
+    fi
+
+    ssh -t $user@$ip "mysql -p -e 'DROP DATABASE ${db_name}'
+                      mysql -p -e 'DROP USER ${db_user}@localhost'"
+
     [[ $? -eq 0 ]] && echo 'Database Removed!'
 }
 
@@ -99,10 +114,11 @@ db -- command for interacting with databases on your server
 commands
 
     login
+    list
     create  [dbname [dbuser]]
-    backup  [dbanem [outputfile]]
+    backup  [dbname [outputfile]]
     migrate [dbname [migration.sql]]
-    remove  [dbname]
+    remove  [dbname [dbuser]]
 
 help_message
 }
@@ -130,6 +146,9 @@ case $command in
         ;;
     remove)
         remove_db $@
+        ;;
+    list|ls)
+        list_databases
         ;;
     login)
         login
