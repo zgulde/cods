@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# check for the utilities we'll need
+prereqs=(dig ssh scp)
+for tool in ${prereqs[@]}; do
+    which $tool >/dev/null
+    if [[ $? -ne 0 ]]; then
+        echo "Please install '$tool' before continuing."
+        exit 1
+    fi
+done
+
 heading(){
     echo '----------------------------------'
     echo "> $@"
