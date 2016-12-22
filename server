@@ -10,6 +10,15 @@ login() {
     ssh $user@$ip
 }
 
+# letsencrypt asks us to choose a random minute of the hour to run the renewal
+# job
+auto_renew_certs() {
+    ssh -t $user@$ip '
+    sudo crontab <<< "$(sudo crontab -l)
+    @daily sleep $((${RANDOM} % 60))m; /usr/bin/letsencrypt renew"
+    '
+}
+
 upload_file() {
     file=$1
     destination=$2
