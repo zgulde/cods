@@ -15,23 +15,35 @@ create_site() {
     if [[ "$(dig +short ${domain})" != $ip ]]; then
         echo 'It looks like the dns records for that domain are not setup to'
         echo 'point to your server.'
-        exit 1
+        read -p 'Continue anyway? (y/n) ' confirm
+        grep -i '^y' <<< $confirm || exit 1
     fi
 
-    echo '--------------------------------------------------'
-    echo " > setting up nginx for ${domain}"
-    echo '--------------------------------------------------'
+    echo "Setting up ${domain}..."
 
     ssh -t $user@$ip "
     echo '$(sed -e s/{{domain}}/${domain}/g -e s/{{user}}/${user}/g site.nginx.conf)' |\
         sudo tee /etc/nginx/sites-available/${domain} >/dev/null
     sudo ln -s /etc/nginx/sites-available/${domain} /etc/nginx/sites-enabled/${domain}
     sudo systemctl restart nginx
+    "
+    [[ $? -eq 0 ]] && echo "${domain} created!"
+}
 
-    echo 'nginx configured and restarted!'
+enable_ssl() {
+    domain=$1
+    if [[ -z $domain ]]; then
+        read -p 'Enter the domain: ' domain
+    fi
 
-    echo 'obtaining ssl certificate...'
+    # verify dns records
+    if [[ "$(dig +short ${domain})" != $ip ]]; then
+        echo 'It looks like the dns records for that domain are not setup to'
+        echo 'point to your server. This is necessary for https. Aborting...'
+        exit 1
+    fi
 
+    ssh -t $user@$ip "
     mkdir -p \$HOME/${domain}
     sudo letsencrypt certonly\
         --authenticator webroot\
@@ -39,14 +51,15 @@ create_site() {
         --domain ${domain}\
         --agree-tos\
         --email $email\
-        --renew-by-default
+        --renew-by-default >> \$HOME/letsencrypt.log
 
     echo '$(sed -e s/{{domain}}/${domain}/g -e s/{{user}}/${user}/g ssl-site.nginx.conf)' |\
         sudo tee /etc/nginx/sites-available/${domain} >/dev/null
     sudo systemctl restart nginx
     "
+    
+    [[ $? -eq 0 ]] && echo "https enabled for ${domain}!"
 
-    [[ $? -eq 0 ]] && echo "${domain} created!"
 }
 
 remove_site() {
@@ -111,9 +124,10 @@ site -- command for insteracting with different sites on your server
 commands
 
     list
-    create [sitename]
-    remove [sitename]
-    deploy [sitename] [/path/to/site.war]
+    create    [sitename]
+    remove    [sitename]
+    enablessl [sitename]
+    deploy    [sitename] [/path/to/site.war]
 
 help
 }
@@ -141,6 +155,9 @@ case $command in
         ;;
     deploy)
         deploy_site $@
+        ;;
+    enablessl)
+        enable_ssl $@
         ;;
     *)
         show_help
