@@ -1,11 +1,5 @@
 #!/bin/bash
 
-heading() {
-    echo '----------------------------------'
-    echo "> $@"
-    echo '----------------------------------'
-}
-
 login() {
     ssh $user@$ip
 }
@@ -14,8 +8,13 @@ login() {
 # job
 auto_renew_certs() {
     ssh -t $user@$ip '
+    grep "/usr/bin/letsencrypt renew"<<< "$(sudo crontab -l)" >/dev/null
+    if [[ $? -eq 0 ]]; then
+        echo "Already setup to auto renew certs!"
+        exit
+    fi
     sudo crontab <<< "$(sudo crontab -l)
-    @daily sleep $((${RANDOM} % 60))m; /usr/bin/letsencrypt renew"
+@daily sleep \$((\${RANDOM} % 60))m; /usr/bin/letsencrypt renew"
     '
 }
 
