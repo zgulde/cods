@@ -65,7 +65,7 @@ run_migration() {
         read -p 'database name: ' database
     fi
     if [[ -z $migration_file ]]; then
-        read -p 'migration file: ' migration_file
+        read -ep 'migration file: ' migration_file
     fi
 
     # ensure file exists and is a sql file (or at least has the extension)

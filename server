@@ -24,7 +24,7 @@ upload_file() {
     destination=$2
 
     if [[ -z $file ]]; then
-        read -p 'File to upload: ' file
+        read -ep 'File to upload: ' file
     fi
 
     if [[ ! -e $file ]]; then

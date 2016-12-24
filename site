@@ -91,7 +91,7 @@ deploy_site() {
     fi
 
     if [[ -z "$war_filepath"  ]]; then
-        read -p 'Enter the path to the war file: ' war_filepath
+        read -ep 'Enter the path to the war file: ' war_filepath
     fi
 
     # ensure file exists and is a war (or at least has the extension)
