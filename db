@@ -136,24 +136,17 @@ shift
 
 case $command in
     create)
-        create_db $@
-        ;;
+        create_db $@;;
     backup)
-        backup_db $@
-        ;;
+        backup_db $@;;
     migrate)
-        run_migration $@
-        ;;
+        run_migration $@;;
     remove)
-        remove_db $@
-        ;;
+        remove_db $@;;
     list|ls)
-        list_databases
-        ;;
+        list_databases;;
     login)
-        login
-        ;;
+        login;;
     *)
-        show_usage
-        ;;
+        show_usage;;
 esac

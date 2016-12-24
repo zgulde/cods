@@ -62,19 +62,20 @@ info
 
 show_usage() {
     cat <<help_message
-server -- command for server maintanace
+server -- command for server management
 
 commands
 
     login
     upload  [file [destination]]
-    info
     restart [servicename]
+    info
+    ping
+    autorenew
     reboot
 
 help_message
 }
-
 
 if [[ ! -f .env ]]; then
     echo 'It looks like you do not have a server setup yet, please'
@@ -89,21 +90,20 @@ shift
 
 case $command in
     login)
-        login
-        ;;
+        login;;
     upload)
-        upload_file $@
-        ;;
+        upload_file $@;;
     restart)
-        restart_service $@
-        ;;
+        restart_service $@;;
     reboot)
-        reboot_server
-        ;;
+        reboot_server;;
     info)
-        show_info
-        ;;
+        show_info;;
+    autorenew)
+        auto_renew_certs;;
+    ping)
+        echo 'Press Ctrl-C to exit.'
+        ping -c5 $ip;;
     *)
-        show_usage
-        ;;
+        show_usage;;
 esac

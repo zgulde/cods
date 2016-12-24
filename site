@@ -145,21 +145,15 @@ shift
 
 case $command in
     create)
-        create_site $@
-        ;;
+        create_site $@;;
     list|ls)
-        list_sites
-        ;;
+        list_sites;;
     remove)
-        remove_site $@
-        ;;
+        remove_site $@;;
     deploy)
-        deploy_site $@
-        ;;
+        deploy_site $@;;
     enablessl)
-        enable_ssl $@
-        ;;
+        enable_ssl $@;;
     *)
-        show_help
-        ;;
+        show_help;;
 esac
