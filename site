@@ -57,7 +57,7 @@ enable_ssl() {
         sudo tee /etc/nginx/sites-available/${domain} >/dev/null
     sudo systemctl restart nginx
     "
-    
+
     [[ $? -eq 0 ]] && echo "https enabled for ${domain}!"
 
 }
