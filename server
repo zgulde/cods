@@ -1,9 +1,5 @@
 #!/bin/bash
 
-login() {
-    ssh $user@$ip
-}
-
 # letsencrypt asks us to choose a random minute of the hour to run the renewal
 # job
 auto_renew_certs() {
@@ -43,8 +39,48 @@ restart_service() {
     [[ $? -eq 0 ]] && echo "$service_name restarted!"
 }
 
-reboot_server() {
-    ssh -i $user@$ip 'sudo reboot'
+add_user() {
+    user=$1
+    sshkeyfile=$2
+    if [[ -z $user ]]; then
+        read -p 'new username: ' user
+    fi
+    if [[ -z $sshkeyfile ]]; then
+        read -ep 'ssh key file path: ' sshkeyfile
+    fi
+    if [[ ! -f $sshkeyfile ]]; then
+        echo 'Please enter a valid ssh key file.'
+        exit 1
+    fi
+
+    read -sp 'password for the new user: ' password
+    echo
+    read -sp 'confirm password: ' password
+    echo
+
+    echo "Creating user ${user}..."
+
+    ssh -t $user@$ip "
+    sudo useradd --create-home --shell /bin/bash --groups sudo,tomcat $user
+    echo '$user:$password' | sudo chpasswd
+    cat '$(cat $sshkeyfile)' | sudo tee /home/$user/.ssh/authorized_keys >/dev/null
+    sudo chown --recursive $user:$user /home/$user
+    "
+    [[ $? -eq 0 ]] && echo "User ${user} created!"
+}
+
+add_sshkey() {
+    sshkeyfile=$1
+    if [[ -z $sshkeyfile ]]; then
+        read -ep 'Path to the key file: ' sshkeyfile
+    fi
+    if [[ ! -f $sshkeyfile ]]; then
+        echo 'Please enter a valid ssh key file path.'
+        exit 1
+    fi
+
+    cat $sshkey | ssh $user@$ip 'cat >> .ssh/authorized_keys'
+    [[ $? -eq 0 ]] && echo 'ssh key added!'
 }
 
 show_info() {
@@ -69,6 +105,8 @@ commands
     login
     upload  [file [destination]]
     restart [servicename]
+    addkey  [sshkeyfile]
+    adduser [username [sshkeyfile]]
     info
     ping
     autorenew
@@ -90,15 +128,19 @@ shift
 
 case $command in
     login)
-        login;;
+        ssh $user@$ip;;
     upload)
         upload_file $@;;
     restart)
         restart_service $@;;
     reboot)
-        reboot_server;;
+        ssh -t $user@$ip 'sudo reboot';;
     info)
         show_info;;
+    adduser)
+        add_user $@;;
+    addkey)
+        add_sshkey $@;;
     autorenew)
         auto_renew_certs;;
     ping)
