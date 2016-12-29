@@ -40,10 +40,10 @@ restart_service() {
 }
 
 add_user() {
-    user=$1
+    new_user=$1
     sshkeyfile=$2
-    if [[ -z $user ]]; then
-        read -p 'new username: ' user
+    if [[ -z $new_user ]]; then
+        read -p 'new username: ' new_user
     fi
     if [[ -z $sshkeyfile ]]; then
         read -ep 'ssh key file path: ' sshkeyfile
@@ -58,15 +58,16 @@ add_user() {
     read -sp 'confirm password: ' password
     echo
 
-    echo "Creating user ${user}..."
+    echo "Creating user ${new_user}..."
 
     ssh -t $user@$ip "
-    sudo useradd --create-home --shell /bin/bash --groups sudo,tomcat $user
-    echo '$user:$password' | sudo chpasswd
-    cat '$(cat $sshkeyfile)' | sudo tee /home/$user/.ssh/authorized_keys >/dev/null
-    sudo chown --recursive $user:$user /home/$user
+    sudo useradd --create-home --shell /bin/bash --groups sudo,tomcat $new_user
+    echo '$new_user:$password' | sudo chpasswd
+    sudo mkdir -p /home/$new_user/.ssh
+    cat <<< '$(cat $sshkeyfile)' | sudo tee /home/$new_user/.ssh/authorized_keys >/dev/null
+    sudo chown --recursive $new_user:$new_user /home/$new_user
     "
-    [[ $? -eq 0 ]] && echo "User ${user} created!"
+    [[ $? -eq 0 ]] && echo "User ${new_user} created!"
 }
 
 add_sshkey() {
