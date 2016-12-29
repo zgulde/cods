@@ -39,7 +39,7 @@ Deploy a blog application and create a database for it:
 ```bash
 # 1. clone this repo
 git clone https://github.com/zgulde/tomcat-setup.git ~/my-awesome-server
-cd ~/my-server
+cd ~/my-awesome-server
 
 # 2. provision the server
 ./setup
@@ -83,6 +83,9 @@ have the following directory structure
     `---my-awesome-sideproject/
     `---capstone-project/
 ```
+
+Once you have cloned this repo, you will need to setup and provision the server.
+Have the ip address of your server handy, and then run the `setup` script.
 
 This setup will allow you to host multiple different domains on each server. For
 each site you wish to host, you will need to:
