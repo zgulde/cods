@@ -28,7 +28,7 @@ create_db() {
 creating database:
     database: $db_name
     user:     $db_user
-When prompted, enter your *database* password to continue
+When prompted, enter your *database administrator* password to continue
 message
 
     ssh -t $user@$ip "mysql -p <<sql
@@ -84,7 +84,7 @@ run_migration() {
     ssh -t $user@$ip "mysql -p $database <<'xxxxxxxxxx_sql_migration_xxxxxxxxx'
     $(cat $migration_file)
 xxxxxxxxxx_sql_migration_xxxxxxxxx"
-
+    [[ $? -eq 0 ]] && echo 'Finished running migration.'
 }
 
 remove_db() {
