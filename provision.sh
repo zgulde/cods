@@ -81,11 +81,18 @@ systemctl daemon-reload
 systemctl enable tomcat
 systemctl start tomcat
 
-heading 'remove default nginx config...'
+heading 'configuring nginx...'
 
 # remove the default nginx config
 rm /etc/nginx/sites-available/default
-rm /etc/nginx/sites-enabled/default
+cat > /etc/nginx/sites-available/default <<nginx_conf
+# return an empty response, don't redirect to an existing server
+server {
+    listen 80 default_server;
+    return 444;
+}
+nginx_conf
+mkdir /var/www
 systemctl restart nginx
 
 heading 'configuring firewall...'
