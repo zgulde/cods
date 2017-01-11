@@ -44,11 +44,45 @@ rm -f /opt/tomcat/conf/Catalina/localhost/host-manager.xml
 rm -f /opt/tomcat/conf/Catalina/localhost/manager.xml
 chmod -R g+w /opt/tomcat/webapps/
 
+# replace default server config
+cat > /opt/tomcat/conf/server.xml <<'server.xml'
+<?xml version="1.0" encoding="UTF-8"?>
+<Server port="8005" shutdown="SHUTDOWN">
+  <Listener className="org.apache.catalina.startup.VersionLoggerListener" />
+  <Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />
+  <Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener" />
+  <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener" />
+  <Listener className="org.apache.catalina.core.ThreadLocalLeakPreventionListener" />
+  <GlobalNamingResources>
+    <Resource name="UserDatabase" auth="Container"
+              type="org.apache.catalina.UserDatabase"
+              description="User database that can be updated and saved"
+              factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
+              pathname="conf/tomcat-users.xml" />
+  </GlobalNamingResources>
+  <Service name="Catalina">
+    <Connector port="8009" protocol="AJP/1.3" redirectPort="8443" />
+    <Connector port="8080"
+        proxyPort="80"
+        protocol="HTTP/1.1"
+        connectionTimeout="20000"
+        redirectPort="8443" />
+    <Engine name="Catalina" defaultHost="localhost">
+      <Realm className="org.apache.catalina.realm.LockOutRealm">
+        <Realm className="org.apache.catalina.realm.UserDatabaseRealm"
+               resourceName="UserDatabase"/>
+      </Realm>
+      <!--## Virtual Hosts ##-->
+      <Host name="localhost" appBase="webapps" deployOnStartup="false" />
+    </Engine>
+  </Service>
+</Server>
+server.xml
+
 # find the java installation path
 java_home=$(update-java-alternatives -l | awk '{print $3}')/jre
-
 # create the tomcat service
-cat > /etc/systemd/system/tomcat.service <<tomcat.service 
+cat > /etc/systemd/system/tomcat.service <<tomcat.service
 [Unit]
 Description=Apache Tomcat Web Application Container
 After=network.target
@@ -92,7 +126,8 @@ server {
     return 444;
 }
 nginx_conf
-mkdir /var/www
+mkdir -p /var/www
+rm -rf /var/www/*
 systemctl restart nginx
 
 heading 'configuring firewall...'
