@@ -144,6 +144,8 @@ case $command in
         add_sshkey $@;;
     autorenew)
         auto_renew_certs;;
+    tomcatlog) # tomcat log
+        ssh -t $user@$ip 'sudo cat /opt/tomcat/logs/catalina.out';;
     ping)
         echo 'Press Ctrl-C to exit.'
         ping -c5 $ip;;
