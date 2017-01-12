@@ -26,9 +26,11 @@ create_site() {
     # tomcat config
     echo 'Configuring tomcat...'
     sudo perl -i -pe 's!^.*--## Virtual Hosts ##--.*\$!$&\n\
-    <Host name=\"${domain}\" appBase=\"webapps\" unpackWARs=\"true\" autoDeploy=\"true\" />!' \
+    <Host name=\"${domain}\" appBase=\"${domain}\" unpackWARs=\"true\" autoDeploy=\"true\" />!' \
         /opt/tomcat/conf/server.xml
-    sudo mkdir -p /opt/tomcat/conf/Catalina/${domain}
+    sudo mkdir -p /opt/tomcat/${domain}
+    sudo chown -R tomcat:tomcat /opt/tomcat/${domain}
+    sudo chmod -R g+w /opt/tomcat/${domain}
     echo 'Restarting tomcat...'
     sudo systemctl restart tomcat
 
@@ -94,8 +96,7 @@ remove_site() {
 
     sudo rm -f /etc/nginx/sites-available/${site}
     sudo rm -f /etc/nginx/sites-enabled/${site}
-    sudo rm -f /opt/tomcat/webapps/${site}.war
-    sudo rm -rf /opt/tomcat/webapps/${site}
+    sudo rm -rf /opt/tomcat/${site}
     sudo rm -rf /opt/tomcat/conf/Catalina/${site}
     sudo rm -rf /var/www/${site}
     "
@@ -133,7 +134,7 @@ deploy_site() {
         exit 1
     fi
 
-    scp $war_filepath $user@$ip:/opt/tomcat/webapps/$site.war
+    scp $war_filepath $user@$ip:/opt/tomcat/$site/ROOT.war
 
 }
 
