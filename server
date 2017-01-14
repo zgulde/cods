@@ -4,13 +4,20 @@
 # job
 auto_renew_certs() {
     ssh -t $user@$ip '
-    grep "/usr/bin/letsencrypt renew"<<< "$(sudo crontab -l)" >/dev/null
-    if [[ $? -eq 0 ]]; then
-        echo "Already setup to auto renew certs!"
-        exit
-    fi
-    sudo crontab <<< "$(sudo crontab -l)
+    sudo crontab -l >/dev/null 2>&1
+    if [[ $? -ne 0 ]]; then
+        # no crontab yet, we will create it
+        sudo crontab <<< "@daily sleep \$((\${RANDOM} % 60))m; /usr/bin/letsencrypt renew"
+    else 
+        # check if autorenew is set up, if not, append to the current crontab
+        grep "/usr/bin/letsencrypt renew"<<< "$(sudo crontab -l)" >/dev/null
+        if [[ $? -eq 0 ]]; then
+            echo "Already setup to auto renew certs!"
+            exit 1
+        fi
+        sudo crontab <<< "$(sudo crontab -l)
 @daily sleep \$((\${RANDOM} % 60))m; /usr/bin/letsencrypt renew"
+    fi
     '
 }
 
