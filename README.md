@@ -155,6 +155,7 @@ administrator password for both your server and your database.
 - `autorenew`: setup letsencrypt certificates to automatically be renewed
 - `addkey`: add an authorized ssh key to the server for your account
 - `adduser`: add a user account to the server
+- `tomcatlog`: view the contents of the tomcat log file, `/opt/tomcat/logs/catalina.out`
 
 `./site`
 

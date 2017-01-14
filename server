@@ -119,6 +119,7 @@ commands
     ping
     autorenew
     reboot
+    tomcatlog
 
 help_message
 }
