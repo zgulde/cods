@@ -10,6 +10,7 @@ nginx, and mysql.
 * [HTTPS](#https)
 * [Commands](#commands)
 * [Sharing your server with teammates](#sharing-your-server-with-teammates)
+* [Uploads](#uploads)
 
 ## Who this is for
 
@@ -92,8 +93,17 @@ each site you wish to host, you will need to:
 
 1. Setup the DNS Records for that domain to point to your server
 1. Create the site
-1. Create a database and user for the application
+1. (Probably) Create a database and user for the application
 1. Deploy a `war` that contains the application
+
+### DNS Records + Site Creation
+
+```bash
+./site create example.com
+```
+
+This command will setup virtual hosts with both tomcat and nginx for the domain
+name you have provided.
 
 When creating a new site, the `site create` command will check to see if the DNS
 records for the given domain point to your server. You will be given a warning
@@ -110,6 +120,55 @@ Where `123.123.123.123` is the ip address of your server, and `test.com` is the
 domain name you wish to host. *Note that this will work on your computer, but no
 one else will be able to visit the site until the DNS records are properly
 configured.*
+
+### Create Database + User
+
+While theoretically you might not need to do this, most applications will need
+to talk to a database in some form or fashion.
+
+```bash
+./db create some_db some_user
+```
+
+This command will create a database and a user that has all permissions on that
+database (but not any others).
+
+You will be prompted for a password for the new database user.
+
+#### (Optionally) Run a migration
+
+Once your database is created, you can have the `db` command run a migration
+script if you so desire.
+
+You will need to provide the name of the database you wish to run the migraiton
+on, and the path to the `sql` file.
+
+```bash
+./db migrate some_db /path/to/the/migration.sql
+```
+
+### Deploy The `war`
+
+This will `scp` the file to the appropriate location on your server. Once you
+run this command, you should be able to see your site live!
+
+```bash
+./site deploy example.com /path/to/the/war/file.war
+```
+
+Of course, before you run this you will need to have packaged your application
+as a war. For example, if you are using maven:
+
+```bash
+# from the root directory
+mvn package
+```
+
+or with maven wrapper
+
+```bash
+./mvnw package
+```
 
 ## HTTPS
 
@@ -219,3 +278,9 @@ administrator password for both your server and your database.
     ip=123.123.123.123
     user=codeup
     ```
+
+## Uploads
+
+Nginx is set up to intercept any requests to `/uploads` and try to serve them
+out of the uploads directory for your site, which is located at
+`/var/www/example.com/uploads`.
