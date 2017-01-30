@@ -27,6 +27,10 @@ upload_file() {
 
     if [[ -z $file ]]; then
         read -ep 'File to upload: ' file
+        # parse the home directory correctly
+        if grep '^~' <<< "$file"; then
+            file=$(perl -pe "s!~!$HOME!" <<< $file)
+        fi
     fi
 
     if [[ ! -e $file ]]; then
@@ -54,6 +58,10 @@ add_user() {
     fi
     if [[ -z $sshkeyfile ]]; then
         read -ep 'ssh key file path: ' sshkeyfile
+        # parse the home directory correctly
+        if grep '^~' <<< "$sshkeyfile"; then
+            sshkeyfile=$(perl -pe "s!~!$HOME!" <<< $sshkeyfile)
+        fi
     fi
     if [[ ! -f $sshkeyfile ]]; then
         echo 'Please enter a valid ssh key file.'
@@ -81,6 +89,10 @@ add_sshkey() {
     sshkeyfile=$1
     if [[ -z $sshkeyfile ]]; then
         read -ep 'Path to the key file: ' sshkeyfile
+        # parse the home directory correctly
+        if grep '^~' <<< "$sshkeyfile"; then
+            sshkeyfile=$(perl -pe "s!~!$HOME!" <<< $sshkeyfile)
+        fi
     fi
     if [[ ! -f $sshkeyfile ]]; then
         echo 'Please enter a valid ssh key file path.'

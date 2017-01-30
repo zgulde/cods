@@ -66,6 +66,10 @@ run_migration() {
     fi
     if [[ -z $migration_file ]]; then
         read -ep 'migration file: ' migration_file
+        # parse the home directory correctly
+        if grep '^~' <<< "$migration_file"; then
+            migration_file=$(perl -pe "s!~!$HOME!" <<< $migration_file)
+        fi
     fi
 
     # ensure file exists and is a sql file (or at least has the extension)

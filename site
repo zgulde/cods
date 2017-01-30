@@ -114,6 +114,10 @@ deploy_site() {
 
     if [[ -z "$war_filepath"  ]]; then
         read -ep 'Enter the path to the war file: ' war_filepath
+        # parse the home directory correctly
+        if grep '^~' <<< "$war_filepath"; then
+            war_filepath=$(perl -pe "s!~!$HOME!" <<< $war_filepath)
+        fi
     fi
 
     # ensure file exists and is a war (or at least has the extension)
