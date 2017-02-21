@@ -40,6 +40,7 @@ if [[ -z "$user" ]]; then
     user=$USER
 fi
 
+echo
 echo 'We will need an email address for obtaining a ssl certificate, while this'
 echo 'is optional, it is recommended so that you can be contacted if anything'
 echo 'goes wrong with your site.'
