@@ -170,16 +170,10 @@ command=$1
 shift
 
 case $command in
-    create)
-        create_site $@;;
-    list|ls)
-        list_sites;;
-    remove)
-        remove_site $@;;
-    deploy)
-        deploy_site $@;;
-    enablessl)
-        enable_ssl $@;;
-    *)
-        show_help;;
+    create)    create_site $@;;
+    list|ls)   list_sites;;
+    remove|rm) remove_site $@;;
+    deploy)    deploy_site $@;;
+    enablessl) enable_ssl $@;;
+    *)         show_help;;
 esac

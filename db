@@ -139,18 +139,11 @@ command=$1
 shift
 
 case $command in
-    create)
-        create_db $@;;
-    backup)
-        backup_db $@;;
-    migrate)
-        run_migration $@;;
-    remove)
-        remove_db $@;;
-    list|ls)
-        list_databases;;
-    login)
-        login;;
-    *)
-        show_usage;;
+    create)    create_db $@;;
+    backup)    backup_db $@;;
+    migrate)   run_migration $@;;
+    remove|rm) remove_db $@;;
+    list|ls)   list_databases;;
+    login)     login;;
+    *)         show_usage;;
 esac

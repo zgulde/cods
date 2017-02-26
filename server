@@ -148,27 +148,15 @@ command=$1
 shift
 
 case $command in
-    login)
-        ssh $user@$ip;;
-    upload)
-        upload_file $@;;
-    restart)
-        restart_service $@;;
-    reboot)
-        ssh -t $user@$ip 'sudo reboot';;
-    info)
-        show_info;;
-    adduser)
-        add_user $@;;
-    addkey)
-        add_sshkey $@;;
-    autorenew)
-        auto_renew_certs;;
-    tomcatlog) # tomcat log
-        ssh -t $user@$ip 'sudo cat /opt/tomcat/logs/catalina.out';;
-    ping)
-        echo 'Press Ctrl-C to exit.'
-        ping -c5 $ip;;
-    *)
-        show_usage;;
+    login)     ssh $user@$ip;;
+    upload)    upload_file $@;;
+    restart)   restart_service $@;;
+    reboot)    ssh -t $user@$ip sudo reboot;;
+    info)      show_info;;
+    adduser)   add_user $@;;
+    addkey)    add_sshkey $@;;
+    autorenew) auto_renew_certs;;
+    tomcatlog) ssh -t $user@$ip 'sudo cat /opt/tomcat/logs/catalina.out';;
+    ping)      ping -c5 $ip;;
+    *)         show_usage;;
 esac
