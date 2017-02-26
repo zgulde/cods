@@ -6,9 +6,20 @@ complete guide to codeup students on deploying their spring boot applications.
 
 ## Build A War From your application
 
+This tool is setup to host any web application that is packaged as a `war`.
+Previously we have just been running the `main` method in our application, but
+Spring boot will also allow us to package our application as a `war`.
+
 1. Make sure your app runs locally!
 
+    Before making any changes or deploying your application, make sure
+    everything is working the way you expect it to locally.
+
 1. Tell our application to be bundled as a war
+
+    We will need to make some changes to our application to allow it to be
+    packaged as a `war`. These will be one-time operations, and we will still be
+    able to run our application through the `main` method, like before.
 
     - Change the `<packaging>` in the `pom.xml` from `jar` to `war`
 
@@ -32,12 +43,17 @@ complete guide to codeup students on deploying their spring boot applications.
 
 1. Change any values that need to be changed for production
 
+    Before we build the `war` file that will end up on our server, we will need
+    to change any values in our application that will be different if our
+    application is running in production. For example:
+
     - database credentials in the `application.properties` file
+    - file upload paths
 
 1. Build the war
 
     Unless you've built out testing for your application, we will need to tell
-    maven to skip running any tests.
+    maven to skip running any tests before building the `war`.
 
     Add the following to your `pom.xml`
 
@@ -57,13 +73,13 @@ complete guide to codeup students on deploying their spring boot applications.
     *Note: instead of modifying the `pom.xml`, you could also pass the
     `-DskipTests` flag to the maven package command.*
 
-Once the `war` is built, you'll need to change the values in the
+Once the `war` is built, you'll want to change the values in the
 `application.properties` back in order to continue local development.
 
 ## Server + Domain Name
 
-1. Buy a domain name (we recoment namecheap), and point the DNS nameservers to
-   digital ocean
+1. Buy a domain name (we recommend namecheap), and point the DNS nameservers for
+   that domain to digital ocean
 
     ```
     ns1.digitalocean.com
@@ -75,7 +91,8 @@ Once the `war` is built, you'll need to change the values in the
 
 1. Create a droplet on digitalocean.com
 
-    Choose the $10/month, 1GB RAM droplet
+    Choose the $10/month, 1GB RAM droplet. *Note: choosing a smaller size
+    droplet here can lead to out-of-memory crashes!*
 
     add your ssh key to the droplet
 
@@ -98,6 +115,8 @@ Once the `war` is built, you'll need to change the values in the
 
     Have the server's ip address ready, and be ready to choose 2 passwords, one
     for the server administrator, and one for the database administrator.
+
+    *Please choose alphanumeric only passwords.*
 
     ```
     cd ~/my-server
@@ -139,15 +158,11 @@ Once the `war` is built, you'll need to change the values in the
     ./site deploy example.com ~/IdeaProjects/myblog/target/blog-1.0-SNAPSHOT.war
     ```
 
-     ./server tomcatlog
+    After uploading the `war` file, you should be able to see your site live!
+    *Note that you may have to wait a minute after the `war` has finished
+    uploading for the application to startup.*
 
-    (optionally) enable ssl
-
-    Note that your DNS must be configured in order to do this
-
-     ./site enablessl example.com
-     # setup automatic renewal of certificates
-     ./server enableautorenew
+1. (optionally) enable ssl
 
 ## Troubleshooting Deployment Problems
 
