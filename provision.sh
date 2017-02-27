@@ -34,8 +34,8 @@ heading "Installing tomcat..."
 # download the tar from apache and extract it to /opt/tomcat
 mkdir -p /opt/tomcat
 cd /tmp
-wget http://mirrors.ocf.berkeley.edu/apache/tomcat/tomcat-8/v8.5.9/bin/apache-tomcat-8.5.9.tar.gz
-tar xzvf apache-tomcat-8.5.9.tar.gz --strip-components=1 -C /opt/tomcat
+wget http://mirrors.sonic.net/apache/tomcat/tomcat-8/v8.5.11/bin/apache-tomcat-8.5.11.tar.gz
+tar xzvf apache-tomcat-8.5.11.tar.gz --strip-components=1 -C /opt/tomcat
 rm apache-tomcat-8.5.9.tar.gz
 
 # create a tomcat user
