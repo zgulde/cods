@@ -15,6 +15,15 @@ Spring boot will also allow us to package our application as a `war`.
     Before making any changes or deploying your application, make sure
     everything is working the way you expect it to locally.
 
+    From the root of your project, run the following command:
+
+    ```
+    ./mvnw spring-boot:run
+    ```
+
+    This will start your application up from the command line, and more closely
+    mimicks the environment your application will be running in in production.
+
 1. Tell our application to be bundled as a war
 
     We will need to make some changes to our application to allow it to be
