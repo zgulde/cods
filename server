@@ -119,19 +119,28 @@ info
 show_usage() {
     cat <<help_message
 server -- command for server management
+usage
 
-commands
+    ./server <command>
 
-    login
-    upload  [file [destination]]
-    restart [servicename]
-    addkey  [sshkeyfile]
-    adduser [username [sshkeyfile]]
-    info
-    ping
-    autorenew
-    reboot
-    tomcatlog
+where <command> is one of the following:
+
+    init -- perform initial server setup
+
+    site -- manage sites
+    db   -- manage databases
+
+    login     -- login to the server
+    info      -- display information about the server
+    ping      -- ping the server
+    autorenew -- setup ssl certs to be automatically renewed
+    reboot    -- reboot the server
+    tomcatlog -- view the contents (cat) of /opt/tomcat/logs/catalina.out
+
+    upload  [file [destination]]    -- upload a file
+    restart [servicename]           -- restart a service
+    addkey  [sshkeyfile]            -- add an ssh key for your user
+    adduser [username [sshkeyfile]] -- create a new admin user
 
 help_message
 }
@@ -148,15 +157,21 @@ command=$1
 shift
 
 case $command in
-    login)     ssh $user@$ip;;
-    upload)    upload_file $@;;
-    restart)   restart_service $@;;
-    reboot)    ssh -t $user@$ip sudo reboot;;
-    info)      show_info;;
-    adduser)   add_user $@;;
-    addkey)    add_sshkey $@;;
+    # sub commands
+    site) source scripts/site;;
+    db) source scripts/db;;
+
+    # server managment
+    login) ssh $user@$ip;;
+    upload) upload_file $@;;
+    restart) restart_service $@;;
+    reboot) ssh -t $user@$ip 'sudo reboot';;
+    info) show_info;;
+    adduser) add_user $@;;
+    addkey) add_sshkey $@;;
     autorenew) auto_renew_certs;;
     tomcatlog) ssh -t $user@$ip 'sudo cat /opt/tomcat/logs/catalina.out';;
-    ping)      ping -c5 $ip;;
-    *)         show_usage;;
+    ping) echo 'Press Ctrl-C to exit.'; ping -c5 $ip;;
+
+    *) show_usage;;
 esac

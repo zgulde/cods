@@ -114,8 +114,11 @@ login() {
 show_usage() {
     cat <<help_message
 db -- command for interacting with databases on your server
+usage
 
-commands
+    ./server db <command>
+
+where <command> is one of the following:
 
     login
     list

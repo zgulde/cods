@@ -145,15 +145,18 @@ deploy_site() {
 
 show_help() {
     cat <<help
-site -- command for insteracting with different sites on your server
+site -- command for managing sites setup on your server
+usage
 
-commands
+    ./server site <command>
+
+where <command> is one of the following:
 
     list
     create    [sitename]
     remove    [sitename]
     enablessl [sitename]
-    deploy    [sitename] [/path/to/site.war]
+    deploy    [sitename [/path/to/site.war]]
 
 help
 }
