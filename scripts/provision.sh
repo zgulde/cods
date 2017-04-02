@@ -125,7 +125,7 @@ systemctl start tomcat
 heading 'configuring nginx...'
 
 # when files are written to the uploads directory for a specific site, they are
-# created by the tomcat user, so in order for nginx to server them, we'll add
+# created by the tomcat user, so in order for nginx to serve them, we'll add
 # the www-data user to the tomcat group
 usermod -a -G tomcat www-data
 
