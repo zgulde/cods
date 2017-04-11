@@ -1,3 +1,6 @@
+TOMCAT_DOWNLOAD_URL=http://mirror.jax.hugeserver.com/apache/tomcat/tomcat-8/v8.5.13/bin/apache-tomcat-8.5.13.tar.gz
+TOMCAT_TARGZ=apache-tomcat-8.5.13.tar.gz
+
 heading(){
     echo '----------------------------------'
     echo "> $@"
@@ -34,9 +37,9 @@ heading "Installing tomcat..."
 # download the tar from apache and extract it to /opt/tomcat
 mkdir -p /opt/tomcat
 cd /tmp
-wget http://mirrors.sonic.net/apache/tomcat/tomcat-8/v8.5.11/bin/apache-tomcat-8.5.11.tar.gz
-tar xzvf apache-tomcat-8.5.11.tar.gz --strip-components=1 -C /opt/tomcat
-rm apache-tomcat-8.5.9.tar.gz
+wget $TOMCAT_DOWNLOAD_URL
+tar xzvf $TOMCAT_TARGZ --strip-components=1 -C /opt/tomcat
+rm $TOMCAT_TARGZ
 
 # create a tomcat user
 groupadd tomcat
@@ -141,6 +144,8 @@ nginx_conf
 mkdir -p /var/www
 rm -rf /var/www/*
 systemctl restart nginx
+
+echo 'Nginx configured and restarted!'
 
 heading 'configuring firewall...'
 # firewall setup
