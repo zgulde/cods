@@ -35,6 +35,8 @@ This project is probably **not** for you if:
 
 ## Quick Start
 
+See also the [step by step deploment guide here.](deployment_guide.md)
+
 Deploy a blog application and create a database for it:
 
 ```bash
@@ -43,17 +45,17 @@ git clone https://github.com/zgulde/tomcat-setup.git ~/my-awesome-server
 cd ~/my-awesome-server
 
 # 2. provision the server
-./setup
+./server
 
 # 3. create a database and user for the application
-./db create blog_db blog_user
-./db migrate blog_db ~/IdeaProjects/myblog/migration.sql
+./server db create blog_db blog_user
+./server db migrate blog_db ~/IdeaProjects/myblog/migration.sql
 
 # 4. setup your server to listen for requests for your domain
-./site create myblog.com
+./server site create myblog.com
 
 # 5. deploy the war
-./site deploy myblog.com ~/IdeaProjects/myblog/target/myblog-v0.0.1-SNAPSHOT.war
+./server site deploy myblog.com ~/IdeaProjects/myblog/target/myblog-v0.0.1-SNAPSHOT.war
 ```
 
 ## Usage
@@ -70,10 +72,6 @@ or a series of commands to achieve the goal of the command. This allows us to
 control the server from a local machine, without much need to log in to the
 server itself.
 
-All of the scripts should be run from the directory where you initially cloned
-this repository. To run the scripts, you will need to prefix them with a `./`.
-To cancel the execution of a script, you can press Control + C.
-
 Clone this repo once per server you wish to automate. For example, you might
 have the following directory structure
 
@@ -86,7 +84,9 @@ have the following directory structure
 ```
 
 Once you have cloned this repo, you will need to setup and provision the server.
-Have the ip address of your server handy, and then run the `setup` script.
+Have the ip address of your server handy, and then run the `server` script. The
+script will detect that we don't have anything setup and run the first time
+setup process.
 
 This setup will allow you to host multiple different domains on each server. For
 each site you wish to host, you will need to:
@@ -99,17 +99,17 @@ each site you wish to host, you will need to:
 ### DNS Records + Site Creation
 
 ```bash
-./site create example.com
+./server site create example.com
 ```
 
 This command will setup virtual hosts with both tomcat and nginx for the domain
 name you have provided.
 
-When creating a new site, the `site create` command will check to see if the DNS
-records for the given domain point to your server. You will be given a warning
-if they do not, but you can go ahead and create the site anyway if you are still
-configuring DNS, or waiting for the records to propogate. To test your site
-under these conditions, you can add a record in your `/etc/hosts` file that
+When creating a new site, the `site create` subcommand will check to see if the
+DNS records for the given domain point to your server. You will be given a
+warning if they do not, but you can go ahead and create the site anyway if you
+are still configuring DNS, or waiting for the records to propogate. To test your
+site under these conditions, you can add a record in your `/etc/hosts` file that
 looks like the following:
 
 ```
@@ -127,7 +127,7 @@ While theoretically you might not need to do this, most applications will need
 to talk to a database in some form or fashion.
 
 ```bash
-./db create some_db some_user
+./server db create some_db some_user
 ```
 
 This command will create a database and a user that has all permissions on that
@@ -137,14 +137,14 @@ You will be prompted for a password for the new database user.
 
 #### (Optionally) Run a migration
 
-Once your database is created, you can have the `db` command run a migration
+Once your database is created, you can have the `db` subcommand run a migration
 script if you so desire.
 
 You will need to provide the name of the database you wish to run the migraiton
 on, and the path to the `sql` file.
 
 ```bash
-./db migrate some_db /path/to/the/migration.sql
+./server db migrate some_db /path/to/the/migration.sql
 ```
 
 ### Deploy The `war`
@@ -153,7 +153,7 @@ This will `scp` the file to the appropriate location on your server. Once you
 run this command, you should be able to see your site live!
 
 ```bash
-./site deploy example.com /path/to/the/war/file.war
+./server site deploy example.com /path/to/the/war/file.war
 ```
 
 Of course, before you run this you will need to have packaged your application
@@ -172,8 +172,9 @@ or with maven wrapper
 
 ## HTTPS
 
-The `site` command has a sub command that will obtain a certificate from
-[letsencrypt](https://letsencrypt.org/) and enable https on a per-site basis.
+The site managment command has a sub command that will obtain a certificate
+from [letsencrypt](https://letsencrypt.org/) and enable https on a per-site
+basis.
 
 To obtain a certificate from letsencrypt, you will need to have the DNS records
 for your domain properly configured to point to your server, so that you can
@@ -185,24 +186,33 @@ Agreement](https://letsencrypt.org/documents/LE-SA-v1.1.1-August-1-2016.pdf).**
 Simply run
 
 ```bash
-./site enablessl myawesomesite.com
+./server site enablessl myawesomesite.com
 ```
+
+After enabling https for a site, you can enable the automatic renewal of certificates:
+
+```bash
+./server autorenew
+```
+
+Note that while you do need to enable https for each site individually, you only
+need to set up automatic certificate renewal once.
 
 ## Commands
 
-Except for `setup`, each command has individual subcommands that must be run,
-documented in the bullet points below. Invoking just the command by itself will
-show a list of available subcommands and the arguments they take. All subcommand
-arguments are optional, they can either be passed on the command line, or you
-will be prompted for them interactively after invoking the command.
+The entrypoint for all commands is the `server` script. It contains various
+subcommands for performing different activities on the server. The first time
+this script is run it will perform the initial server setup and
+provisioning. Once the server is setup you will be able to run the various
+subcommands.
 
-`./setup` 
+Any commands that require arguments can either be passed on the command line, or
+the command can be run without arguments and you will be prompted for them.
 
-Setup your server for the first time. Before running this, make sure you
-have a server created and have it's ip address. Also be prepared to choose a
-administrator password for both your server and your database.
+To see all the available subcommands, run the `server` command without any
+arguments.
 
-`./server`
+### General Server Commands
 
 - `login`: log in to the server
 - `upload`: upload a file to the server
@@ -216,7 +226,12 @@ administrator password for both your server and your database.
 - `adduser`: add a user account to the server
 - `tomcatlog`: view the contents of the tomcat log file, `/opt/tomcat/logs/catalina.out`
 
-`./site`
+### Site and Database Managment Commands
+
+The `site`, `db`, and `devserver` subcommands themselves contain subcommands
+which can be seen by running the command by itself.
+
+`site`
 
 - `list`: view the sites that are currently setup on the server
 - `create`: create a new site
@@ -225,7 +240,7 @@ administrator password for both your server and your database.
 - `enablessl`: enable https for a site
 - `deploy`: deploy a `war` file for an individual site
 
-`./db`
+`db`
 
 - `login`: login to your mysql database
 - `list`: list the databases that exist on your server
@@ -234,6 +249,64 @@ administrator password for both your server and your database.
 - `backup`: create a backup of a database
 - `migrate`: run a migration script for a specific database
 - `remove`: remove a database and user
+
+### Examples
+
+In all of the following examples, it is assumed that your current working
+directory is the directory where you cloned this repository.
+
+#### View all the available subcommands
+
+```bash
+./server
+```
+
+#### View the commands for database managment
+
+```bash
+./server db
+```
+
+#### Login to the server
+
+```bash
+./server login
+```
+
+#### Login to the database
+
+```bash
+./server db login
+```
+
+#### Create a site
+
+```bash
+./server site create example.com
+```
+
+OR
+
+```
+./server site create
+```
+
+and you will be prompted for the domain name.
+
+#### Deploy a `war` to a site
+
+```bash
+./server site deploy example.com ~/JavaProjects/my-awesome-project/target/my-awesome-project.war
+```
+
+OR
+
+```bash
+./server site deploy
+```
+
+and you will be prompted for the site to deploy to, as well as the filepath for
+the `war` file.
 
 ## Sharing your server with teammates
 
@@ -284,3 +357,20 @@ administrator password for both your server and your database.
 Nginx is set up to intercept any requests to `/uploads` and try to serve them
 out of the uploads directory for your site, which is located at
 `/var/www/example.com/uploads`.
+
+## Development Webserver
+
+There is a subcommand of server, `devserver` that can be used to start up nginx
+locally.
+
+```bash
+./server devserver my-project.dev
+```
+
+see the built in help
+
+```bash
+./server devserver
+```
+
+for more details.
