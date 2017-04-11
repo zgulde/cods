@@ -39,7 +39,7 @@ create_site() {
 
     # nginx config
     echo 'Configuring nginx...'
-    echo '$(sed -e s/{{domain}}/${domain}/g -e s/{{user}}/${user}/g site.nginx.conf)' |\
+    echo '$(sed -e s/{{domain}}/${domain}/g -e s/{{user}}/${user}/g $TEMPLATES/site.nginx.conf)' |\
         sudo tee /etc/nginx/sites-available/${domain} >/dev/null
     sudo ln -s /etc/nginx/sites-available/${domain} /etc/nginx/sites-enabled/${domain}
     echo 'Restarting nginx...'
@@ -71,7 +71,7 @@ enable_ssl() {
         --email $email\
         --renew-by-default >> \$HOME/letsencrypt.log
 
-    echo '$(sed -e s/{{domain}}/${domain}/g -e s/{{user}}/${user}/g ssl-site.nginx.conf)' |\
+    echo '$(sed -e s/{{domain}}/${domain}/g -e s/{{user}}/${user}/g $TEMPLATES/ssl-site.nginx.conf)' |\
         sudo tee /etc/nginx/sites-available/${domain} >/dev/null
     sudo systemctl restart nginx
     "
@@ -139,7 +139,6 @@ deploy_site() {
     fi
 
     scp $war_filepath $user@$ip:/opt/tomcat/$site/ROOT.war
-
 }
 
 
@@ -160,14 +159,6 @@ where <command> is one of the following:
 
 help
 }
-
-if [[ ! -f .env ]]; then
-    echo 'It looks like you do not have a server setup yet, please'
-    echo 'run the setup script first.'
-    exit 1
-fi
-
-source .env
 
 command=$1
 shift

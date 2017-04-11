@@ -91,7 +91,7 @@ read -p 'Press enter to continue and setup the server'
 
 heading 'running provision script'
 
-ssh root@$ip bash < provision.sh | tee provision.log
+ssh root@$ip bash < $SCRIPTS/provision.sh | tee $BASE_DIR/provision.log
 
 heading 'securing mysql installation...'
 
@@ -105,6 +105,8 @@ DELETE FROM mysql.user WHERE User='';
 DELETE FROM mysql.db WHERE Db='test' OR Db='test\_%';
 FLUSH PRIVILEGES;
 sql
+
+echo 'MySQL configured!'
 
 heading 'creating user'
 
@@ -123,5 +125,7 @@ perl -i -pe 's/(PermitRootLogin\s*)yes/\1no/' /etc/ssh/sshd_config
 service sshd restart
 service ssh restart
 setup_user
+
+echo 'User created and ssh locked down!'
 
 heading 'all done!'

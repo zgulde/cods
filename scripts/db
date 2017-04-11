@@ -130,14 +130,6 @@ where <command> is one of the following:
 help_message
 }
 
-if [[ ! -f .env ]]; then
-    echo 'It looks like you do not have a server setup yet, please'
-    echo 'run the setup script first.'
-    exit 1
-fi
-
-source .env
-
 command=$1
 shift
 

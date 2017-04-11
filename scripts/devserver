@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if ! which brew >/dev/null; then
+if ! which nginx >/dev/null; then
     echo 'Please install nginx first.' 1>&2
     exit 1
 fi
@@ -20,7 +20,7 @@ if [[ -z $domain ]]; then
     cat 1>&2 <<'help'
 Usage
 
-    ./devserver domain [webroot]
+    ./server devserver <domain> [webroot]
 
 Description
 
@@ -37,12 +37,12 @@ Examples
 
     ./devserver mydomain.dev
 
-- Start the server for test.dev with a custom webroot
+- Start the server for codeup.dev with a custom webroot
 
-    ./devserver test.dev ~/Downloads/tmp
+    ./devserver codeup.dev ~/Downloads/tmp
 
 help
-exit 1
+	exit 1
 fi
 
 if [[ -z $webroot ]]; then
@@ -50,8 +50,14 @@ if [[ -z $webroot ]]; then
     mkdir -p $webroot/uploads
 fi
 
+if [[ -f $nginx_config_file ]]; then
+	echo "It looks like the server is already running. ($nginx_config_file exists)"
+	echo "To restart, remove $nginx_config_file"
+	exit 1
+fi
+
 perl -pe "s/DOMAIN/${domain}/g; s!WEBROOT!${webroot}!g"\
-    ./nginx-dev.conf\
+    $TEMPLATES/nginx-dev.conf\
     > $nginx_config_file
 
 echo "Starting development webserver!"

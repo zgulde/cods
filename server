@@ -125,10 +125,10 @@ usage
 
 where <command> is one of the following:
 
-    init -- perform initial server setup
-
     site -- manage sites
     db   -- manage databases
+
+	devserver -- development web server
 
     login     -- login to the server
     info      -- display information about the server
@@ -145,21 +145,30 @@ where <command> is one of the following:
 help_message
 }
 
-if [[ ! -f .env ]]; then
-    echo 'It looks like you do not have a server setup yet, please'
-    echo 'run the setup script first.'
-    exit 1
-fi
+# find out where this script is located
+BASE_DIR="$( cd "$( dirname "$0" )" && pwd )"
 
-source .env
+ENV_FILE="$BASE_DIR/.env"
+TEMPLATES="$BASE_DIR/templates"
+SCRIPTS="$BASE_DIR/scripts"
+
+if [[ ! -f $ENV_FILE ]]; then
+	echo 'No .env file found!'
+	echo 'Running initial setup...'
+	source $SCRIPTS/setup
+	exit
+fi
 
 command=$1
 shift
+
+source $ENV_FILE
 
 case $command in
     # sub commands
     site) source scripts/site;;
     db) source scripts/db;;
+	devserver) source $SCRIPTS/devserver;;
 
     # server managment
     login) ssh $user@$ip;;
