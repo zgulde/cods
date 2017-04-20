@@ -42,7 +42,7 @@ Examples
     ./devserver codeup.dev ~/Downloads/tmp
 
 help
-	exit 1
+    exit 1
 fi
 
 if [[ -z $webroot ]]; then
@@ -51,9 +51,9 @@ if [[ -z $webroot ]]; then
 fi
 
 if [[ -f $nginx_config_file ]]; then
-	echo "It looks like the server is already running. ($nginx_config_file exists)"
-	echo "To restart, remove $nginx_config_file"
-	exit 1
+    echo "It looks like the server is already running. ($nginx_config_file exists)"
+    echo "To restart, remove $nginx_config_file"
+    exit 1
 fi
 
 perl -pe "s/DOMAIN/${domain}/g; s!WEBROOT!${webroot}!g"\
