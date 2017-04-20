@@ -35,11 +35,11 @@ Examples
 
 - Start the server for mydomain.dev
 
-    ./devserver mydomain.dev
+    ./server devserver mydomain.dev
 
 - Start the server for codeup.dev with a custom webroot
 
-    ./devserver codeup.dev ~/Downloads/tmp
+    ./server devserver codeup.dev ~/Downloads/tmp
 
 help
     exit 1
