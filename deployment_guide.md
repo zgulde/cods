@@ -4,6 +4,14 @@ This document is meant to supplement the [documentation included with the
 deployment tool](https://github.com/gocodeup/tomcat-setup), and to be a mostly
 complete guide to codeup students on deploying their spring boot applications.
 
+## Overview
+
+1. Change the application to be buildable as a `war`.
+1. Setup + Provision the server
+1. Setup a database and site
+1. Login to configure the site (application.properties)
+1. Add the git remote and push
+
 ## Build A War From your application
 
 This tool is setup to host any web application that is packaged as a `war`.

@@ -12,7 +12,7 @@ create_site() {
     fi
 
     # verify dns records
-    if [[ "$(dig +short ${domain})" != $ip ]]; then
+    if [[ "$(dig +short ${domain} | tail -n 1)" != $ip ]]; then
         echo 'It looks like the dns records for that domain are not setup to'
         echo 'point to your server.'
         read -p 'Continue anyway? (y/n) ' confirm
@@ -46,6 +46,30 @@ create_site() {
     sudo systemctl restart nginx
     "
     [[ $? -eq 0 ]] && echo "${domain} created!"
+
+	echo "Setting up git deployment..."
+
+	ssh -t $user@$ip "
+	mkdir -p \$HOME/${domain}
+	cat > \$HOME/${domain}/.config <<'.'
+$(cat $TEMPLATES/.config)
+.
+	git init --bare \$HOME/${domain}/repo.git
+	cat > \$HOME/${domain}/repo.git/hooks/post-receive <<'.'
+$(sed -e s/{{site}}/$domain/g $TEMPLATES/post-receive.sh)
+.
+	chmod +x \$HOME/${domain}/repo.git/hooks/post-receive
+	"
+	echo "git deployment configured!"
+	echo "Here is your deployment remote:"
+	echo
+	echo "    $user@$ip:${domain}/repo.git"
+	echo
+	echo "You can run something like:"
+	echo
+	echo "    git remote add production $user@$ip:${domain}/repo.git"
+	echo
+	echo "To add the remote."
 }
 
 enable_ssl() {
@@ -54,8 +78,13 @@ enable_ssl() {
         read -p 'Enter the domain: ' domain
     fi
 
+    echo "domain: $domain"
+    echo '$(dig +short ${domain} | tail -n 1)'
+    echo "$(dig +short ${domain} | tail -n 1)"
+    echo "ip: $ip"
+
     # verify dns records
-    if [[ "$(dig +short ${domain})" != $ip ]]; then
+    if [[ "$(dig +short ${domain}) | tail -n 1" != $ip ]]; then
         echo 'It looks like the dns records for that domain are not setup to'
         echo 'point to your server. This is necessary for https. Aborting...'
         exit 1
@@ -104,6 +133,7 @@ remove_site() {
     sudo rm -rf /opt/tomcat/${site}
     sudo rm -rf /opt/tomcat/conf/Catalina/${site}
     sudo rm -rf /var/www/${site}
+	sudo rm -rf \$HOME/${site}
     "
 
     [[ $? -eq 0 ]] && echo 'site removed!'

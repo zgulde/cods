@@ -1,16 +1,24 @@
 #!/bin/bash
 
+SITE_DIR=$HOME/{{site}}
+
 echo '--------------------------------------------------'
-tmp_file=$(mktemp -d)
-git clone $(pwd) $tmp_file
-cd $tmp_file
+
+tmp_repo=$(mktemp -d)
+git clone $(pwd) $tmp_repo
+cd $tmp_repo
+
+if [[ -f $SITE_DIR/.config ]]; then
+	source $SITE_DIR/.config
+	if [[ ! -z "$source" ]] && [[ ! -z "$destination" ]]; then
+		cp $SITE_DIR/$source $tmp_repo/$destination
+	fi
+fi
 
 if [[ -f .build_config ]]; then
 	source .build_config
 
-	# sudo here to prompt for admin access and bail out if we don't
-	# have it
-	sudo echo ' > Building...'
+	echo ' > Building...'
 	[[ $? -ne 0 ]] && exit 1
 
 	$BUILD_COMMAND
@@ -23,9 +31,9 @@ if [[ -f .build_config ]]; then
 		exit 1
 	fi
 
-	# rm -rf /opt/tomcat/{{site}}/*
-	# mv $WAR_FILE /opt/tomcat/{{site}}/ROOT.war
-	# echo '{{site}} deployed!'
+	rm -f /opt/tomcat/{{site}}/ROOT.war
+	mv $WAR_FILE /opt/tomcat/{{site}}/ROOT.war
+	echo '{{site}} deployed!'
 elif [[ -f install.sh ]]; then
 	bash install.sh
 fi
