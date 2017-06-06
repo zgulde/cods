@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # check for the utilities we'll need
-prereqs=(dig ssh scp)
+# these should be available on a default osx install
+prereqs=(perl dig ssh scp)
 for tool in ${prereqs[@]}; do
     which $tool >/dev/null
     if [[ $? -ne 0 ]]; then
@@ -47,47 +48,28 @@ echo 'goes wrong with your site.'
 read -p 'email: ' email
 echo
 
-# set the admin password
-echo
-echo 'We are going to ask you for a password, this will be the password for'
-echo 'administrative access on your server. Make sure this is a strong password!'
-echo 'Make sure to remember this password.'
-echo
-read -sp 'Enter a password: ' password
-echo
-read -sp 'Confirm password: ' confirm_password
-echo
-if [[ "$password" != "$confirm_password" ]]; then
-    echo 'passwords do not match!'
-    exit 1
-fi
+password=$(tr -cd 'a-zA-Z0-9' < /dev/urandom | head -c 16)
+db_password=$(tr -cd 'a-zA-Z0-9' < /dev/urandom | head -c 16)
 
-# set database password
+echo "Here are your auto-generated passwords for the server:"
 echo
-echo 'We are going to ask for another password. This will be the password for'
-echo 'administrative access to your database. Be sure to remember this one as'
-echo 'well, and to choose a *strong* password.'
+echo "Sudo Password: $password" | tee -a "$BASE_DIR/credentials.txt"
+echo "DB Password:   $db_password" | tee -a "$BASE_DIR/credentials.txt"
 echo
-read -sp 'Enter a password: ' db_password
+echo 'These have been saved to "credentials.txt". For security purposes, it is'
+echo 'advised you move these into a password manager and remove the'
+echo '"credentials.txt" file.'
 echo
-read -sp 'Confirm password: ' confirm_db_password
-echo
-echo
-if [[ "$db_password" != "$confirm_db_password" ]]; then
-    echo 'passwords do not match!'
-    exit 1
-fi
+read -p 'Press <Enter> to continue and setup the server'
 
 # create the .env file
-cat > .env <<EOF
+cat > $ENV_FILE <<EOF
 ip=$ip
 user=$user
 email=$email
 EOF
 
 echo '".env" file created!'
-echo
-read -p 'Press enter to continue and setup the server'
 
 heading 'running provision script'
 

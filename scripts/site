@@ -71,6 +71,11 @@ enable_ssl() {
         --email $email\
         --renew-by-default >> \$HOME/letsencrypt.log
 
+    if [[ $? -ne 0 ]]; then
+	    echo 'It looks like something went wrong! Check the above output for more details.'
+        exit 1
+    fi
+
     echo '$(sed -e s/{{domain}}/${domain}/g -e s/{{user}}/${user}/g $TEMPLATES/ssl-site.nginx.conf)' |\
         sudo tee /etc/nginx/sites-available/${domain} >/dev/null
     sudo systemctl restart nginx
