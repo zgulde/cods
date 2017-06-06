@@ -11,6 +11,7 @@ cd $tmp_repo
 if [[ -f $SITE_DIR/.config ]]; then
 	source $SITE_DIR/.config
 	if [[ ! -z "$source" ]] && [[ ! -z "$destination" ]]; then
+        echo "Copying $source file to $destination..."
 		cp $SITE_DIR/$source $tmp_repo/$destination
 	fi
 fi
@@ -18,16 +19,28 @@ fi
 if [[ -f .build_config ]]; then
 	source .build_config
 
+    if [[ -z $BUILD_COMMAND ]]; then
+        echo '$BUILD_COMMAND not set! (Check the .build_config file)'
+        echo 'Aborting...'
+        exit 1
+    fi
+    if [[ -z $WAR_FILE ]]; then
+        echo '$WAR_FILE not set! (Check the .build_config file)'
+        echo 'Aborting...'
+        exit 1
+    fi
+
 	echo ' > Building...'
-	[[ $? -ne 0 ]] && exit 1
 
 	$BUILD_COMMAND
 	if [[ $? -ne 0 ]]; then
-		echo 'It looks like your build command failed! Aborting...'
+        echo 'It looks like your build command failed (exited with a non-zero code)!'
+        echo 'Aborting...'
 		exit 1
 	fi
 	if [[ ! -f $WAR_FILE ]]; then
-		echo "$WAR_FILE not found!"
+		echo "Build was successful, but war file: "$WAR_FILE" was not found!"
+        echo 'Aborting...'
 		exit 1
 	fi
 
