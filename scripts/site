@@ -4,6 +4,33 @@ list_sites() {
     ssh $user@$ip 'ls -1 /etc/nginx/sites-available' | grep -v '^default$'
 }
 
+enable_git_deploment() {
+    domain=$1
+	echo "Setting up git deployment..."
+
+	ssh -t $user@$ip "
+	mkdir -p \$HOME/${domain}
+	cat > \$HOME/${domain}/.config <<'.'
+$(cat $TEMPLATES/.config)
+.
+	git init --bare \$HOME/${domain}/repo.git
+	cat > \$HOME/${domain}/repo.git/hooks/post-receive <<'.'
+$(sed -e s/{{site}}/$domain/g $TEMPLATES/post-receive.sh)
+.
+	chmod +x \$HOME/${domain}/repo.git/hooks/post-receive
+	"
+	echo "git deployment configured!"
+	echo "Here is your deployment remote:"
+	echo
+	echo "    $user@$ip:${domain}/repo.git"
+	echo
+	echo "You can run something like:"
+	echo
+	echo "    git remote add production $user@$ip:${domain}/repo.git"
+	echo
+	echo "To add the remote."
+}
+
 create_site() {
     domain=$1
 
@@ -47,29 +74,7 @@ create_site() {
     "
     [[ $? -eq 0 ]] && echo "${domain} created!"
 
-	echo "Setting up git deployment..."
-
-	ssh -t $user@$ip "
-	mkdir -p \$HOME/${domain}
-	cat > \$HOME/${domain}/.config <<'.'
-$(cat $TEMPLATES/.config)
-.
-	git init --bare \$HOME/${domain}/repo.git
-	cat > \$HOME/${domain}/repo.git/hooks/post-receive <<'.'
-$(sed -e s/{{site}}/$domain/g $TEMPLATES/post-receive.sh)
-.
-	chmod +x \$HOME/${domain}/repo.git/hooks/post-receive
-	"
-	echo "git deployment configured!"
-	echo "Here is your deployment remote:"
-	echo
-	echo "    $user@$ip:${domain}/repo.git"
-	echo
-	echo "You can run something like:"
-	echo
-	echo "    git remote add production $user@$ip:${domain}/repo.git"
-	echo
-	echo "To add the remote."
+    enable_git_deploment $domain
 }
 
 enable_ssl() {
@@ -111,7 +116,6 @@ enable_ssl() {
     "
 
     [[ $? -eq 0 ]] && echo "https enabled for ${domain}!"
-
 }
 
 remove_site() {
