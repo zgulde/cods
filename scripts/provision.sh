@@ -30,6 +30,7 @@ apt-get install -y\
     ufw\
     mysql-server\
     unattended-upgrades\
+    maven\
     letsencrypt
 
 heading "Installing tomcat..."
