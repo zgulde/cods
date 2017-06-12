@@ -1,5 +1,5 @@
-TOMCAT_DOWNLOAD_URL=http://mirror.jax.hugeserver.com/apache/tomcat/tomcat-8/v8.5.13/bin/apache-tomcat-8.5.13.tar.gz
-TOMCAT_TARGZ=apache-tomcat-8.5.13.tar.gz
+TOMCAT_DOWNLOAD_URL=http://mirror.cc.columbia.edu/pub/software/apache/tomcat/tomcat-8/v8.5.15/bin/apache-tomcat-8.5.15.tar.gz
+TOMCAT_TARGZ="$(perl -pe 's/.*\///' <<< $TOMCAT_DOWNLOAD_URL)"
 
 heading(){
     echo '----------------------------------'

@@ -56,9 +56,12 @@ echo
 echo "Sudo Password: $password" | tee -a "$BASE_DIR/credentials.txt"
 echo "DB Password:   $db_password" | tee -a "$BASE_DIR/credentials.txt"
 echo
-echo 'These have been saved to "credentials.txt". For security purposes, it is'
-echo 'advised you move these into a password manager and remove the'
-echo '"credentials.txt" file.'
+echo 'These have been saved to "credentials.txt".'
+echo
+echo '+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Warning ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+'
+echo '| For security purposes, it is advised you delete the credentials.txt  |'
+echo '| file and move these into a password manager                          |'
+echo '+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+'
 echo
 read -p 'Press <Enter> to continue and setup the server'
 
