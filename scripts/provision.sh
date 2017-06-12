@@ -1,5 +1,5 @@
-TOMCAT_DOWNLOAD_URL=http://mirror.olnevhost.net/pub/apache/tomcat/tomcat-8/v8.5.15/bin/apache-tomcat-8.5.15.tar.gz
-TOMCAT_TARGZ="$(ruby -ne 'puts $_.split("/").last' <<< $TOMCAT_DOWNLOAD_URL)"
+TOMCAT_DOWNLOAD_URL=http://mirror.cc.columbia.edu/pub/software/apache/tomcat/tomcat-8/v8.5.15/bin/apache-tomcat-8.5.15.tar.gz
+TOMCAT_TARGZ="$(perl -pe 's/.*\///' <<< $TOMCAT_DOWNLOAD_URL)"
 
 heading(){
     echo '----------------------------------'
