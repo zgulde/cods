@@ -3,14 +3,15 @@
 For setup and management of a remote server and virtual hosting with tomcat,
 nginx, and mysql.
 
-* [Who this is for](#who-this-is-for)
-* [Prerequisites](#prerequisites)
-* [Quick Start](#quick-start)
-* [Usage](#usage)
-* [HTTPS](#https)
-* [Commands](#commands)
-* [Sharing your server with teammates](#sharing-your-server-with-teammates)
-* [Uploads](#uploads)
+- [Who this is for](#who-this-is-for)
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+- [Usage](#usage)
+- [Git Deployment](#git-deployment)
+- [HTTPS](#https)
+- [Commands](#commands)
+- [Sharing your server with teammates](#sharing-your-server-with-teammates)
+- [Uploads](#uploads)
 
 ## Who this is for
 
@@ -49,6 +50,7 @@ cd ~/my-awesome-server
 
 # 3. create a database and user for the application
 ./server db create blog_db blog_user
+# optionally run a migration
 ./server db migrate blog_db ~/IdeaProjects/myblog/migration.sql
 
 # 4. setup your server to listen for requests for your domain
@@ -169,6 +171,58 @@ or with maven wrapper
 ```bash
 ./mvnw package
 ```
+
+Alternatively, you can setup automated deployments with git.
+
+## Git Deployment
+
+When a site is setup, the server will also be setup for automated builds and
+deployments with git. This functionality is two-fold: there is a simple setup,
+and the ability to do somethings more advanced. When the site is created, an
+empty git repository will be initialized in a directory in your home directory
+named after the site name, for example:
+
+    ~/example.com/repo.git
+
+You'll see instructions for adding this as a remote to an existing project in
+the output of the command that sets up the site.
+
+When the repo is pushed to, the post-receive git hook will be triggered, which
+will run the build for your project, or run a custom script.
+
+To tell the hook how to build your project, you will need to (at a bare
+minimum), add a file to your project defining how to build your project, and
+where the built `war` file lives. To do this, create a file named
+`.build_config` in the root of your project with the following contents:
+
+`.build_config`
+
+```bash
+BUILD_COMMAND=command_to_execute_to_build_your_project.sh
+WAR_FILE=relative_path_to_the_artifact.war
+```
+
+In addition, often times you will need to include a file in the build that is
+not part of the git repository (e.g. a file with database credentials). To do
+that, we can create that file on the server, and tell the git hook how to find
+this file. To do this create the file you want to be included in the build
+inside of the directory named after your site in your home directory, and edit
+the `.config` file found in the same place.
+
+For example, if you needed an `application.properties` file included in the
+build for example.com, but this file is ignored by git, you would do the
+following:
+
+1. ssh into the server and create the production `application.properties` file
+   inside the `example.com` directory.
+1. edit the `~/example.com/.config` file and define the name of the file to be
+   included, as well as where in the project it should be copied to
+
+Take a look at the `.config` file for more information.
+
+If your deploment needs are more complex than what is described above, you can
+create a file named `install.sh` in the root of your project. This file will be
+executed if a `.build_config` file is not found.
 
 ## HTTPS
 
