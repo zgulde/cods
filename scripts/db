@@ -13,7 +13,7 @@ create_db() {
     [[ -z $db_name ]] && read -p 'database name: ' db_name
     db_user=$2
     [[ -z $db_user ]] && read -p 'database user: ' db_user
-    read -sp 'Choose a STRONG password for this database user: ' db_pass
+    read -sp 'Choose a password for this database user: ' db_pass
     echo
     read -sp 'confirm password: ' confirm_pass
     echo
