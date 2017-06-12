@@ -166,8 +166,8 @@ source $ENV_FILE
 
 case $command in
     # sub commands
-    site) source scripts/site;;
-    db) source scripts/db;;
+    site) source $SCRIPTS/site;;
+    db) source $SCRIPTS/db;;
     devserver) source $SCRIPTS/devserver;;
 
     # server managment
