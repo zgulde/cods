@@ -99,6 +99,8 @@ Spring boot will also allow us to package our application as a `war`.
     setup, make sure the name of the war file matches up with what you defined
     in your `pom.xml`.*
 
+    Make sure to add and commit the `.build_config` file!
+
 ## Server + Domain Name
 
 1. Buy a domain name (we recommend namecheap), and point the DNS nameservers for
