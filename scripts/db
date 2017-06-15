@@ -74,15 +74,19 @@ run_migration() {
 
     # ensure file exists and is a sql file (or at least has the extension)
     if [[ ! -f $migration_file ]]; then
-        echo 'It looks like that file does not exist!'
+        echo 'It looks like that file does not exist! Aborting...'
+        echo "Could not find '$migration_file'! No migrations run."
         exit 1
     fi
     grep '\.sql$' >/dev/null <<< $migration_file
     if [[ $? -ne 0 ]]; then
-        echo 'must be a valid .sql file'
+        echo 'It looks like that is not a valid SQL file! Aborting...'
+        echo "'$migration_file' does not have a '.sql' file extension."
+        echo 'No migrations run.'
         exit 1
     fi
 
+    echo 'When prompted, enter your *database administrator* password to continue'
     # make sure the nowdoc identifier doesnt clash with anything in the
     # migration
     ssh -t $user@$ip "mysql -p $database <<'xxxxxxxxxx_sql_migration_xxxxxxxxx'
