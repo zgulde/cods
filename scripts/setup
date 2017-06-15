@@ -36,9 +36,36 @@ if [[ $? -ne 0 ]]; then
     exit 1
 fi
 
+echo 'You will need to now choose a username for the server. This is the user'
+echo 'you will log in as, as well as the database administrator user that'
+echo 'will be setup.'
+echo
+echo 'A username should start with a lowercase letter, and only consist of'
+echo 'lowercase letters, numbers, or the "_" character. It should also'
+echo 'be no longer than 30 characters.'
+echo
+echo 'Usually it is fine (and easier) to use the same username as the one on'
+echo 'your local machine, but if your local username does not match the given'
+echo 'rules, you should choose something different.'
+echo
 read -p "Enter a username (default $USER): " user
 if [[ -z "$user" ]]; then
     user=$USER
+fi
+# validate username
+if [[ "$user" == "root" ]]; then
+    echo 'Username cannot be "root". Aborting...'
+    echo 'Server not setup, and no configuration file created.'
+    echo 'Try running the script again.'
+    exit 1
+fi
+perl -ne 'exit 1 unless /^[a-z][a-z0-9_]{0,29}$/' <<< "$user"
+if [[ $? -ne 0 ]]; then
+    echo "Ivalid username: '$user'!"
+    echo 'Server not setup, and no configuration file created.'
+    echo 'Make sure your username matches the given rules, and try running'
+    echo 'the script again.'
+    exit 1
 fi
 
 echo
