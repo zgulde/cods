@@ -36,6 +36,7 @@ if [[ $? -ne 0 ]]; then
     exit 1
 fi
 
+echo
 echo 'You will need to now choose a username for the server. This is the user'
 echo 'you will log in as, as well as the database administrator user that'
 echo 'will be setup.'
@@ -61,7 +62,7 @@ if [[ "$user" == "root" ]]; then
 fi
 perl -ne 'exit 1 unless /^[a-z][a-z0-9_]{0,29}$/' <<< "$user"
 if [[ $? -ne 0 ]]; then
-    echo "Ivalid username: '$user'!"
+    echo "Ivalid username: '$user'! Aborting..."
     echo 'Server not setup, and no configuration file created.'
     echo 'Make sure your username matches the given rules, and try running'
     echo 'the script again.'
@@ -72,6 +73,7 @@ echo
 echo 'We will need an email address for obtaining a ssl certificate, while this'
 echo 'is optional, it is recommended so that you can be contacted if anything'
 echo 'goes wrong with your site.'
+echo
 read -p 'email: ' email
 echo
 
@@ -90,6 +92,9 @@ echo '| For security purposes, it is advised you delete the credentials.txt  |'
 echo '| file and move these into a password manager                          |'
 echo '+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+'
 echo
+echo 'Next, we will provision the server. Please be patient, as this process'
+echo 'can take a few minutes.'
+echo
 read -p 'Press <Enter> to continue and setup the server'
 
 # create the .env file
@@ -103,7 +108,24 @@ echo '".env" file created!'
 
 heading 'running provision script'
 
-ssh root@$ip bash < $SCRIPTS/provision.sh | tee $BASE_DIR/provision.log
+ssh root@$ip bash < $SCRIPTS/provision.sh
+
+# make sure provisioning went okay
+if [[ $? -ne 0 ]]; then
+    echo
+    echo 'Uh oh! Looks like something went wrong with the server provisioning!'
+    echo
+    echo 'Check the above output for more details. Is the tomcat download url'
+    echo 'up to date? (Check scripts/provision.sh) and https://tomcat.apache.org/download-80.cgi.'
+    echo
+    echo 'To re-provision, you should:'
+    echo '  1. Re-image your server'
+    echo '  2. Remove the ".env" and "credentials.txt" file from this directory'
+    echo '  3. Edit "~/.ssh/known_hosts" and remove the entry for the servers ip'
+    echo '  4. Re-run this script'
+    echo
+    exit 1
+fi
 
 heading 'securing mysql installation...'
 
@@ -118,7 +140,7 @@ DELETE FROM mysql.db WHERE Db='test' OR Db='test\_%';
 FLUSH PRIVILEGES;
 sql
 
-echo 'MySQL configured!'
+[[ $? -eq 0 ]] && echo 'MySQL configured!'
 
 heading 'creating user'
 
@@ -138,6 +160,6 @@ service sshd restart
 service ssh restart
 setup_user
 
-echo 'User created and ssh locked down!'
+[[ $? -eq 0 ]] && echo 'User created and ssh locked down!'
 
 heading 'all done!'

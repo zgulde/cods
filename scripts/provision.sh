@@ -7,6 +7,8 @@ heading(){
     echo '----------------------------------'
 }
 
+set -e
+
 # setup swap file
 fallocate -l 1G /swapfile
 chmod 600 /swapfile
