@@ -8,7 +8,7 @@ auto_renew_certs() {
     if [[ $? -ne 0 ]]; then
         # no crontab yet, we will create it
         sudo crontab <<< "@daily sleep \$((\${RANDOM} % 60))m; /usr/bin/letsencrypt renew"
-    else 
+    else
         # check if autorenew is set up, if not, append to the current crontab
         grep "/usr/bin/letsencrypt renew"<<< "$(sudo crontab -l)" >/dev/null
         if [[ $? -eq 0 ]]; then
@@ -136,6 +136,7 @@ where <command> is one of the following:
     autorenew -- setup ssl certs to be automatically renewed
     reboot    -- reboot the server
     tomcatlog -- view the contents (cat) of /opt/tomcat/logs/catalina.out
+    followlog -- tail -f the contents of /opt/tomcat/logs/catalina.out
 
     upload  [file [destination]]    -- upload a file
     restart [servicename]           -- restart a service
@@ -180,6 +181,7 @@ case $command in
     addkey) add_sshkey $@;;
     autorenew) auto_renew_certs;;
     tomcatlog) ssh -t $user@$ip 'sudo cat /opt/tomcat/logs/catalina.out';;
+    followlog) ssh -t $user@$ip 'sudo tail -f /opt/tomcat/logs/catalina.out';;
     ping) echo 'Press Ctrl-C to exit.'; ping -c5 $ip;;
 
     *) show_usage;;
