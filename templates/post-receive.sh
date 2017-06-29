@@ -11,6 +11,7 @@ cd $tmp_repo
 if [[ -f $SITE_DIR/.config ]]; then
 	source $SITE_DIR/.config
 	if [[ ! -z "$source" ]] && [[ ! -z "$destination" ]]; then
+		echo "Found configuration file ${SITE_DIR}/.config!"
         echo "Copying $source file to $destination..."
 		cp $SITE_DIR/$source $tmp_repo/$destination
 	fi
@@ -33,6 +34,8 @@ if [[ -f .build_config ]]; then
 	echo ' > Building...'
 
 	$BUILD_COMMAND
+
+	# checks for successful building
 	if [[ $? -ne 0 ]]; then
         echo 'It looks like your build command failed (exited with a non-zero code)!'
         echo 'Aborting...'
@@ -46,9 +49,13 @@ if [[ -f .build_config ]]; then
 
 	rm -f /opt/tomcat/{{site}}/ROOT.war
 	mv $WAR_FILE /opt/tomcat/{{site}}/ROOT.war
+
 	echo '{{site}} deployed!'
+
 elif [[ -f install.sh ]]; then
 	bash install.sh
+else
+	echo 'No ".build_config" file or "install.sh" file found.'
 fi
 
 rm -rf $tmp_file
