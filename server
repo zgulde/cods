@@ -38,7 +38,7 @@ upload_file() {
         exit 1
     fi
 
-    scp $file $user@$ip:$destination
+    scp -r $file $user@$ip:$destination
 }
 
 restart_service() {
