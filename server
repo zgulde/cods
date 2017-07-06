@@ -32,6 +32,11 @@ upload_file() {
             file=$(perl -pe "s!~!$HOME!" <<< $file)
         fi
     fi
+    if [[ -z $destination ]]; then
+        echo 'Where should the file be uploaded on the server (e.g. /var/www/example.com/uploads)?'
+        echo 'Leave blank to default to the home directory of your user.'
+        read -p 'Destination: ' destination
+    fi
 
     if [[ ! -e $file ]]; then
         echo 'It appears as tough that file does not exist!'

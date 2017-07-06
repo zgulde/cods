@@ -269,7 +269,8 @@ arguments.
 ### General Server Commands
 
 - `login`: log in to the server
-- `upload`: upload a file to the server
+- `upload`: upload a file to the server (will default to the user's home
+  directory if no destination path is specified)
 - `info`: view some general information about your server
 - `restart`: restart a specific service. Shortcut for logging in and running
   `sudo systemctl restart ...`
@@ -360,6 +361,12 @@ OR
 ```
 
 and you will be prompted for the domain name.
+
+#### Upload a file to a site's uploads directory
+
+```bash
+./server upload ~/Downloads/kittens.png /var/www/example.com/uploads
+```
 
 #### Deploy a `war` to a site
 
