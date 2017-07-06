@@ -222,7 +222,14 @@ Take a look at the `.config` file for more information.
 
 If your deploment needs are more complex than what is described above, you can
 create a file named `install.sh` in the root of your project. This file will be
-executed if a `.build_config` file is not found.
+executed if a `.build_config` file is not found. This script will be executed
+from your project root, and several environment variables are available to it:
+
+- `SITE_DIR`: the directory that has the repo for your site, along with any
+  config files you have setup there (example value: `~/example.com`)
+- `WAR_TARGET_LOCATION`: Where the built war needs to end up so that tomcat can
+  find it (example value: `/opt/tomcat/example.com/ROOT.war`)
+- `TMP_REPO`: where the hook cloned the project, you probably won't need this
 
 ## HTTPS
 
