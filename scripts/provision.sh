@@ -1,4 +1,4 @@
-TOMCAT_DOWNLOAD_URL=http://supergsego.com/apache/tomcat/tomcat-8/v8.5.16/bin/apache-tomcat-8.5.16.tar.gz
+TOMCAT_DOWNLOAD_URL=http://mirror.nexcess.net/apache/tomcat/tomcat-8/v8.5.16/bin/apache-tomcat-8.5.16.tar.gz
 TOMCAT_TARGZ="$(perl -pe 's/.*\///' <<< $TOMCAT_DOWNLOAD_URL)"
 
 heading(){
