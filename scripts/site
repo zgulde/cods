@@ -62,7 +62,8 @@ create_site() {
     sudo systemctl restart tomcat
 
     sudo mkdir -p /var/www/${domain}/uploads
-    sudo chmod a+rw /var/www/${domain}/uploads
+    sudo chmod g+rw /var/www/${domain}/uploads
+    sudo chown -R tomcat:tomcat /var/www/${domain}/uploads
 
     # nginx config
     echo 'Configuring nginx...'
