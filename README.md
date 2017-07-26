@@ -220,6 +220,8 @@ following:
 
 Take a look at the `.config` file for more information.
 
+---
+
 If your deploment needs are more complex than what is described above, you can
 create a file named `install.sh` in the root of your project. This file will be
 executed if a `.build_config` file is not found. This script will be executed
@@ -229,7 +231,24 @@ from your project root, and several environment variables are available to it:
   config files you have setup there (example value: `~/example.com`)
 - `WAR_TARGET_LOCATION`: Where the built war needs to end up so that tomcat can
   find it (example value: `/opt/tomcat/example.com/ROOT.war`)
-- `TMP_REPO`: where the hook cloned the project, you probably won't need this
+
+Example `install.sh`
+
+```bash
+# 1. Do any pre-build steps you need to (e.g. compiling css/js assets)
+
+npm install
+# assuming npm is configured to output build files to the right place in your java app
+npm run build
+
+# 2. copy over any env specific files you have setup
+cp $SITE_DIR/application.properties src/main/resources/application.properties
+cp $SITE_DIR/secret.file src/main/resources/secret.file
+
+# 3. Build the war file and put it in the right place
+./mvnw package
+mv target/my-awesome-project.war $WAR_TARGET_LOCATION
+```
 
 ## HTTPS
 
