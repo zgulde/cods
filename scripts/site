@@ -84,19 +84,14 @@ enable_ssl() {
         read -p 'Enter the domain: ' domain
     fi
 
-    echo "domain: $domain"
-    echo '$(dig +short ${domain} | tail -n 1)'
-    echo "$(dig +short ${domain} | tail -n 1)"
-    echo "ip: $ip"
-
-    # verify dns records
-    if [[ "$(dig +short ${domain}) | tail -n 1" != $ip ]]; then
-        echo 'It looks like the dns records for that domain are not setup to'
-        echo 'point to your server. This is necessary for https. Aborting...'
-        exit 1
-    fi
+    echo 'Before running this command, make sure that the DNS records for your domain'
+    echo 'are configured to point to your server.'
+    echo 'If they are not properly configured, this command *will* fail.'
+    echo
+    read -p 'Press Enter to continue, or Ctrl-C to exit'
 
     ssh -t $user@$ip "
+    set -e
     mkdir -p \$HOME/${domain}
     sudo letsencrypt certonly\
         --authenticator webroot\
@@ -106,11 +101,7 @@ enable_ssl() {
         --email $email\
         --renew-by-default >> \$HOME/letsencrypt.log
 
-    if [[ $? -ne 0 ]]; then
-	    echo 'It looks like something went wrong! Check the above output for more details.'
-        exit 1
-    fi
-
+    echo 'Setting up nginx to serve ${domain} over https...'
     echo '$(sed -e s/{{domain}}/${domain}/g -e s/{{user}}/${user}/g $TEMPLATES/ssl-site.nginx.conf)' |\
         sudo tee /etc/nginx/sites-available/${domain} >/dev/null
     sudo systemctl restart nginx
