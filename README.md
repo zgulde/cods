@@ -462,7 +462,8 @@ out of the uploads directory for your site, which is located at
 ## Development Webserver
 
 There is a subcommand of server, `devserver` that can be used to start up nginx
-locally.
+locally. This will simulate the nginx setup running in production, but it is up
+to you to start the tomcat server locally on port 8080.
 
 ```bash
 ./server devserver my-project.dev
