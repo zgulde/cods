@@ -4,29 +4,29 @@ list_sites() {
 
 enable_git_deploment() {
     domain=$1
-	echo "Setting up git deployment..."
+    echo "Setting up git deployment..."
 
-	ssh -t $user@$ip "
-	mkdir -p \$HOME/${domain}
-	cat > \$HOME/${domain}/.config <<'.'
+    ssh -t $user@$ip "
+    mkdir -p \$HOME/${domain}
+    cat > \$HOME/${domain}/.config <<'.'
 $(cat $TEMPLATES/.config)
 .
-	git init --bare \$HOME/${domain}/repo.git
-	cat > \$HOME/${domain}/repo.git/hooks/post-receive <<'.'
+    git init --bare \$HOME/${domain}/repo.git
+    cat > \$HOME/${domain}/repo.git/hooks/post-receive <<'.'
 $(sed -e s/{{site}}/$domain/g $TEMPLATES/post-receive.sh)
 .
-	chmod +x \$HOME/${domain}/repo.git/hooks/post-receive
-	"
-	echo "git deployment configured!"
-	echo "Here is your deployment remote:"
-	echo
-	echo "    $user@$ip:${domain}/repo.git"
-	echo
-	echo "You can run something like:"
-	echo
-	echo "    git remote add production $user@$ip:${domain}/repo.git"
-	echo
-	echo "To add the remote."
+    chmod +x \$HOME/${domain}/repo.git/hooks/post-receive
+    "
+    echo "git deployment configured!"
+    echo "Here is your deployment remote:"
+    echo
+    echo "    $user@$ip:${domain}/repo.git"
+    echo
+    echo "You can run something like:"
+    echo
+    echo "    git remote add production $user@$ip:${domain}/repo.git"
+    echo
+    echo "To add the remote."
 }
 
 create_site() {
@@ -127,10 +127,31 @@ remove_site() {
     sudo rm -rf /opt/tomcat/${site}
     sudo rm -rf /opt/tomcat/conf/Catalina/${site}
     sudo rm -rf /var/www/${site}
-	sudo rm -rf \$HOME/${site}
+    sudo rm -rf \$HOME/${site}
     "
 
     [[ $? -eq 0 ]] && echo 'site removed!'
+}
+
+build_site() {
+    site=$1
+
+    if [[ -z "$site" ]]; then
+        read -p 'Enter the name of the site you wish to trigger a build for: ' site
+    fi
+
+    # ensure site exists
+    list_sites | grep "^$site$" >/dev/null 2>&1
+    if [[ $? -ne 0 ]]; then
+        echo 'That site does not exist!'
+        exit 1
+    fi
+
+    ssh -t $user@$ip "
+    cd $site/repo.git
+    hooks/post-receive
+    "
+
 }
 
 deploy_site() {
@@ -183,6 +204,7 @@ where <command> is one of the following:
     list
     create    [sitename]
     remove    [sitename]
+    build     [sitename]
     enablessl [sitename]
     deploy    [sitename [/path/to/site.war]]
 
@@ -193,10 +215,11 @@ command=$1
 shift
 
 case $command in
-    create)    create_site $@;;
     list|ls)   list_sites;;
+    create)    create_site $@;;
     remove|rm) remove_site $@;;
-    deploy)    deploy_site $@;;
+    build)     build_site $@;;
     enablessl) enable_ssl $@;;
+    deploy)    deploy_site $@;;
     *)         show_help;;
 esac
