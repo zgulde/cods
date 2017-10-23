@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # check for the utilities we'll need
 # these should be available on a default osx install
 prereqs=(perl dig ssh scp)

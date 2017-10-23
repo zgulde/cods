@@ -1,5 +1,3 @@
-#!/bin/bash
-
 list_sites() {
     ssh $user@$ip 'ls -1 /etc/nginx/sites-available' | grep -v '^default$'
 }

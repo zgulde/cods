@@ -161,7 +161,7 @@ SCRIPTS="$BASE_DIR/scripts"
 if [[ ! -f $ENV_FILE ]]; then
     echo 'No .env file found!'
     echo 'Running initial setup...'
-    source $SCRIPTS/setup
+    source $SCRIPTS/setup.sh
     exit
 fi
 
@@ -172,9 +172,9 @@ source $ENV_FILE
 
 case $command in
     # sub commands
-    site) source $SCRIPTS/site;;
-    db) source $SCRIPTS/db;;
-    devserver) source $SCRIPTS/devserver;;
+    site) source $SCRIPTS/site.sh;;
+    db) source $SCRIPTS/db.sh;;
+    devserver) source $SCRIPTS/devserver.sh;;
 
     # server managment
     login) ssh $user@$ip;;

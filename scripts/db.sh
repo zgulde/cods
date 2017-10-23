@@ -1,5 +1,3 @@
-#!/bin/bash
-
 list_databases() {
     ssh -t $user@$ip "mysql -p -e 'show databases'"
 }
