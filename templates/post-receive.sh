@@ -3,14 +3,22 @@
 SITE_DIR=$HOME/{{site}}
 WAR_TARGET_LOCATION=/opt/tomcat/{{site}}/ROOT.war
 
+TMP_REPO=$(mktemp -d)
+
 log() {
 	echo "[post-receive]: $@"
 }
 
-log '---- post-receive script started! ----'
-log 'cloning project...'
+cleanup() {
+	log "cleaning up temp files ($TMP_REPO)..."
+	rm -rf $TMP_REPO
+}
 
-TMP_REPO=$(mktemp -d)
+trap cleanup EXIT
+
+log '---- post-receive script started! ----'
+log "cloning project to '$TMP_REPO'..."
+
 git clone $(pwd) $TMP_REPO
 cd $TMP_REPO
 
@@ -42,7 +50,11 @@ if [[ -f .build_config ]]; then
         exit 1
     fi
 
-	log ' > Building...'
+	log '--------------------------------------------------'
+	log '> Building...'
+	log '--------------------------------------------------'
+	log
+	log "> $BUILD_COMMAND"
 
 	$BUILD_COMMAND
 
@@ -58,7 +70,7 @@ if [[ -f .build_config ]]; then
 		exit 1
 	fi
 
-	log 'Build success! Deploying the built war...'
+	log "Build success! Deploying $WAR_FILE to $WAR_TARGET_LOCATION..."
 	rm -f $WAR_TARGET_LOCATION
 	mv $WAR_FILE $WAR_TARGET_LOCATION
 
@@ -74,10 +86,6 @@ else
 	log 'No ".build_config" file or "install.sh" file found.'
 fi
 
-log 'Cleaning up...'
-rm -rf $TMP_REPO
-
-log 'All done!'
 log '--------------------------------------------------'
-log '> Thanks For Pushing!'
+log '> All done!'
 log '--------------------------------------------------'
