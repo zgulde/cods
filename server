@@ -1,24 +1,7 @@
 #!/bin/bash
 
-# letsencrypt asks us to choose a random minute of the hour to run the renewal
-# job
 auto_renew_certs() {
-	ssh -t $user@$ip '
-	sudo crontab -l >/dev/null 2>&1
-	if [[ $? -ne 0 ]]; then
-		# no crontab yet, we will create it
-		sudo crontab <<< "@daily sleep \$((\${RANDOM} % 60))m; /usr/bin/letsencrypt renew"
-	else
-		# check if autorenew is set up, if not, append to the current crontab
-		grep "/usr/bin/letsencrypt renew"<<< "$(sudo crontab -l)" >/dev/null
-		if [[ $? -eq 0 ]]; then
-			echo "Already setup to auto renew certs!"
-			exit 1
-		fi
-		sudo crontab <<< "$(sudo crontab -l)
-@daily sleep \$((\${RANDOM} % 60))m; /usr/bin/letsencrypt renew"
-	fi
-	'
+    ssh -t $user@$ip email=$email "$(< $SCRIPTS/snippets/letsencrypt-cronjob.sh)"
 }
 
 upload_file() {
