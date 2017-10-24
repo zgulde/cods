@@ -1,65 +1,91 @@
 #!/bin/bash
 
 SITE_DIR=$HOME/{{site}}
+WAR_TARGET_LOCATION=/opt/tomcat/{{site}}/ROOT.war
 
-echo '--------------------------------------------------'
+TMP_REPO=$(mktemp -d)
 
-tmp_repo=$(mktemp -d)
-git clone $(pwd) $tmp_repo
-cd $tmp_repo
+log() {
+	echo "[post-receive]: $@"
+}
+
+cleanup() {
+	log "cleaning up temp files ($TMP_REPO)..."
+	rm -rf $TMP_REPO
+}
+
+trap cleanup EXIT
+
+log '---- post-receive script started! ----'
+log "cloning project to '$TMP_REPO'..."
+
+git clone $(pwd) $TMP_REPO
+cd $TMP_REPO
 
 if [[ -f $SITE_DIR/.config ]]; then
 	source $SITE_DIR/.config
 	if [[ ! -z "$source" ]] && [[ ! -z "$destination" ]]; then
-		echo "Found configuration file ${SITE_DIR}/.config!"
-        echo "Copying $source file to $destination..."
-		cp $SITE_DIR/$source $tmp_repo/$destination
+		log "Found configuration file: '${SITE_DIR}/.config'!"
+		log "Copying $source file to $destination..."
+		cp $SITE_DIR/$source $TMP_REPO/$destination
+	else
+		log 'Configuration file found, but $source and $destination are not set.'
+		log 'Nothing copied. Continuing...'
 	fi
+else
+	log "No configuration file ($SITE_DIR/.config) found. Continuing..."
 fi
 
 if [[ -f .build_config ]]; then
 	source .build_config
 
-    if [[ -z $BUILD_COMMAND ]]; then
-        echo '$BUILD_COMMAND not set! (Check the .build_config file)'
-        echo 'Aborting...'
-        exit 1
-    fi
-    if [[ -z $WAR_FILE ]]; then
-        echo '$WAR_FILE not set! (Check the .build_config file)'
-        echo 'Aborting...'
-        exit 1
-    fi
+	if [[ -z $BUILD_COMMAND ]]; then
+		log '$BUILD_COMMAND not set! (Check the .build_config file)'
+		log 'Aborting...'
+		exit 1
+	fi
+	if [[ -z $WAR_FILE ]]; then
+		log '$WAR_FILE not set! (Check the .build_config file)'
+		log 'Aborting...'
+		exit 1
+	fi
 
-	echo ' > Building...'
+	log '--------------------------------------------------'
+	log '> Building...'
+	log '--------------------------------------------------'
+	log
+	log "> $BUILD_COMMAND"
 
 	$BUILD_COMMAND
 
 	# checks for successful building
 	if [[ $? -ne 0 ]]; then
-        echo 'It looks like your build command failed (exited with a non-zero code)!'
-        echo 'Aborting...'
+		log 'It looks like your build command failed (exited with a non-zero code)!'
+		log 'Aborting...'
 		exit 1
 	fi
 	if [[ ! -f $WAR_FILE ]]; then
-		echo "Build was successful, but war file: "$WAR_FILE" was not found!"
-        echo 'Aborting...'
+		log "Build was successful, but war file: '$WAR_FILE' was not found!"
+		log 'Aborting...'
 		exit 1
 	fi
 
-	rm -f /opt/tomcat/{{site}}/ROOT.war
-	mv $WAR_FILE /opt/tomcat/{{site}}/ROOT.war
+	log "Build success! Deploying $WAR_FILE to $WAR_TARGET_LOCATION..."
+	rm -f $WAR_TARGET_LOCATION
+	mv $WAR_FILE $WAR_TARGET_LOCATION
 
-	echo '{{site}} deployed!'
+	log '{{site}} deployed!'
 
 elif [[ -f install.sh ]]; then
+	log 'Found "install.sh"! Running...'
+	export SITE_DIR
+	export WAR_TARGET_LOCATION
+	export TMP_REPO
 	bash install.sh
 else
-	echo 'No ".build_config" file or "install.sh" file found.'
+	log 'No ".build_config" file or "install.sh" file found.'
 fi
 
-rm -rf $tmp_file
-
-echo '--------------------------------------------------'
-echo '> Thanks For Pushing!'
-echo '--------------------------------------------------'
+log '--------------------------------------------------'
+log '> All done!'
+log '--------------------------------------------------'

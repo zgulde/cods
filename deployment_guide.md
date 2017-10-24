@@ -53,7 +53,7 @@ Spring boot will also allow us to package our application as a `war`.
         public static void main(String[] args) {
             SpringApplication.run(BlogApplication.class, args);
         }
-        
+
         protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
             return application.sources(BlogApplication.class);
         }
@@ -143,7 +143,7 @@ Spring boot will also allow us to package our application as a `war`.
     ```
     cd ~/my-server
     ./server
-    ``` 
+    ```
 
 1. Create a database for your site
 
@@ -188,8 +188,16 @@ Spring boot will also allow us to package our application as a `war`.
     This file should be located in `~/example.com/application.properties` on
     your server, and should contain your production credentials.
 
+    ```
+    nano example.com/application.properties
+    ```
+
     Next, uncomment the two lines in `~/example.com/.config` that reference the
     `application.properties` file.
+
+    ```
+    nano example.com/.config
+    ```
 
     You can now log out of the server.
 
@@ -198,7 +206,15 @@ Spring boot will also allow us to package our application as a `war`.
     Add the git remote (from the site setup command) to your project, and push
     to your new remote.
 
-1. (optionally) enable ssl
+    ```
+    cd ~/IdeaProjects/my-project
+    git remote add ...
+    ```
+
+# Additional Information
+
+Everything that follows is additional information, and not formally part of the
+deployment process.
 
 ## Troubleshooting Deployment Problems
 
@@ -222,11 +238,11 @@ Spring boot will also allow us to package our application as a `war`.
 - Did you:
 
     - Change your class with the `main` method?
-    - Change the `packaging` in your `pom.xml`?
+    - Change the `packaging` in your `pom.xml`? Change it from `jar` to `war`
     - Add the `.build_config` file?
-    - Setup the site on the server?
-    - Setup a database on the server?
-    - Setup the production `application.properties` file?
+    - Setup the site on the server? Run `./server site create`
+    - Setup a database on the server? Run `./server db create`
+    - Setup the production `application.properties` file on your server?
     - Setup the `.config` file on your server?
     - Push your changes?
 
@@ -234,6 +250,15 @@ Spring boot will also allow us to package our application as a `war`.
 
 To make changes to an existing site, simply commit the changes and push to your
 deployment remote.
+
+If change a file on the server *without* a change to your Java code base (e.g.
+editing a value in the production `application.properties` file), you might wish
+to rebuild the project without pushing a change to the git remote. You can do so
+with the following command:
+
+```
+./server site build example.com
+```
 
 ## Creating a new site on a server that is already setup
 
@@ -261,12 +286,13 @@ deployment remote.
 
 ## HTTPS
 
-See the main readme for instructions on enabling https. After doing that, you
-can run the following command to setup auto-renewal of any ssl certificates:
+**You can only do this if your DNS records are properly configured.**
 
 ```
-./server autorenew
+./server site enablessl example.com
 ```
+
+See the `HTTPS` section in the main README for more details
 
 ## Manual Deployment
 

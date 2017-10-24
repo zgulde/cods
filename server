@@ -1,149 +1,137 @@
 #!/bin/bash
 
-# letsencrypt asks us to choose a random minute of the hour to run the renewal
-# job
 auto_renew_certs() {
-    ssh -t $user@$ip '
-    sudo crontab -l >/dev/null 2>&1
-    if [[ $? -ne 0 ]]; then
-        # no crontab yet, we will create it
-        sudo crontab <<< "@daily sleep \$((\${RANDOM} % 60))m; /usr/bin/letsencrypt renew"
-    else
-        # check if autorenew is set up, if not, append to the current crontab
-        grep "/usr/bin/letsencrypt renew"<<< "$(sudo crontab -l)" >/dev/null
-        if [[ $? -eq 0 ]]; then
-            echo "Already setup to auto renew certs!"
-            exit 1
-        fi
-        sudo crontab <<< "$(sudo crontab -l)
-@daily sleep \$((\${RANDOM} % 60))m; /usr/bin/letsencrypt renew"
-    fi
-    '
+    ssh -t $user@$ip email=$email "$(< $SCRIPTS/snippets/letsencrypt-cronjob.sh)"
 }
 
 upload_file() {
-    file=$1
-    destination=$2
+	file=$1
+	destination=$2
 
-    if [[ -z $file ]]; then
-        read -ep 'File to upload: ' file
-        # parse the home directory correctly
-        if grep '^~' <<< "$file"; then
-            file=$(perl -pe "s!~!$HOME!" <<< $file)
-        fi
-    fi
+	if [[ -z $file ]]; then
+		read -ep 'File to upload: ' file
+		# parse the home directory correctly
+		if grep '^~' <<< "$file"; then
+			file=$(perl -pe "s!~!$HOME!" <<< $file)
+		fi
+	fi
+	if [[ -z $destination ]]; then
+		echo 'Where should the file be uploaded on the server (e.g. /var/www/example.com/uploads)?'
+		echo 'Leave blank to default to the home directory of your user.'
+		read -p 'Destination: ' destination
+	fi
 
-    if [[ ! -e $file ]]; then
-        echo 'It appears as tough that file does not exist!'
-        exit 1
-    fi
+	if [[ ! -e $file ]]; then
+		echo 'It appears as tough that file does not exist!'
+		exit 1
+	fi
 
-    scp -r $file $user@$ip:$destination
+	scp -r $file $user@$ip:$destination
 }
 
 restart_service() {
-    service_name=$1
-    if [[ -z $service_name ]]; then
-        read -p 'service to restart: ' service_name
-    fi
-    ssh -t $user@$ip "sudo systemctl restart $service_name"
-    [[ $? -eq 0 ]] && echo "$service_name restarted!"
+	service_name=$1
+	if [[ -z $service_name ]]; then
+		read -p 'service to restart: ' service_name
+	fi
+	ssh -t $user@$ip "sudo systemctl restart $service_name"
+	[[ $? -eq 0 ]] && echo "$service_name restarted!"
 }
 
 add_user() {
-    new_user=$1
-    sshkeyfile=$2
-    if [[ -z $new_user ]]; then
-        read -p 'new username: ' new_user
-    fi
-    if [[ -z $sshkeyfile ]]; then
-        read -ep 'ssh key file path: ' sshkeyfile
-        # parse the home directory correctly
-        if grep '^~' <<< "$sshkeyfile"; then
-            sshkeyfile=$(perl -pe "s!~!$HOME!" <<< $sshkeyfile)
-        fi
-    fi
-    if [[ ! -f $sshkeyfile ]]; then
-        echo 'Please enter a valid ssh key file.'
-        exit 1
-    fi
+	new_user=$1
+	sshkeyfile=$2
+	if [[ -z $new_user ]]; then
+		read -p 'new username: ' new_user
+	fi
+	if [[ -z $sshkeyfile ]]; then
+		read -ep 'ssh key file path: ' sshkeyfile
+		# parse the home directory correctly
+		if grep '^~' <<< "$sshkeyfile"; then
+			sshkeyfile=$(perl -pe "s!~!$HOME!" <<< $sshkeyfile)
+		fi
+	fi
+	if [[ ! -f $sshkeyfile ]]; then
+		echo 'Please enter a valid ssh key file.'
+		exit 1
+	fi
 
-    read -sp 'password for the new user: ' password
-    echo
-    read -sp 'confirm password: ' password
-    echo
+	read -sp 'password for the new user: ' password
+	echo
+	read -sp 'confirm password: ' password
+	echo
 
-    echo "Creating user ${new_user}..."
+	echo "Creating user ${new_user}..."
 
-    ssh -t $user@$ip "
-    sudo useradd --create-home --shell /bin/bash --groups sudo,tomcat $new_user
-    echo '$new_user:$password' | sudo chpasswd
-    sudo mkdir -p /home/$new_user/.ssh
-    cat <<< '$(cat $sshkeyfile)' | sudo tee /home/$new_user/.ssh/authorized_keys >/dev/null
-    sudo chown --recursive $new_user:$new_user /home/$new_user
-    "
-    [[ $? -eq 0 ]] && echo "User ${new_user} created!"
+	ssh -t $user@$ip "
+	sudo useradd --create-home --shell /bin/bash --groups sudo,tomcat $new_user
+	echo '$new_user:$password' | sudo chpasswd
+	sudo mkdir -p /home/$new_user/.ssh
+	cat <<< '$(cat $sshkeyfile)' | sudo tee /home/$new_user/.ssh/authorized_keys >/dev/null
+	sudo chown --recursive $new_user:$new_user /home/$new_user
+	"
+	[[ $? -eq 0 ]] && echo "User ${new_user} created!"
 }
 
 add_sshkey() {
-    sshkeyfile=$1
-    if [[ -z $sshkeyfile ]]; then
-        read -ep 'Path to the key file: ' sshkeyfile
-        # parse the home directory correctly
-        if grep '^~' <<< "$sshkeyfile"; then
-            sshkeyfile=$(perl -pe "s!~!$HOME!" <<< $sshkeyfile)
-        fi
-    fi
-    if [[ ! -f $sshkeyfile ]]; then
-        echo 'Please enter a valid ssh key file path.'
-        exit 1
-    fi
+	sshkeyfile=$1
+	if [[ -z $sshkeyfile ]]; then
+		read -ep 'Path to the key file: ' sshkeyfile
+		# parse the home directory correctly
+		if grep '^~' <<< "$sshkeyfile"; then
+			sshkeyfile=$(perl -pe "s!~!$HOME!" <<< $sshkeyfile)
+		fi
+	fi
+	if [[ ! -f $sshkeyfile ]]; then
+		echo 'Please enter a valid ssh key file path.'
+		exit 1
+	fi
 
-    cat $sshkey | ssh $user@$ip 'cat >> .ssh/authorized_keys'
-    [[ $? -eq 0 ]] && echo 'ssh key added!'
+	cat $sshkey | ssh $user@$ip 'cat >> .ssh/authorized_keys'
+	[[ $? -eq 0 ]] && echo 'ssh key added!'
 }
 
 show_info() {
-    cat <<info
-Information about your server:
+	cat <<-info
+	Information about your server:
 
-ip address: $ip
-login:      $user
+	ip address: $ip
+	login:	  $user
 
-MySQL port: 3306
-ssh port:   22
+	MySQL port: 3306
+	ssh port:   22
 
-info
+	info
 }
 
 show_usage() {
-    cat <<help_message
-server -- command for server management
-usage
+	cat <<-help_message
+	server -- command for server management
+	usage
 
-    ./server <command>
+	    ./server <command>
 
-where <command> is one of the following:
+	where <command> is one of the following:
 
-    site -- manage sites
-    db   -- manage databases
+	    site -- manage sites
+	    db   -- manage databases
 
-    devserver -- development web server
+	    devserver -- development web server
 
-    login     -- login to the server
-    info      -- display information about the server
-    ping      -- ping the server
-    autorenew -- setup ssl certs to be automatically renewed
-    reboot    -- reboot the server
-    tomcatlog -- view the contents (cat) of /opt/tomcat/logs/catalina.out
-    followlog -- tail -f the contents of /opt/tomcat/logs/catalina.out
+	    login     -- login to the server
+	    info      -- display information about the server
+	    ping      -- ping the server
+	    autorenew -- setup ssl certs to be automatically renewed
+	    reboot    -- reboot the server
+	    tomcatlog -- view the contents (cat) of /opt/tomcat/logs/catalina.out
+	    followlog -- tail -f the contents of /opt/tomcat/logs/catalina.out
 
-    upload  [file [destination]]    -- upload a file
-    restart [servicename]           -- restart a service
-    addkey  [sshkeyfile]            -- add an ssh key for your user
-    adduser [username [sshkeyfile]] -- create a new admin user
+	    upload  [file [destination]]    -- upload a file
+	    restart [servicename]           -- restart a service
+	    addkey  [sshkeyfile]            -- add an ssh key for your user
+	    adduser [username [sshkeyfile]] -- create a new admin user
 
-help_message
+	help_message
 }
 
 # find out where this script is located
@@ -154,10 +142,10 @@ TEMPLATES="$BASE_DIR/templates"
 SCRIPTS="$BASE_DIR/scripts"
 
 if [[ ! -f $ENV_FILE ]]; then
-    echo 'No .env file found!'
-    echo 'Running initial setup...'
-    source $SCRIPTS/setup
-    exit
+	echo 'No .env file found!'
+	echo 'Running initial setup...'
+	source $SCRIPTS/setup.sh
+	exit
 fi
 
 command=$1
@@ -166,23 +154,23 @@ shift
 source $ENV_FILE
 
 case $command in
-    # sub commands
-    site) source $SCRIPTS/site;;
-    db) source $SCRIPTS/db;;
-    devserver) source $SCRIPTS/devserver;;
+	# sub commands
+	site)      source $SCRIPTS/site.sh;;
+	db)        source $SCRIPTS/db.sh;;
+	devserver) source $SCRIPTS/devserver.sh;;
 
-    # server managment
-    login) ssh $user@$ip;;
-    upload) upload_file $@;;
-    restart) restart_service $@;;
-    reboot) ssh -t $user@$ip 'sudo reboot';;
-    info) show_info;;
-    adduser) add_user $@;;
-    addkey) add_sshkey $@;;
-    autorenew) auto_renew_certs;;
-    tomcatlog) ssh -t $user@$ip 'sudo cat /opt/tomcat/logs/catalina.out';;
-    followlog) ssh -t $user@$ip 'sudo tail -f /opt/tomcat/logs/catalina.out';;
-    ping) echo 'Press Ctrl-C to exit.'; ping -c5 $ip;;
+	# server managment
+	login)     ssh $user@$ip;;
+	upload)    upload_file $@;;
+	restart)   restart_service $@;;
+	reboot)    ssh -t $user@$ip 'sudo reboot';;
+	info)      show_info;;
+	adduser)   add_user $@;;
+	addkey)    add_sshkey $@;;
+	autorenew) auto_renew_certs;;
+	tomcatlog) ssh -t $user@$ip 'sudo cat /opt/tomcat/logs/catalina.out';;
+	followlog) ssh -t $user@$ip 'sudo tail -f /opt/tomcat/logs/catalina.out';;
+	ping)      echo 'Press Ctrl-C to exit.'; ping -c5 $ip;;
 
-    *) show_usage;;
+	*) show_usage;;
 esac

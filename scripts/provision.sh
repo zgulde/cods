@@ -1,10 +1,10 @@
-TOMCAT_DOWNLOAD_URL=http://mirror.nexcess.net/apache/tomcat/tomcat-8/v8.5.16/bin/apache-tomcat-8.5.16.tar.gz
+TOMCAT_DOWNLOAD_URL=http://apache.mirrors.tds.net/tomcat/tomcat-8/v8.5.23/bin/apache-tomcat-8.5.23.tar.gz
 TOMCAT_TARGZ="$(perl -pe 's/.*\///' <<< $TOMCAT_DOWNLOAD_URL)"
 
 heading(){
-    echo '----------------------------------'
-    echo "> $@"
-    echo '----------------------------------'
+	echo '----------------------------------'
+	echo "> $@"
+	echo '----------------------------------'
 }
 
 set -e
@@ -27,13 +27,13 @@ heading 'installing packages'
 export DEBIAN_FRONTEND=noninteractive
 
 apt-get install -y\
-    nginx\
-    default-jdk\
-    ufw\
-    mysql-server\
-    unattended-upgrades\
-    maven\
-    letsencrypt
+	nginx\
+	default-jdk\
+	ufw\
+	mysql-server\
+	unattended-upgrades\
+	maven\
+	letsencrypt
 
 heading "Installing tomcat..."
 
@@ -67,27 +67,27 @@ cat > /opt/tomcat/conf/server.xml <<'server.xml'
   <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener" />
   <Listener className="org.apache.catalina.core.ThreadLocalLeakPreventionListener" />
   <GlobalNamingResources>
-    <Resource name="UserDatabase" auth="Container"
-              type="org.apache.catalina.UserDatabase"
-              description="User database that can be updated and saved"
-              factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
-              pathname="conf/tomcat-users.xml" />
+	<Resource name="UserDatabase" auth="Container"
+			  type="org.apache.catalina.UserDatabase"
+			  description="User database that can be updated and saved"
+			  factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
+			  pathname="conf/tomcat-users.xml" />
   </GlobalNamingResources>
   <Service name="Catalina">
-    <Connector port="8009" protocol="AJP/1.3" redirectPort="8443" />
-    <Connector port="8080"
-        proxyPort="80"
-        protocol="HTTP/1.1"
-        connectionTimeout="20000"
-        redirectPort="8443" />
-    <Engine name="Catalina" defaultHost="localhost">
-      <Realm className="org.apache.catalina.realm.LockOutRealm">
-        <Realm className="org.apache.catalina.realm.UserDatabaseRealm"
-               resourceName="UserDatabase"/>
-      </Realm>
-      <!--## Virtual Hosts ##-->
-      <Host name="localhost" appBase="webapps" deployOnStartup="false" />
-    </Engine>
+	<Connector port="8009" protocol="AJP/1.3" redirectPort="8443" />
+	<Connector port="8080"
+		proxyPort="80"
+		protocol="HTTP/1.1"
+		connectionTimeout="20000"
+		redirectPort="8443" />
+	<Engine name="Catalina" defaultHost="localhost">
+	  <Realm className="org.apache.catalina.realm.LockOutRealm">
+		<Realm className="org.apache.catalina.realm.UserDatabaseRealm"
+			   resourceName="UserDatabase"/>
+	  </Realm>
+	  <!--## Virtual Hosts ##-->
+	  <Host name="localhost" appBase="webapps" deployOnStartup="false" />
+	</Engine>
   </Service>
 </Server>
 server.xml
@@ -140,8 +140,8 @@ rm /etc/nginx/sites-available/default
 cat > /etc/nginx/sites-available/default <<nginx_conf
 # return an empty response, don't redirect to an existing server
 server {
-    listen 80 default_server;
-    return 444;
+	listen 80 default_server;
+	return 444;
 }
 nginx_conf
 mkdir -p /var/www

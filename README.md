@@ -50,8 +50,8 @@ cd ~/my-awesome-server
 
 # 3. create a database and user for the application
 ./server db create blog_db blog_user
-# optionally run a migration
-./server db migrate blog_db ~/IdeaProjects/myblog/migration.sql
+# optionally run a migration or seeder
+./server db run blog_db ~/IdeaProjects/myblog/migration.sql
 
 # 4. setup your server to listen for requests for your domain
 ./server site create myblog.com
@@ -137,16 +137,16 @@ database (but not any others).
 
 You will be prompted for a password for the new database user.
 
-#### (Optionally) Run a migration
+#### (Optionally) Run a migration or seeder
 
-Once your database is created, you can have the `db` subcommand run a migration
-script if you so desire.
+Once your database is created, you can use the `db` subcommand to run a
+migration or seeder script if you so desire.
 
-You will need to provide the name of the database you wish to run the migraiton
-on, and the path to the `sql` file.
+You will need to provide the name of the database you wish to run the file on,
+and the path to the `sql` file.
 
 ```bash
-./server db migrate some_db /path/to/the/migration.sql
+./server db run some_db /path/to/the/migration.sql
 ```
 
 ### Deploy The `war`
@@ -177,10 +177,11 @@ Alternatively, you can setup automated deployments with git.
 ## Git Deployment
 
 When a site is setup, the server will also be setup for automated builds and
-deployments with git. This functionality is two-fold: there is a simple setup,
-and the ability to do somethings more advanced. When the site is created, an
-empty git repository will be initialized in a directory in your home directory
-named after the site name, for example:
+deployments with git. This is accomplished through a `post-receive` git hook.
+This functionality is two-fold: there is a simple setup, and the ability to do
+somethings more advanced. When the site is created, an empty git repository will
+be initialized in a directory in your home directory named after the site name,
+for example:
 
     ~/example.com/repo.git
 
@@ -220,13 +221,51 @@ following:
 
 Take a look at the `.config` file for more information.
 
+---
+
 If your deploment needs are more complex than what is described above, you can
 create a file named `install.sh` in the root of your project. This file will be
-executed if a `.build_config` file is not found.
+executed if a `.build_config` file is not found. This script will be executed
+from your project root, and several environment variables are available to it:
+
+- `SITE_DIR`: the directory that has the repo for your site, along with any
+  config files you have setup there (example value: `~/example.com`)
+- `WAR_TARGET_LOCATION`: Where the built war needs to end up so that tomcat can
+  find it (example value: `/opt/tomcat/example.com/ROOT.war`)
+
+Example `install.sh`
+
+```bash
+# 1. Do any pre-build steps you need to (e.g. compiling css/js assets)
+#    Any custom build/deployment logic should go here
+
+# for example
+npm install
+npm run build
+
+# 2. copy over any env specific files you have setup
+cp $SITE_DIR/application.properties src/main/resources/application.properties
+cp $SITE_DIR/secret.file src/main/resources/secret.file
+
+# 3. Build the war file and put it in the right place
+./mvnw package
+mv target/my-awesome-project.war $WAR_TARGET_LOCATION
+```
+
+### Manually Triggering A Build
+
+You can also manually trigger a build and deploy without needing to push to the
+git remote on your server.
+
+```
+./server site build example.com
+```
+
+This will run the same script that runs when you push to the remote.
 
 ## HTTPS
 
-The site managment command has a sub command that will obtain a certificate
+The site management command has a sub command that will obtain a certificate
 from [letsencrypt](https://letsencrypt.org/) and enable https on a per-site
 basis.
 
@@ -269,7 +308,8 @@ arguments.
 ### General Server Commands
 
 - `login`: log in to the server
-- `upload`: upload a file to the server
+- `upload`: upload a file to the server (will default to the user's home
+  directory if no destination path is specified)
 - `info`: view some general information about your server
 - `restart`: restart a specific service. Shortcut for logging in and running
   `sudo systemctl restart ...`
@@ -279,6 +319,7 @@ arguments.
 - `addkey`: add an authorized ssh key to the server for your account
 - `adduser`: add a user account to the server
 - `tomcatlog`: view the contents of the tomcat log file, `/opt/tomcat/logs/catalina.out`
+- `followlog`: watch the contents of the tomcat log file in real-time (`tail -f`)
 
 ### Site and Database Managment Commands
 
@@ -289,6 +330,7 @@ which can be seen by running the command by itself.
 
 - `list`: view the sites that are currently setup on the server
 - `create`: create a new site
+- `build`: trigger a build and deployment of an existing site
 - `remove`: remove a site. Will remove the nginx config for the site, as well as
   any previously deployed `war`s
 - `enablessl`: enable https for a site
@@ -301,7 +343,7 @@ which can be seen by running the command by itself.
 - `create`: create a new database and a user with privileges on only that
   database
 - `backup`: create a backup of a database
-- `migrate`: run a migration script for a specific database
+- `run`: run a sql script for a specific database
 - `remove`: remove a database and user
 
 ### Examples
@@ -333,6 +375,20 @@ directory is the directory where you cloned this repository.
 ./server db login
 ```
 
+#### Run a seeder file on an already existing database
+
+```bash
+./server db run example_db ~/my-project/sql/seeder.sql
+```
+
+OR
+
+```bash
+./server db run
+```
+
+and you will be prompted for the database name and filepath.
+
 #### Create a site
 
 ```bash
@@ -346,6 +402,12 @@ OR
 ```
 
 and you will be prompted for the domain name.
+
+#### Upload a file to a site's uploads directory
+
+```bash
+./server upload ~/Downloads/kittens.png /var/www/example.com/uploads
+```
 
 #### Deploy a `war` to a site
 
@@ -412,10 +474,14 @@ Nginx is set up to intercept any requests to `/uploads` and try to serve them
 out of the uploads directory for your site, which is located at
 `/var/www/example.com/uploads`.
 
+You can setup your application to interact with this directory, and use the
+`upload` subcommand to manually put files here.
+
 ## Development Webserver
 
 There is a subcommand of server, `devserver` that can be used to start up nginx
-locally.
+locally. This will simulate the nginx setup running in production, but it is up
+to you to start the tomcat server locally on port 8080.
 
 ```bash
 ./server devserver my-project.dev

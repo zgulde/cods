@@ -1,26 +1,24 @@
-#!/bin/bash
-
 # check for the utilities we'll need
 # these should be available on a default osx install
 prereqs=(perl dig ssh scp)
 for tool in ${prereqs[@]}; do
-    which $tool >/dev/null
-    if [[ $? -ne 0 ]]; then
-        echo "Please install '$tool' before continuing."
-        exit 1
-    fi
+	which $tool >/dev/null
+	if [[ $? -ne 0 ]]; then
+		echo "Please install '$tool' before continuing."
+		exit 1
+	fi
 done
 
 heading(){
-    echo '----------------------------------'
-    echo "> $@"
-    echo '----------------------------------'
+	echo '----------------------------------'
+	echo "> $@"
+	echo '----------------------------------'
 }
 
 if [[ -e ./.env ]]; then
-    echo 'It looks like things are already setup, aborting...'
-    echo 'To redo the setup process, delete the ".env" file'
-    exit 1
+	echo 'It looks like things are already setup, aborting...'
+	echo 'To redo the setup process, delete the ".env" file'
+	exit 1
 fi
 
 read -p 'Enter the servers ip address: ' ip
@@ -32,8 +30,8 @@ echo
 # make sure we can access that server
 ssh root@$ip ls > /dev/null
 if [[ $? -ne 0 ]]; then
-    echo "Cannot login to $ip!"
-    exit 1
+	echo "Cannot login to $ip!"
+	exit 1
 fi
 
 echo
@@ -51,22 +49,22 @@ echo 'rules, you should choose something different.'
 echo
 read -p "Enter a username (default $USER): " user
 if [[ -z "$user" ]]; then
-    user=$USER
+	user=$USER
 fi
 # validate username
 if [[ "$user" == "root" ]]; then
-    echo 'Username cannot be "root". Aborting...'
-    echo 'Server not setup, and no configuration file created.'
-    echo 'Try running the script again.'
-    exit 1
+	echo 'Username cannot be "root". Aborting...'
+	echo 'Server not setup, and no configuration file created.'
+	echo 'Try running the script again.'
+	exit 1
 fi
 perl -ne 'exit 1 unless /^[a-z][a-z0-9_]{0,29}$/' <<< "$user"
 if [[ $? -ne 0 ]]; then
-    echo "Ivalid username: '$user'! Aborting..."
-    echo 'Server not setup, and no configuration file created.'
-    echo 'Make sure your username matches the given rules, and try running'
-    echo 'the script again.'
-    exit 1
+	echo "Ivalid username: '$user'! Aborting..."
+	echo 'Server not setup, and no configuration file created.'
+	echo 'Make sure your username matches the given rules, and try running'
+	echo 'the script again.'
+	exit 1
 fi
 
 echo
@@ -89,7 +87,7 @@ echo 'These have been saved to "credentials.txt".'
 echo
 echo '+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Warning ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+'
 echo '| For security purposes, it is advised you delete the credentials.txt  |'
-echo '| file and move these into a password manager                          |'
+echo '| file and move these into a password manager						  |'
 echo '+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+'
 echo
 echo 'Next, we will provision the server. Please be patient, as this process'
@@ -112,19 +110,19 @@ ssh root@$ip bash < $SCRIPTS/provision.sh
 
 # make sure provisioning went okay
 if [[ $? -ne 0 ]]; then
-    echo
-    echo 'Uh oh! Looks like something went wrong with the server provisioning!'
-    echo
-    echo 'Check the above output for more details. Is the tomcat download url'
-    echo 'up to date? (Check scripts/provision.sh) and https://tomcat.apache.org/download-80.cgi.'
-    echo
-    echo 'To re-provision, you should:'
-    echo '  1. Re-image your server'
-    echo '  2. Remove the ".env" and "credentials.txt" file from this directory'
-    echo '  3. Edit "~/.ssh/known_hosts" and remove the entry for the servers ip'
-    echo '  4. Re-run this script'
-    echo
-    exit 1
+	echo
+	echo 'Uh oh! Looks like something went wrong with the server provisioning!'
+	echo
+	echo 'Check the above output for more details. Is the tomcat download url'
+	echo 'up to date? (Check scripts/provision.sh) and https://tomcat.apache.org/download-80.cgi.'
+	echo
+	echo 'To re-provision, you should:'
+	echo '  1. Re-image your server'
+	echo '  2. Remove the ".env" and "credentials.txt" file from this directory'
+	echo '  3. Edit "~/.ssh/known_hosts" and remove the entry for the servers ip'
+	echo '  4. Re-run this script'
+	echo
+	exit 1
 fi
 
 heading 'securing mysql installation...'
