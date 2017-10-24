@@ -26,7 +26,7 @@ if [[ -f $SITE_DIR/.config ]]; then
 	source $SITE_DIR/.config
 	if [[ ! -z "$source" ]] && [[ ! -z "$destination" ]]; then
 		log "Found configuration file: '${SITE_DIR}/.config'!"
-        log "Copying $source file to $destination..."
+		log "Copying $source file to $destination..."
 		cp $SITE_DIR/$source $TMP_REPO/$destination
 	else
 		log 'Configuration file found, but $source and $destination are not set.'
@@ -39,16 +39,16 @@ fi
 if [[ -f .build_config ]]; then
 	source .build_config
 
-    if [[ -z $BUILD_COMMAND ]]; then
-        log '$BUILD_COMMAND not set! (Check the .build_config file)'
-        log 'Aborting...'
-        exit 1
-    fi
-    if [[ -z $WAR_FILE ]]; then
-        log '$WAR_FILE not set! (Check the .build_config file)'
-        log 'Aborting...'
-        exit 1
-    fi
+	if [[ -z $BUILD_COMMAND ]]; then
+		log '$BUILD_COMMAND not set! (Check the .build_config file)'
+		log 'Aborting...'
+		exit 1
+	fi
+	if [[ -z $WAR_FILE ]]; then
+		log '$WAR_FILE not set! (Check the .build_config file)'
+		log 'Aborting...'
+		exit 1
+	fi
 
 	log '--------------------------------------------------'
 	log '> Building...'
@@ -60,13 +60,13 @@ if [[ -f .build_config ]]; then
 
 	# checks for successful building
 	if [[ $? -ne 0 ]]; then
-        log 'It looks like your build command failed (exited with a non-zero code)!'
-        log 'Aborting...'
+		log 'It looks like your build command failed (exited with a non-zero code)!'
+		log 'Aborting...'
 		exit 1
 	fi
 	if [[ ! -f $WAR_FILE ]]; then
 		log "Build was successful, but war file: '$WAR_FILE' was not found!"
-        log 'Aborting...'
+		log 'Aborting...'
 		exit 1
 	fi
 
