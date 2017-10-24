@@ -177,10 +177,11 @@ Alternatively, you can setup automated deployments with git.
 ## Git Deployment
 
 When a site is setup, the server will also be setup for automated builds and
-deployments with git. This functionality is two-fold: there is a simple setup,
-and the ability to do somethings more advanced. When the site is created, an
-empty git repository will be initialized in a directory in your home directory
-named after the site name, for example:
+deployments with git. This is accomplished through a `post-receive` git hook.
+This functionality is two-fold: there is a simple setup, and the ability to do
+somethings more advanced. When the site is created, an empty git repository will
+be initialized in a directory in your home directory named after the site name,
+for example:
 
     ~/example.com/repo.git
 
@@ -236,9 +237,10 @@ Example `install.sh`
 
 ```bash
 # 1. Do any pre-build steps you need to (e.g. compiling css/js assets)
+#    Any custom build/deployment logic should go here
 
+# for example
 npm install
-# assuming npm is configured to output build files to the right place in your java app
 npm run build
 
 # 2. copy over any env specific files you have setup
@@ -250,9 +252,20 @@ cp $SITE_DIR/secret.file src/main/resources/secret.file
 mv target/my-awesome-project.war $WAR_TARGET_LOCATION
 ```
 
+### Manually Triggering A Build
+
+You can also manually trigger a build and deploy without needing to push to the
+git remote on your server.
+
+```
+./server site build example.com
+```
+
+This will run the same script that runs when you push to the remote.
+
 ## HTTPS
 
-The site managment command has a sub command that will obtain a certificate
+The site management command has a sub command that will obtain a certificate
 from [letsencrypt](https://letsencrypt.org/) and enable https on a per-site
 basis.
 
@@ -306,6 +319,7 @@ arguments.
 - `addkey`: add an authorized ssh key to the server for your account
 - `adduser`: add a user account to the server
 - `tomcatlog`: view the contents of the tomcat log file, `/opt/tomcat/logs/catalina.out`
+- `followlog`: watch the contents of the tomcat log file in real-time (`tail -f`)
 
 ### Site and Database Managment Commands
 
@@ -316,6 +330,7 @@ which can be seen by running the command by itself.
 
 - `list`: view the sites that are currently setup on the server
 - `create`: create a new site
+- `build`: trigger a build and deployment of an existing site
 - `remove`: remove a site. Will remove the nginx config for the site, as well as
   any previously deployed `war`s
 - `enablessl`: enable https for a site
@@ -458,6 +473,9 @@ the `war` file.
 Nginx is set up to intercept any requests to `/uploads` and try to serve them
 out of the uploads directory for your site, which is located at
 `/var/www/example.com/uploads`.
+
+You can setup your application to interact with this directory, and use the
+`upload` subcommand to manually put files here.
 
 ## Development Webserver
 
