@@ -113,6 +113,15 @@ remove_site() {
 	if [[ -z "$site" ]]; then
 		read -p 'Enter the name of the site to remove: ' site
 	fi
+
+	# confirm deletion
+	read -p "Are your sure you want to remove $site? [y/N] " confirm
+	echo "$confirm" | grep -i '^y' >/dev/null
+	if [[ $? -ne 0 ]]; then
+		echo 'site not removed!'
+		exit 1
+	fi
+
 	ssh -t $user@$ip "
 	ls /etc/nginx/sites-available | grep '^$site$' >/dev/null 2>&1
 	if [[ \$? -ne 0 ]]; then
