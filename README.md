@@ -36,7 +36,7 @@ This project is probably **not** for you if:
 
 ## Quick Start
 
-See also the [step by step deploment guide here.](deployment_guide.md)
+See also the [step by step deployment guide here.](deployment_guide.md)
 
 Deploy a blog application and create a database for it:
 
