@@ -63,8 +63,8 @@ perl -pe "s/DOMAIN/${domain}/g; s!WEBROOT!${webroot}!g"\
 echo "Starting development webserver!"
 sudo echo 'sudo test' >/dev/null # get sudo password here so we aren't prompted later
 echo
-echo "Domain:			${domain}"
-echo "Webroot:		   ${webroot}"
+echo "Domain:            ${domain}"
+echo "Webroot:           ${webroot}"
 echo "Uploads Directory: ${webroot}/uploads"
 echo
 echo 'Server running, press Ctrl-C to exit.'
