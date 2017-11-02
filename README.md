@@ -334,6 +334,7 @@ which can be seen by running the command by itself.
 - `remove`: remove a site. Will remove the nginx config for the site, as well as
   any previously deployed `war`s
 - `enablessl`: enable https for a site
+- `info`: show general information for a site
 - `deploy`: deploy a `war` file for an individual site
 
 `db`

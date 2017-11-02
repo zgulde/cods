@@ -201,6 +201,27 @@ deploy_site() {
 	scp $war_filepath $user@$ip:/opt/tomcat/$site/ROOT.war
 }
 
+show_info() {
+	site=$1
+	if [[ -z $site ]]; then
+		read -p 'Site name: ' site
+	fi
+
+	# ensure site exists
+	list_sites | grep "^$site$" >/dev/null 2>&1
+	if [[ $? -ne 0 ]]; then
+		echo 'That site does not exist!'
+		exit 1
+	fi
+
+	cat <<-.
+		Site: $site
+
+		deployment git remote: $user@$ip:$site/repo.git
+		uploads directory:     /var/www/$site/uploads
+		nginx config file:     /etc/nginx/sites-available/$site
+	.
+}
 
 show_help() {
 	cat <<-help
@@ -216,6 +237,7 @@ show_help() {
 	    remove    [sitename]
 	    build     [sitename]
 	    enablessl [sitename]
+	    info      [sitename]
 	    deploy    [sitename [/path/to/site.war]]
 
 	help
@@ -230,6 +252,7 @@ case $command in
 	remove|rm) remove_site $@;;
 	build)	   build_site $@;;
 	enablessl) enable_ssl $@;;
+	info)      show_info $@;;
 	deploy)	   deploy_site $@;;
 	*)         show_help;;
 esac
