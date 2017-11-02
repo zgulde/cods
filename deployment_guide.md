@@ -42,11 +42,11 @@ Spring boot will also allow us to package our application as a `war`.
 
     Edit your class with the `main` method
 
-   ```java
-	import org.springframework.boot.SpringApplication;
-	import org.springframework.boot.autoconfigure.SpringBootApplication;
-	import org.springframework.boot.builder.SpringApplicationBuilder;
-	import org.springframework.boot.web.support.SpringBootServletInitializer;
+    ```java
+    import org.springframework.boot.SpringApplication;
+    import org.springframework.boot.autoconfigure.SpringBootApplication;
+    import org.springframework.boot.builder.SpringApplicationBuilder;
+    import org.springframework.boot.web.support.SpringBootServletInitializer;
 
     @SpringBootApplication
     public class BlogApplication extends SpringBootServletInitializer {
@@ -92,8 +92,10 @@ Spring boot will also allow us to package our application as a `war`.
     is what tells the server how to build our project. This file should have the
     following contents:
 
-        BUILD_COMMAND='./mvnw package'
-        WAR_FILE=target/blog-0.0.1-SNAPSHOT.war
+    ```
+    BUILD_COMMAND='./mvnw package'
+    WAR_FILE=target/blog-0.0.1-SNAPSHOT.war
+    ```
 
     *Your war file path could be different depending on how your project is
     setup, make sure the name of the war file matches up with what you defined
