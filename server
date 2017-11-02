@@ -2,6 +2,7 @@
 
 auto_renew_certs() {
     ssh -t $user@$ip email=$email "$(< $SCRIPTS/snippets/letsencrypt-cronjob.sh)"
+    [[ $? -eq 0 ]] && echo 'Autorenewal enabled!'
 }
 
 upload_file() {

@@ -147,6 +147,7 @@ build_site() {
 		exit 1
 	fi
 
+	echo "Running post-receive hook for $site"
 	ssh -t $user@$ip "
 	cd $site/repo.git
 	hooks/post-receive
