@@ -179,9 +179,9 @@ Alternatively, you can setup automated deployments with git.
 When a site is setup, the server will also be setup for automated builds and
 deployments with git. This is accomplished through a `post-receive` git hook.
 This functionality is two-fold: there is a simple setup, and the ability to do
-somethings more advanced. When the site is created, an empty git repository will
-be initialized in a directory in your home directory named after the site name,
-for example:
+somethings more advanced (see the customizing deployment section below). When
+the site is created, an empty git repository will be initialized in a directory
+in your home directory named after the site name, for example:
 
     ~/example.com/repo.git
 
@@ -221,7 +221,7 @@ following:
 
 Take a look at the `.config` file for more information.
 
----
+### Customizing Deployment
 
 If your deploment needs are more complex than what is described above, you can
 create a file named `install.sh` in the root of your project. This file will be
@@ -305,6 +305,10 @@ the command can be run without arguments and you will be prompted for them.
 To see all the available subcommands, run the `server` command without any
 arguments.
 
+In general, any password prompts will be for your server admin password (i.e.
+your sudo password), unless you are running the `db` subcommand, in which case
+you will need to enter the database administrator password.
+
 ### General Server Commands
 
 - `login`: log in to the server
@@ -317,11 +321,11 @@ arguments.
 - `ping`: ping the server
 - `autorenew`: setup letsencrypt certificates to automatically be renewed
 - `addkey`: add an authorized ssh key to the server for your account
-- `adduser`: add a user account to the server
+- `adduser`: add an admin user account to the server
 - `tomcatlog`: view the contents of the tomcat log file, `/opt/tomcat/logs/catalina.out`
 - `followlog`: watch the contents of the tomcat log file in real-time (`tail -f`)
 
-### Site and Database Managment Commands
+### Site and Database Management Commands
 
 The `site`, `db`, and `devserver` subcommands themselves contain subcommands
 which can be seen by running the command by itself.
@@ -444,6 +448,16 @@ the `war` file.
 
 1. Choose (or have your teamate choose) a password for the new user
 
+1. (Optionally) log into your mysql server and create a database administrator
+   account for the new user.
+
+    ```
+    ./server db login
+    # from mysql
+    CREATE USER new_user@localhost IDENTIFIED BY 'secret_password';
+    GRANT ALL ON *.* TO new_user@localhost WITH GRANT OPTION;
+    ```
+
 **For the teamate being added**
 
 1. Clone this repo
@@ -473,7 +487,10 @@ the `war` file.
 
 Nginx is set up to intercept any requests to `/uploads` and try to serve them
 out of the uploads directory for your site, which is located at
-`/var/www/example.com/uploads`.
+
+```
+/var/www/example.com/uploads
+```
 
 You can setup your application to interact with this directory, and use the
 `upload` subcommand to manually put files here.
