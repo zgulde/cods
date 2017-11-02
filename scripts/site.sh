@@ -7,24 +7,24 @@ enable_git_deploment() {
 	echo "Setting up git deployment..."
 
 	ssh -t $user@$ip "
-	mkdir -p \$HOME/${domain}
-	cat > \$HOME/${domain}/.config <<'.'
+	mkdir /srv/${domain}
+	cat > /srv/${domain}/.config <<'.'
 $(cat $TEMPLATES/.config)
 .
-	git init --bare \$HOME/${domain}/repo.git
-	cat > \$HOME/${domain}/repo.git/hooks/post-receive <<'.'
+	git init --bare --shared=group /srv/${domain}/repo.git
+	cat > /srv/${domain}/repo.git/hooks/post-receive <<'.'
 $(sed -e s/{{site}}/$domain/g $TEMPLATES/post-receive.sh)
 .
-	chmod +x \$HOME/${domain}/repo.git/hooks/post-receive
+	chmod +x /srv/${domain}/repo.git/hooks/post-receive
 	"
 	echo "git deployment configured!"
 	echo "Here is your deployment remote:"
 	echo
-	echo "	$user@$ip:${domain}/repo.git"
+	echo "	$user@$ip:/srv/${domain}/repo.git"
 	echo
 	echo "You can run something like:"
 	echo
-	echo "	git remote add production $user@$ip:${domain}/repo.git"
+	echo "	git remote add production $user@$ip:/srv/${domain}/repo.git"
 	echo
 	echo "To add the remote."
 }
@@ -90,14 +90,14 @@ enable_ssl() {
 
 	ssh -t $user@$ip "
 	set -e
-	mkdir -p \$HOME/${domain}
+	mkdir -p /srv/${domain}
 	sudo letsencrypt certonly\
 		--authenticator webroot\
 		--webroot-path=/var/www/${domain}\
 		--domain ${domain}\
 		--agree-tos\
 		--email $email\
-		--renew-by-default >> \$HOME/letsencrypt.log
+		--renew-by-default >> /srv/letsencrypt.log
 
 	echo 'Setting up nginx to serve ${domain} over https...'
 	echo '$(sed -e s/{{domain}}/${domain}/g -e s/{{user}}/${user}/g $TEMPLATES/ssl-site.nginx.conf)' |\
@@ -136,7 +136,7 @@ remove_site() {
 	sudo rm -rf /opt/tomcat/${site}
 	sudo rm -rf /opt/tomcat/conf/Catalina/${site}
 	sudo rm -rf /var/www/${site}
-	sudo rm -rf \$HOME/${site}
+	sudo rm -rf /srv/${site}
 	"
 
 	[[ $? -eq 0 ]] && echo 'site removed!'
@@ -158,7 +158,7 @@ build_site() {
 
 	echo "Running post-receive hook for $site"
 	ssh -t $user@$ip "
-	cd $site/repo.git
+	cd /srv/$site/repo.git
 	hooks/post-receive
 	"
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SITE_DIR=$HOME/{{site}}
+SITE_DIR=/srv/{{site}}
 WAR_TARGET_LOCATION=/opt/tomcat/{{site}}/ROOT.war
 
 TMP_REPO=$(mktemp -d)
