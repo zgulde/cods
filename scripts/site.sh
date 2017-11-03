@@ -217,7 +217,7 @@ show_info() {
 	cat <<-.
 		Site: $site
 
-		deployment git remote: $user@$ip:$site/repo.git
+		deployment git remote: $user@$ip:/srv/$site/repo.git
 		uploads directory:     /var/www/$site/uploads
 		nginx config file:     /etc/nginx/sites-available/$site
 	.

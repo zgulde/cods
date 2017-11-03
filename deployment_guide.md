@@ -187,18 +187,18 @@ Spring boot will also allow us to package our application as a `war`.
 
     Create the production `application.properties` file.
 
-    This file should be located in `~/example.com/application.properties` on
+    This file should be located in `/srv/example.com/application.properties` on
     your server, and should contain your production credentials.
 
     ```
-    nano example.com/application.properties
+    nano /srv/example.com/application.properties
     ```
 
-    Next, uncomment the two lines in `~/example.com/.config` that reference the
+    Next, uncomment the two lines in `/srv/example.com/.config` that reference the
     `application.properties` file.
 
     ```
-    nano example.com/.config
+    nano /srv/example.com/.config
     ```
 
     You can now log out of the server.
