@@ -12,6 +12,15 @@
 * [What is my git deployment remote?](#what-is-my-git-deployment-remote)
 * [My site's not working.](#my-sites-not-working)
 
+All the example command below assume you have already `cd`d into the directory
+that contains your server setup. E.g.
+
+```
+cd ~/my-server
+```
+
+before running any commands below.
+
 ## Do I need to create a new server (droplet) for every site I want to host?
 
 No! You can host multiple sites on the same server. The server setup and
@@ -45,6 +54,26 @@ short (assuming the server is already setup and provisioned):
 Yes! Assuming the DNS records are setup properly, you could host different
 applications at `example.com`, `blog.example.com`, or even
 `myawesome.blog.example.com`.
+
+## How do I login to my server?
+
+Run
+
+```
+./server login
+```
+
+---
+
+Really this is just running the `ssh` command, you could also run
+
+```
+ssh USERNAME@IP_ADDRESS
+# OR
+ssh USERNAME@DOMAIN # assuming DNS is already configured
+```
+
+replacing `USERNAME` and `IP_ADDRESS` with you values
 
 ## How do I enable https?
 
