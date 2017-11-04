@@ -3,13 +3,14 @@
 * [Do I need to create a new server (droplet) for every site I want to host?](#do-i-need-to-create-a-new-server-droplet-for-every-site-i-want-to-host)
 * [How do I setup a new site?](#how-do-i-setup-a-new-site)
 * [Can I use a subdomain?](#can-i-use-a-subdomain)
+* [How do I login to my server?](#how-do-i-login-to-my-server)
 * [How do I enable https?](#how-do-i-enable-https)
 * [How do I deploy changes to my site?](#how-do-i-deploy-changes-to-my-site)
-* [Can I upload a `war` file directly (i.e. without using the git deployment)?](#can-i-upload-a-war-file-directly-ie-without-using-the-git-deployment)
 * [Can I redeploy my project without a `git push`?](#can-i-redeploy-my-project-without-a-git-push)
 * [I made a typo when setting up the database credentials. What do?](#i-made-a-typo-when-setting-up-the-database-credentials-what-do)
 * [How can I find my server's ip address?](#how-can-i-find-my-servers-ip-address)
 * [What is my git deployment remote?](#what-is-my-git-deployment-remote)
+* [Can I upload a `war` file directly (i.e. without using the git deployment)?](#can-i-upload-a-war-file-directly-ie-without-using-the-git-deployment)
 * [My site's not working.](#my-sites-not-working)
 
 All the example command below assume you have already `cd`d into the directory
