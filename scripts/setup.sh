@@ -31,6 +31,11 @@ echo
 ssh root@$ip ls > /dev/null
 if [[ $? -ne 0 ]]; then
 	echo "Cannot login to $ip!"
+	echo 'Make sure:'
+	echo '  - The ip address is correct'
+	echo '  - Your public key is on the server'
+	echo '  - The server is "fresh" (not setup manually or by another tool)'
+	echo 'and try again.'
 	exit 1
 fi
 
