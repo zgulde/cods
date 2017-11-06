@@ -4,6 +4,8 @@
 * [How do I setup a new site?](#how-do-i-setup-a-new-site)
 * [Can I use a subdomain?](#can-i-use-a-subdomain)
 * [How do I login to my server?](#how-do-i-login-to-my-server)
+* [How do I login to my database?](#how-do-i-login-to-my-database)
+* [How can I run a seeder script on my production database?](#how-can-i-run-a-seeder-script-on-my-production-database)
 * [How do I enable https?](#how-do-i-enable-https)
 * [How do I deploy changes to my site?](#how-do-i-deploy-changes-to-my-site)
 * [Can I redeploy my project without a `git push`?](#can-i-redeploy-my-project-without-a-git-push)
@@ -75,6 +77,25 @@ ssh USERNAME@DOMAIN # assuming DNS is already configured
 ```
 
 replacing `USERNAME` and `IP_ADDRESS` with you values
+
+## How do I login to my database?
+
+Have your database administrator password ready, and run:
+
+```
+./server db login
+```
+
+## How can I run a seeder script on my production database?
+
+Run
+
+```
+./server db run example_db /path/to/seeder.sql
+```
+
+Replacing `example_db` and `/path/to/seeder.sql` with the name of your database
+and the filepath to the seeder script you wish to run.
 
 ## How do I enable https?
 
