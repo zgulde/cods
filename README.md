@@ -237,18 +237,26 @@ from your project root, and several environment variables are available to it:
 Example `install.sh`
 
 ```bash
-# 1. Do any pre-build steps you need to (e.g. compiling css/js assets)
-#    Any custom build/deployment logic should go here
+# exit the script on any errors
+set -e
 
-# for example
-npm install
-npm run build
-
-# 2. copy over any env specific files you have setup
+# 1. copy over any env specific files you setup on the server
 cp $SITE_DIR/application.properties src/main/resources/application.properties
 cp $SITE_DIR/secret.file src/main/resources/secret.file
+cp $SITE_DIR/env.js src/main/javascript/env.js
+
+# 2. Do any pre-build steps you need to (e.g. compiling css/js assets)
+#    Any custom build/deployment logic should go here
+echo '[install.sh] Installing dependencies...'
+echo '[install.sh] > npm install'
+npm install
+echo '[install.sh] Building JS...'
+echo '[install.sh] > npm run build'
+npm run build
 
 # 3. Build the war file and put it in the right place
+echo '[install.sh] Building war file...'
+echo '[install.sh] > ./mvnw package'
 ./mvnw package
 mv target/my-awesome-project.war $WAR_TARGET_LOCATION
 ```
