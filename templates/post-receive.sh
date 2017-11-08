@@ -29,7 +29,7 @@ if [[ -f $SITE_DIR/.config ]]; then
 		log "Copying $source file to $destination..."
 		cp $SITE_DIR/$source $TMP_REPO/$destination
 	else
-		log 'Configuration file found, but $source and $destination are not set.'
+		log "Configuration file found '${SITE_DIR}/.config', but $source and $destination are not set."
 		log 'Nothing copied. Continuing...'
 	fi
 else
@@ -37,6 +37,7 @@ else
 fi
 
 if [[ -f .build_config ]]; then
+	log 'Found ".build_config" file! Building based on this file...'
 	source .build_config
 
 	if [[ -z $BUILD_COMMAND ]]; then
