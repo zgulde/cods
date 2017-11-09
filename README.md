@@ -451,7 +451,7 @@ the `war` file.
 1. Run the appropriate `./server` command
 
     ```bash
-    ./server adduser trustyfriend ~/my_friends_ssh_key.pub
+    ./server adduser sally ~/sallys_ssh_key.pub
     ```
 
 1. Choose (or have your teamate choose) a password for the new user
@@ -462,8 +462,8 @@ the `war` file.
     ```
     ./server db login
     # from mysql
-    CREATE USER new_user@localhost IDENTIFIED BY 'secret_password';
-    GRANT ALL ON *.* TO new_user@localhost WITH GRANT OPTION;
+    CREATE USER sally@localhost IDENTIFIED BY 'astrongpassword';
+    GRANT ALL ON *.* TO sally@localhost WITH GRANT OPTION;
     ```
 
 **For the teamate being added**
@@ -488,7 +488,7 @@ the `war` file.
 
     ```
     ip=123.123.123.123
-    user=codeup
+    user=sally
     ```
 
 ## Uploads
