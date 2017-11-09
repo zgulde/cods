@@ -3,15 +3,14 @@
 For setup and management of a remote server and virtual hosting with tomcat,
 nginx, and mysql.
 
-- [Who this is for](#who-this-is-for)
-- [Prerequisites](#prerequisites)
-- [Quick Start](#quick-start)
-- [Usage](#usage)
-- [Git Deployment](#git-deployment)
-- [HTTPS](#https)
-- [Commands](#commands)
-- [Sharing your server with teammates](#sharing-your-server-with-teammates)
-- [Uploads](#uploads)
+* [Who this is for](#who-this-is-for)
+* [Prerequisites](#prerequisites)
+* [Quick Start](#quick-start)
+* [Usage](#usage)
+* [Git Deployment](#git-deployment)
+* [HTTPS](#https)
+* [Commands](#commands)
+* [Examples](#examples)
 
 ## Who this is for
 
