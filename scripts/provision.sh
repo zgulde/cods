@@ -21,6 +21,9 @@ heading 'updating + upgrading apt'
 apt-get update
 yes | apt-get upgrade
 
+heading 'setting up nodejs repository'
+curl -sL https://deb.nodesource.com/setup_8.x | bash -
+
 heading 'installing packages'
 
 # otherwise mysql will try to prompt us for info
@@ -33,7 +36,8 @@ apt-get install -y\
 	mysql-server\
 	unattended-upgrades\
 	maven\
-	letsencrypt
+	letsencrypt\
+	nodejs
 
 heading "Installing tomcat..."
 
