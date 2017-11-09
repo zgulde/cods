@@ -150,7 +150,7 @@ heading 'creating user'
 ssh root@$ip bash <<setup_user
 # create the git group and directory structure for deployment
 groupadd git
-mkdir /srv
+mkdir -p /srv
 chgrp git /srv
 chmod g+srwx /srv
 # create a user and add the ssh key

@@ -1,4 +1,4 @@
-TOMCAT_DOWNLOAD_URL=http://apache.mirrors.ionfish.org/tomcat/tomcat-8/v8.5.23/bin/apache-tomcat-8.5.23.tar.gz
+TOMCAT_DOWNLOAD_URL=http://mirror.stjschools.org/public/apache/tomcat/tomcat-8/v8.5.23/bin/apache-tomcat-8.5.23.tar.gz
 TOMCAT_TARGZ="$(perl -pe 's/.*\///' <<< $TOMCAT_DOWNLOAD_URL)"
 
 heading(){
