@@ -230,7 +230,10 @@ show_info() {
 		nginx config file:     /etc/nginx/sites-available/$site
 		deployment git remote: $user@$ip:/srv/$site/repo.git
 
-			git remote add production $user@$ip:/srv/$site/repo.git
+		To add the deployment remote (from your project, not from $BASE_DIR):
+
+		    git remote add production $user@$ip:/srv/$site/repo.git
+
 	.
 }
 
