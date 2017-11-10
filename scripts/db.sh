@@ -54,7 +54,7 @@ backup_db() {
 		read -p 'database name: ' database
 	fi
 	if [[ -z $outputfile ]]; then
-		outputfile="$(date +%Y-%m-%d_%H:%M:%S)-${database}-backup.sql"
+		outputfile="$BASE_DIR/db-backups/$(date +%Y-%m-%d_%H:%M:%S)-${database}-backup.sql"
 	fi
 
 	read -sp 'Password: ' db_pass
