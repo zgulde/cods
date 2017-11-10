@@ -4,13 +4,13 @@ This document is meant to supplement the [documentation included with the
 deployment tool](https://github.com/gocodeup/tomcat-setup), and to be a mostly
 complete guide to codeup students on deploying their spring boot applications.
 
+See also the [FAQs](faq.md)
+
 ## Overview
 
 1. Change the application to be buildable as a `war`.
 1. Setup + Provision the server
-1. Setup a database and site
-1. Login to configure git deploment
-1. Add the git remote to your project and push
+1. Setup a database and site and configure git deployment
 
 ## Build A War From your application
 
@@ -103,7 +103,7 @@ Spring boot will also allow us to package our application as a `war`.
 
     Make sure to add and commit the `.build_config` file!
 
-## Server + Domain Name
+## Domain Name + First Time Server Setup
 
 1. Buy a domain name (we recommend namecheap), and point the DNS nameservers for
    that domain to digital ocean
@@ -147,6 +147,8 @@ Spring boot will also allow us to package our application as a `war`.
     ./server
     ```
 
+## Site Setup
+
 1. Create a database for your site
 
     ```
@@ -183,7 +185,9 @@ Spring boot will also allow us to package our application as a `war`.
 
     Login to the server.
 
-        ./server login
+    ```
+    ./server login
+    ```
 
     Create the production `application.properties` file.
 
@@ -191,14 +195,26 @@ Spring boot will also allow us to package our application as a `war`.
     your server, and should contain your production credentials.
 
     ```
-    nano /srv/example.com/application.properties
+    cd /srv
+    cd example.com
+    nano application.properties
     ```
 
-    Next, uncomment the two lines in `/srv/example.com/.config` that reference the
+    It's usually easiest to start by copying your local `application.properties`
+    and pasting it into `nano`, then changing the relevant values.
+
+    To save and exit nano:
+
+    1. Ctrl-x
+    1. Type `y`
+    1. Press Enter
+
+    Next, uncomment (i.e. delete the `# ` at the beginning of the line) the two
+    lines in `/srv/example.com/.config` that reference the
     `application.properties` file.
 
     ```
-    nano /srv/example.com/.config
+    nano .config
     ```
 
     You can now log out of the server.
@@ -210,5 +226,6 @@ Spring boot will also allow us to package our application as a `war`.
 
     ```
     cd ~/IdeaProjects/my-project
-    git remote add ...
+    git remote add production ...
+    git push production master
     ```
