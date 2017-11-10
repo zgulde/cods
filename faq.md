@@ -1,5 +1,6 @@
 # Frequently Asked Questions
 
+* [How do I deploy changes to my site?](#how-do-i-deploy-changes-to-my-site)
 * [Do I need to create a new server (droplet) for every site I want to host?](#do-i-need-to-create-a-new-server-droplet-for-every-site-i-want-to-host)
 * [How do I setup a new site?](#how-do-i-setup-a-new-site)
 * [Can I use a subdomain?](#can-i-use-a-subdomain)
@@ -7,7 +8,6 @@
 * [How do I login to my database?](#how-do-i-login-to-my-database)
 * [How can I run a seeder script on my production database?](#how-can-i-run-a-seeder-script-on-my-production-database)
 * [How do I enable https?](#how-do-i-enable-https)
-* [How do I deploy changes to my site?](#how-do-i-deploy-changes-to-my-site)
 * [Can I redeploy my project without a `git push`?](#can-i-redeploy-my-project-without-a-git-push)
 * [I made a typo when setting up the database credentials. What do?](#i-made-a-typo-when-setting-up-the-database-credentials-what-do)
 * [How can I find my server's ip address?](#how-can-i-find-my-servers-ip-address)
@@ -23,6 +23,16 @@ cd ~/my-server
 ```
 
 before running any commands below.
+
+## How do I deploy changes to my site?
+
+Short answer: add, commit, and push to your deployment remote.
+
+If you are working by yourself, simply add and commit your code (possibly merge
+a branch into `master`), and push to the production remote.
+
+If you are working on a team project, you should pull down the most recent
+version of the master branch locally, and push that to your production remote.
 
 ## Do I need to create a new server (droplet) for every site I want to host?
 
@@ -76,7 +86,7 @@ ssh USERNAME@IP_ADDRESS
 ssh USERNAME@DOMAIN # assuming DNS is already configured
 ```
 
-replacing `USERNAME` and `IP_ADDRESS` with you values
+replacing `USERNAME` and `IP_ADDRESS` with your values
 
 ## How do I login to my database?
 
@@ -91,10 +101,10 @@ Have your database administrator password ready, and run:
 Run
 
 ```
-./server db run example_db /path/to/seeder.sql
+./server db run example_db /local/path/to/seeder.sql
 ```
 
-Replacing `example_db` and `/path/to/seeder.sql` with the name of your database
+Replacing `example_db` and `/local/path/to/seeder.sql` with the name of your database
 and the filepath to the seeder script you wish to run.
 
 ## How do I enable https?
@@ -106,18 +116,6 @@ and the filepath to the seeder script you wish to run.
 ```
 
 See the `HTTPS` section in the main README for more details
-
-## How do I deploy changes to my site?
-
-Short answer: push to your deployment remote.
-
-If you are working by yourself, add and commit your code, and push to the
-production remote.
-
-If you are working on a team project, you should pull down the most recent
-version of the master branch locally, and push that to your production remote.
-
-See also, "Can I redeploy my project without a `git push`?"
 
 ## Can I redeploy my project without a `git push`?
 ## I made a typo when setting up the database credentials. What do?
