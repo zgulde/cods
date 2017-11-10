@@ -1,3 +1,11 @@
+##############################################################################
+# First time setup script
+#
+# This script will be invoked when the `.env` file is not found, when running
+# the `server` command for the first time. It will perform all the first time
+# setup, as well as run the provision script on the server
+##############################################################################
+
 # check for the utilities we'll need
 # these should be available on a default osx install
 prereqs=(perl dig ssh scp)

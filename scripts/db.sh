@@ -1,3 +1,10 @@
+##############################################################################
+# Database management script
+#
+# This script contains functions for database management, and will invoke the
+# appropriate function based on the arguments passed to it.
+##############################################################################
+
 list_databases() {
 	ssh -t $user@$ip "mysql -p -e 'show databases'"
 }

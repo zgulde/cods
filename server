@@ -1,5 +1,15 @@
 #!/bin/bash
 
+##############################################################################
+# Entrypoint for the cli interface
+#
+# This script contains functions for general server management, and serves as
+# the entrypoint to all the other scripts. Based on the arguments passed to it,
+# it will either run the appropriate function, or load the necessary subcommand
+# script. If a `.env` file is not found at the root of the project, will invoke
+# the setup script.
+##############################################################################
+
 auto_renew_certs() {
     ssh -t $user@$ip email=$email "$(< $SCRIPTS/snippets/letsencrypt-cronjob.sh)"
     [[ $? -eq 0 ]] && echo 'Autorenewal enabled!'
@@ -135,7 +145,8 @@ show_usage() {
 	help_message
 }
 
-# find out where this script is located
+# find out where this script is located so we can be sure we're running
+# everything from the correct location
 BASE_DIR="$( cd "$( dirname "$0" )" && pwd )"
 
 ENV_FILE="$BASE_DIR/.env"

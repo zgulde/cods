@@ -1,3 +1,10 @@
+##############################################################################
+# Server provisioning script
+#
+# this script will be run on the server by the setup script. It contains most of
+# the common server setup, most notably, the tomcat and nginx configuration.
+##############################################################################
+
 TOMCAT_DOWNLOAD_URL=http://mirror.stjschools.org/public/apache/tomcat/tomcat-8/v8.5.23/bin/apache-tomcat-8.5.23.tar.gz
 TOMCAT_TARGZ="$(perl -pe 's/.*\///' <<< $TOMCAT_DOWNLOAD_URL)"
 

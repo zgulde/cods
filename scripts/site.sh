@@ -1,3 +1,12 @@
+##############################################################################
+# Site management script
+#
+# This script contains functions for site management, and will run the
+# appropriate function based on the arguments passed to it. Most of the
+# functionality here is for setting up nginx and tomcat to host sites, as well
+# as enabling https for sites.
+##############################################################################
+
 list_sites() {
 	ssh $user@$ip 'ls -1 /etc/nginx/sites-available' | grep -v '^default$'
 }
