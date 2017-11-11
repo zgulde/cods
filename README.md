@@ -11,6 +11,8 @@ nginx, and mysql.
 * [HTTPS](#https)
 * [Commands](#commands)
 * [Examples](#examples)
+* [Uploads](#uploads)
+* [Bash Completion](#bash-completion)
 
 ## Who this is for
 
@@ -520,3 +522,12 @@ see the built in help
 ```
 
 for more details.
+
+## Bash Completion
+
+There is a script (`scripts/bash_completion.sh`) that provides tab completion
+for the `./server` command. You can either source this file manually, or run
+
+```
+scripts/install-bash-completion.sh
+```

@@ -178,4 +178,27 @@ setup_user
 
 [[ $? -eq 0 ]] && echo 'User created and ssh locked down!'
 
-heading 'all done!'
+heading 'Finsihed Provisioning!'
+
+echo 'Congradulations! Your server is now setup and ready to go!'
+echo "Here's some next steps:"
+echo
+echo 'Install tab completion for the ./server command'
+echo
+echo "    source $SCRIPTS/install-bash-completion.sh"
+echo
+echo 'Setup a site and database'
+echo
+echo '    ./server site create'
+echo '    ./server db create'
+echo ''
+echo 'Login to your server'
+echo
+echo '    ./server login'
+echo
+echo "Check out the documentation in $BASE_DIR"
+echo '  - README.md'
+echo '  - deployment_guide.md'
+echo '  - faq.md'
+echo
+echo 'Enjoy!'

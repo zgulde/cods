@@ -49,7 +49,7 @@ create_site() {
 	if [[ "$(dig +short ${domain} | tail -n 1)" != $ip ]]; then
 		echo 'It looks like the dns records for that domain are not setup to'
 		echo 'point to your server.'
-		read -p 'Continue anyway? (y/n) ' confirm
+		read -p 'Continue anyway? [y/N] ' confirm
 		grep -i '^y' <<< $confirm || exit 1
 	fi
 
