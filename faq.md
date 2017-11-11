@@ -59,7 +59,7 @@ short (assuming the server is already setup and provisioned):
     ```
 
 1. Login to the server and create `example.com/application.properties` and edit
-   `example.com/.config`
+   `example.com/config`
 
 1. Add the git remote to your project and push
 
@@ -177,7 +177,7 @@ Did you:
 - Setup the site on the server? I.e. run `./server site create`
 - Setup a database on the server? I.e. run `./server db create`
 - Setup the production `application.properties` file on your server?
-- Setup the `.config` file on your server?
+- Setup the `config` file on your server?
 - Push your changes?
 
 ### The site was working, but no longer is

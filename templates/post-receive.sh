@@ -22,18 +22,18 @@ log "cloning project to '$TMP_REPO'..."
 git clone $(pwd) $TMP_REPO
 cd $TMP_REPO
 
-if [[ -f $SITE_DIR/.config ]]; then
-	source $SITE_DIR/.config
+if [[ -f $SITE_DIR/config ]]; then
+	source $SITE_DIR/config
 	if [[ ! -z "$source" ]] && [[ ! -z "$destination" ]]; then
-		log "Found configuration file: '${SITE_DIR}/.config'!"
+		log "Found configuration file: '${SITE_DIR}/config'!"
 		log "Copying $source file to $destination..."
 		cp $SITE_DIR/$source $TMP_REPO/$destination
 	else
-		log "Configuration file found '${SITE_DIR}/.config', but $source and $destination are not set."
+		log "Configuration file found '${SITE_DIR}/config', but $source and $destination are not set."
 		log 'Nothing copied. Continuing...'
 	fi
 else
-	log "No configuration file ($SITE_DIR/.config) found. Continuing..."
+	log "No configuration file ($SITE_DIR/config) found. Continuing..."
 fi
 
 if [[ -f .build_config ]]; then

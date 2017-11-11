@@ -209,11 +209,11 @@ Spring boot will also allow us to package our application as a `war`.
     1. Press Enter
 
     Next, uncomment (i.e. delete the `# ` at the beginning of the line) the two
-    lines in `/srv/example.com/.config` that reference the
+    lines in `/srv/example.com/config` that reference the
     `application.properties` file.
 
     ```
-    nano .config
+    nano config
     ```
 
     You can now log out of the server.

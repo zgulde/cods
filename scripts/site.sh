@@ -17,8 +17,8 @@ enable_git_deploment() {
 
 	ssh -t $user@$ip "
 	mkdir /srv/${domain}
-	cat > /srv/${domain}/.config <<'.'
-$(cat $TEMPLATES/.config)
+	cat > /srv/${domain}/config <<'.'
+$(cat $TEMPLATES/config)
 .
 	git init --bare --shared=group /srv/${domain}/repo.git
 	cat > /srv/${domain}/repo.git/hooks/post-receive <<'.'

@@ -210,7 +210,7 @@ not part of the git repository (e.g. a file with database credentials). To do
 that, we can create that file on the server, and tell the git hook how to find
 this file. To do this, create the file you want to be included in the build
 inside of the directory named after your site inside of `/srv`, and edit the
-`.config` file found in the same place.
+`config` file found in the same place.
 
 For example, if you needed an `application.properties` file included in the
 build for `example.com`, but this file is ignored by git, you would do the
@@ -218,10 +218,10 @@ following:
 
 1. ssh into the server and create the production `application.properties` file
    inside the `/srv/example.com/` directory.
-1. edit the `/srv/example.com/.config` file and define the name of the file to
+1. edit the `/srv/example.com/config` file and define the name of the file to
    be included, as well as where in the project it should be copied to
 
-Take a look at the `.config` file or template for more information.
+Take a look at the `config` file or template for more information.
 
 ### Customizing Deployment
 
