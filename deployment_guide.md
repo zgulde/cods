@@ -6,6 +6,9 @@ complete guide to codeup students on deploying their spring boot applications.
 
 See also the [FAQs](faq.md)
 
+Note that if you are looking to add a site to an existing server, you should
+skip the "Domain Name + First Time Server Setup" section.
+
 ## Overview
 
 1. Change the application to be buildable as a `war`.
