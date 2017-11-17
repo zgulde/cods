@@ -174,12 +174,8 @@ Spring boot will also allow us to package our application as a `war`.
     ```
 
     If the DNS records are improperly configured, the script will warn you, you
-    can go ahead and continue, you just won't be able to see your site unless
-    you add an entry to your `/etc/hosts` file like the following:
-
-    ```
-    111.111.111.111 example.com
-    ```
+    can go ahead and continue, you just won't be able to see your site until the
+    records are properly configured.
 
     The output of this command will contain instructions for adding a git remote
     for deploment. Take note of this command, we will be using it later on.

@@ -14,6 +14,7 @@
 * [What is my git deployment remote?](#what-is-my-git-deployment-remote)
 * [Can I upload a `war` file directly (i.e. without using the git deployment)?](#can-i-upload-a-war-file-directly-ie-without-using-the-git-deployment)
 * [My site's not working.](#my-sites-not-working)
+* [Can I view my site if the DNS records aren't properly configured?](#can-i-view-my-site-if-the-dns-records-arent-properly-configured)
 
 All the example command below assume you have already `cd`d into the directory
 that contains your server setup. E.g.
@@ -199,3 +200,36 @@ production and their stack traces here.
 
 *Note you will need your server admin password for this operation.*
 
+## Can I view my site if the DNS records aren't properly configured?
+
+Yes, but it will only work on your laptop. In order for other people to view
+your site, the DNS records will need to be configured to point to your server.
+
+To "fake" the DNS records on your machine:
+
+1. Open the file `/etc/hosts`
+
+    This file is probably locked down, and you will most likely need to enter
+    your computer's administrator password to edit it.
+
+1. Add a line that looks like the following:
+
+    ```
+    123.123.123.123 example.com
+    ```
+
+    Replacing `123.123.123.123` with your server's IP address, and `example.com`
+    with your domain name.
+
+    *Note that if you want to "fake" a subdomain, you will need a separate entry
+    (i.e. line) for each subdomain.*
+
+Now you should be able to visit your site (assuming everything else is setup
+properly).
+
+Keep in mind that you will only be able to visit the site on your laptop, you
+will **not** be able to enable https for the domain until the DNS records are
+setup.
+
+Once the DNS records are setup properly, or to test if they are, you can remove
+the same line from `/etc/hosts`.
