@@ -45,6 +45,13 @@ create_site() {
 		read -p 'Enter the site name without the www: ' domain
 	fi
 
+	if list_sites | grep "^$domain$" > /dev/null ; then
+		echo 'It looks like that site is already setup. Doing nothing.'
+		echo 'If you wish to re-create the site, first remove the site, then'
+		echo 're-create it.'
+		exit 1
+	fi
+
 	# verify dns records
 	if [[ "$(dig +short ${domain} | tail -n 1)" != $ip ]]; then
 		echo 'It looks like the dns records for that domain are not setup to'
