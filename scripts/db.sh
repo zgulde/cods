@@ -64,43 +64,6 @@ backup_db() {
 	echo "$outputfile created!"
 }
 
-run_file() {
-	database=$1
-	sql_file=$2
-	if [[ -z $database ]]; then
-		read -p 'database name: ' database
-	fi
-	if [[ -z $sql_file ]]; then
-		read -ep 'sql file: ' sql_file
-		# parse the home directory correctly
-		if grep '^~' <<< "$sql_file"; then
-			sql_file=$(perl -pe "s!~!$HOME!" <<< $sql_file)
-		fi
-	fi
-
-	# ensure file exists and is a sql file (or at least has the extension)
-	if [[ ! -f $sql_file ]]; then
-		echo 'It looks like that file does not exist! Aborting...'
-		echo "Could not find '$sql_file'! No migrations run."
-		exit 1
-	fi
-	grep '\.sql$' >/dev/null <<< $sql_file
-	if [[ $? -ne 0 ]]; then
-		echo 'It looks like that is not a valid SQL file! Aborting...'
-		echo "'$sql_file' does not have a '.sql' file extension."
-		echo 'No migrations run.'
-		exit 1
-	fi
-
-	echo 'When prompted, enter your *database administrator* password to continue'
-	# make sure the nowdoc identifier doesnt clash with anything in the
-	# migration
-	ssh -t $user@$ip "mysql -p $database <<'xxxxxxxxxx_sql_migration_xxxxxxxxx'
-	$(cat $sql_file)
-xxxxxxxxxx_sql_migration_xxxxxxxxx"
-	[[ $? -eq 0 ]] && echo 'Finished running!'
-}
-
 remove_db() {
 	db_name=$1
 	db_user=$2

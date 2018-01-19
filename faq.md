@@ -6,7 +6,7 @@
 * [Can I use a subdomain?](#can-i-use-a-subdomain)
 * [How do I login to my server?](#how-do-i-login-to-my-server)
 * [How do I login to my database?](#how-do-i-login-to-my-database)
-* [How can I run a seeder script on my production database?](#how-can-i-run-a-seeder-script-on-my-production-database)
+* [How can I run a sql script on my production database?](#how-can-i-run-a-sql-script-on-my-production-database)
 * [How do I enable https?](#how-do-i-enable-https)
 * [Can I redeploy my project without a `git push`?](#can-i-redeploy-my-project-without-a-git-push)
 * [I made a typo when setting up the database credentials. What do?](#i-made-a-typo-when-setting-up-the-database-credentials-what-do)
@@ -97,16 +97,17 @@ Have your database administrator password ready, and run:
 ./server db login
 ```
 
-## How can I run a seeder script on my production database?
+## How can I run a sql script on my production database?
 
-Run
+You can transfer the script to the server and run it there.
 
 ```
-./server db run example_db /local/path/to/seeder.sql
-```
+./server upload /local/path/to/my-script.sql
+./server login
 
-Replacing `example_db` and `/local/path/to/seeder.sql` with the name of your database
-and the filepath to the seeder script you wish to run.
+# from the server
+mysql -p < my-script.sql # you'll be promted for your db password
+```
 
 ## How do I enable https?
 

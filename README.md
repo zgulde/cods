@@ -51,8 +51,6 @@ cd ~/my-awesome-server
 
 # 3. create a database and user for the application
 ./server db create blog_db blog_user
-# optionally run a migration or seeder
-./server db run blog_db ~/IdeaProjects/myblog/migration.sql
 
 # 4. setup your server to listen for requests for your domain
 ./server site create myblog.com
@@ -138,17 +136,8 @@ database (but not any others).
 
 You will be prompted for a password for the new database user.
 
-#### (Optionally) Run a migration or seeder
-
-Once your database is created, you can use the `db` subcommand to run a
-migration or seeder script if you so desire.
-
-You will need to provide the name of the database you wish to run the file on,
-and the path to the `sql` file.
-
-```bash
-./server db run some_db /path/to/the/migration.sql
-```
+At this point you may wish to log into the server to do any database setup
+required for your application.
 
 ### Deploy The `war`
 
@@ -389,20 +378,6 @@ directory is the directory where you cloned this repository.
 ```bash
 ./server db login
 ```
-
-#### Run a seeder file on an already existing database
-
-```bash
-./server db run example_db ~/my-project/sql/seeder.sql
-```
-
-OR
-
-```bash
-./server db run
-```
-
-and you will be prompted for the database name and filepath.
 
 #### Create a site
 
