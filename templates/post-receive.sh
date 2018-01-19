@@ -57,7 +57,7 @@ if [[ -f .build_config ]]; then
 	log
 	log "> $BUILD_COMMAND"
 
-	$BUILD_COMMAND
+	eval "$BUILD_COMMAND"
 
 	# checks for successful building
 	if [[ $? -ne 0 ]]; then
