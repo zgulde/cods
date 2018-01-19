@@ -100,7 +100,7 @@ echo 'These have been saved to "credentials.txt".'
 echo
 echo '+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Warning ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+'
 echo '| For security purposes, it is advised you delete the credentials.txt  |'
-echo '| file and move these into a password manager						  |'
+echo '| file and move these into a password manager                          |'
 echo '+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+'
 echo
 echo 'Next, we will provision the server. Please be patient, as this process'
