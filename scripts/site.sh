@@ -40,10 +40,15 @@ $(sed -e s/{{site}}/$domain/g $TEMPLATES/post-receive.sh)
 }
 
 create_site() {
-	domain=$1
-
-	if [[ -z $domain ]]; then
-		read -p 'Enter the site name without the www: ' domain
+	while getopts 'd:' opt ; do
+		case $opt in
+			d) domain=${OPTARG};;
+		esac
+	done
+	if [[ -z $domain ]] ; then
+		echo 'Setup up the server to host a new site'
+		echo
+		die '-d <domain>'
 	fi
 
 	if list_sites | grep "^$domain$" > /dev/null ; then
@@ -58,7 +63,7 @@ create_site() {
 		echo 'It looks like the dns records for that domain are not setup to'
 		echo 'point to your server.'
 		read -p 'Continue anyway? [y/N] ' confirm
-		grep -i '^y' <<< $confirm || exit 1
+		echo $confirm | grep -i '^y' >/dev/null || exit 1
 	fi
 
 	echo "Setting up ${domain}..."
@@ -94,10 +99,17 @@ create_site() {
 }
 
 enable_ssl() {
-	domain=$1
-	if [[ -z $domain ]]; then
-		read -p 'Enter the domain: ' domain
+	while getopts 'd:' opt ; do
+		case $opt in
+			d) domain=${OPTARG};;
+		esac
+	done
+	if [[ -z $domain ]] ; then
+		echo 'Enable https for a site'
+		echo
+		die '-d <domain>'
 	fi
+
 
 	echo 'Before running this command, make sure that the DNS records for your domain'
 	echo 'are configured to point to your server.'
@@ -126,9 +138,15 @@ enable_ssl() {
 }
 
 remove_site() {
-	site=$1
-	if [[ -z "$site" ]]; then
-		read -p 'Enter the name of the site to remove: ' site
+	while getopts 'd:' opt ; do
+		case $opt in
+			d) domain=${OPTARG};;
+		esac
+	done
+	if [[ -z $domain ]] ; then
+		echo 'Remove a site from the server'
+		echo
+		die '-d <domain>'
 	fi
 
 	# confirm deletion
@@ -160,10 +178,15 @@ remove_site() {
 }
 
 build_site() {
-	site=$1
-
-	if [[ -z "$site" ]]; then
-		read -p 'Enter the name of the site you wish to trigger a build for: ' site
+	while getopts 'd:' opt ; do
+		case $opt in
+			d) domain=${OPTARG};;
+		esac
+	done
+	if [[ -z $domain ]] ; then
+		echo 'Trigger a build and deploy for a site'
+		echo
+		die '-d <domain>'
 	fi
 
 	# ensure site exists
@@ -182,19 +205,18 @@ build_site() {
 }
 
 deploy_site() {
-	site=$1
-	war_filepath="$2"
+	while getopts 'f:d:' opt ; do
+		case $opt in
+			f) war_filepath=${OPTARG};;
+			d) domain=${OPTARG};;
+		esac
+	done
 
-	if [[ -z "$site" ]]; then
-		read -p 'Enter the name of the site you want to deploy to: ' site
-	fi
-
-	if [[ -z "$war_filepath"  ]]; then
-		read -ep 'Enter the path to the war file: ' war_filepath
-		# parse the home directory correctly
-		if grep '^~' <<< "$war_filepath"; then
-			war_filepath=$(perl -pe "s!~!$HOME!" <<< $war_filepath)
-		fi
+	if [[ -z $domain ]] || [[ -z $war_filepath ]] ; then
+		echo 'Deploy a pre-built war file.'
+		echo
+		echo '-d <domain>'
+		die '-f <path to the war file>'
 	fi
 
 	# ensure file exists and is a war (or at least has the extension)
@@ -202,26 +224,32 @@ deploy_site() {
 		echo 'It looks like that file does not exist!'
 		exit 1
 	fi
-	grep '\.war$' >/dev/null <<< $war_filepath
+	echo $war_filepath | grep '\.war$' >/dev/null
 	if [[ $? -ne 0 ]]; then
 		echo 'must be a valid .war file'
 		exit 1
 	fi
 
 	# ensure site exists
-	list_sites | grep "^$site$" >/dev/null 2>&1
+	list_sites | grep "^$domain$" >/dev/null 2>&1
 	if [[ $? -ne 0 ]]; then
 		echo 'That site does not exist!'
 		exit 1
 	fi
 
-	scp $war_filepath $user@$ip:/opt/tomcat/$site/ROOT.war
+	scp $war_filepath $user@$ip:/opt/tomcat/${domain}/ROOT.war
 }
 
 show_info() {
-	site=$1
-	if [[ -z $site ]]; then
-		read -p 'Site name: ' site
+	while getopts 'd:' opt ; do
+		case $opt in
+			d) domain=${OPTARG};;
+		esac
+	done
+	if [[ -z $domain ]] ; then
+		echo 'Show information about a site that is setup on the server'
+		echo
+		die '-d <domain>'
 	fi
 
 	# ensure site exists
@@ -254,13 +282,14 @@ show_help() {
 
 	where <command> is one of the following:
 
-	    list
-	    create    [sitename]
-	    remove    [sitename]
-	    build     [sitename]
-	    enablessl [sitename]
-	    info      [sitename]
-	    deploy    [sitename [/path/to/site.war]]
+	    list -- list the sites setup on your server
+
+	    create    -d <domain>
+	    remove    -d <domain>
+	    build     -d <domain>
+	    enablessl -d <domain>
+	    info      -d <domain>
+	    deploy    -d <domain> -f <warfile>
 
 	help
 }

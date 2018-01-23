@@ -10,28 +10,29 @@
 # the setup script.
 ##############################################################################
 
+die() {
+    echo "$@"
+    exit 1
+}
+
 auto_renew_certs() {
     ssh -t $user@$ip email=$email "$(< $SCRIPTS/snippets/letsencrypt-cronjob.sh)"
     [[ $? -eq 0 ]] && echo 'Autorenewal enabled!'
 }
 
 upload_file() {
-	file=$1
-	destination=$2
-
-	if [[ -z $file ]]; then
-		read -ep 'File to upload: ' file
-		# parse the home directory correctly
-		if grep '^~' <<< "$file"; then
-			file=$(perl -pe "s!~!$HOME!" <<< $file)
-		fi
-	fi
-	if [[ -z $destination ]]; then
-		echo 'Where should the file be uploaded on the server (e.g. /var/www/example.com/uploads)?'
-		echo 'Leave blank to default to the home directory of your user.'
-		read -p 'Destination: ' destination
-	fi
-
+    while getopts 'f:d:' opt; do
+        case $opt in
+            f) file=${OPTARG};;
+            d) destination=${OPTARG};;
+        esac
+    done
+    if [[ -z $file ]] ; then
+        echo 'Upload a file to the server'
+        echo
+        echo '-f <file to upload>'
+        die '-d <file detination on the server> (optional)'
+    fi
 	if [[ ! -e $file ]]; then
 		echo 'It appears as tough that file does not exist!'
 		exit 1
@@ -41,27 +42,33 @@ upload_file() {
 }
 
 restart_service() {
-	service_name=$1
+    while getopts 's:' opt ; do
+        case $opt in
+            s) service_name=${OPTARG};;
+        esac
+    done
 	if [[ -z $service_name ]]; then
-		read -p 'service to restart: ' service_name
+        echo 'Restart a service'
+        echo
+        die '-s <service name>'
 	fi
 	ssh -t $user@$ip "sudo systemctl restart $service_name"
 	[[ $? -eq 0 ]] && echo "$service_name restarted!"
 }
 
 add_user() {
-	new_user=$1
-	sshkeyfile=$2
-	if [[ -z $new_user ]]; then
-		read -p 'new username: ' new_user
-	fi
-	if [[ -z $sshkeyfile ]]; then
-		read -ep 'ssh key file path: ' sshkeyfile
-		# parse the home directory correctly
-		if grep '^~' <<< "$sshkeyfile"; then
-			sshkeyfile=$(perl -pe "s!~!$HOME!" <<< $sshkeyfile)
-		fi
-	fi
+    while getopts 'u:f:' opt ; do
+        case $opt in
+            u) new_user=${OPTARG};;
+            f) sshkeyfile=${OPTARG};;
+        esac
+    done
+    if [[ -z $new_user ]] || [[ -z $sshkeyfile ]] ; then
+        echo 'Add a new admin user to the server'
+        echo
+        echo '-f <ssh key file for the user>'
+        die '-u <new username>'
+    fi
 	if [[ ! -f $sshkeyfile ]]; then
 		echo 'Please enter a valid ssh key file.'
 		exit 1
@@ -85,17 +92,19 @@ add_user() {
 }
 
 add_sshkey() {
-	sshkeyfile=$1
-	if [[ -z $sshkeyfile ]]; then
-		read -ep 'Path to the key file: ' sshkeyfile
-		# parse the home directory correctly
-		if grep '^~' <<< "$sshkeyfile"; then
-			sshkeyfile=$(perl -pe "s!~!$HOME!" <<< $sshkeyfile)
-		fi
-	fi
+    local sshkeyfile
+    while getopts 'f:' opt ; do
+        case $opt in
+            f) sshkeyfile=${OPTARG};;
+        esac
+    done
+    if [[ -z $sshkeyfile ]] || [[ $# -eq 0 ]] ; then
+        echo 'Add an addition authorized ssh key to your account'
+        echo
+        die '-f <sshkeyfile>'
+    fi
 	if [[ ! -f $sshkeyfile ]]; then
-		echo 'Please enter a valid ssh key file path.'
-		exit 1
+		die "It looks like $sshkeyfile does not exist!"
 	fi
 
 	cat $sshkey | ssh $user@$ip 'cat >> .ssh/authorized_keys'
@@ -134,13 +143,13 @@ show_usage() {
 	    ping      -- ping the server
 	    autorenew -- setup ssl certs to be automatically renewed
 	    reboot    -- reboot the server
-	    tomcatlog -- view the contents (cat) of /opt/tomcat/logs/catalina.out
-	    followlog -- tail -f the contents of /opt/tomcat/logs/catalina.out
+	    log:cat   -- view the contents (cat) of /opt/tomcat/logs/catalina.out
+	    log:tail  -- follow (tail -f) the contents of /opt/tomcat/logs/catalina.out
 
-	    upload  [file [destination]]    -- upload a file
-	    restart [servicename]           -- restart a service
-	    addkey  [sshkeyfile]            -- add an ssh key for your user
-	    adduser [username [sshkeyfile]] -- create a new admin user
+	    upload  -f <file> [-d <destination>]
+	    restart -s <service>
+	    addkey  -f <sshkeyfile>
+	    adduser -u <username> -f <sshkeyfile>
 
 	help_message
 }
@@ -180,9 +189,9 @@ case $command in
 	adduser)   add_user $@;;
 	addkey)    add_sshkey $@;;
 	autorenew) auto_renew_certs;;
-	tomcatlog) ssh -t $user@$ip 'sudo cat /opt/tomcat/logs/catalina.out';;
-	followlog) ssh -t $user@$ip 'sudo tail -f /opt/tomcat/logs/catalina.out';;
-	ping)      echo 'Press Ctrl-C to exit.'; ping -c5 $ip;;
+	log:cat)   ssh -t $user@$ip 'sudo cat /opt/tomcat/logs/catalina.out';;
+	log:tail)  ssh -t $user@$ip 'sudo tail -f /opt/tomcat/logs/catalina.out';;
+	ping)      ping -c5 $ip;;
 
 	*) show_usage;;
 esac
