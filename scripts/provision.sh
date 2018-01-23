@@ -5,9 +5,10 @@
 # the common server setup, most notably, the tomcat and nginx configuration.
 ##############################################################################
 
-# Note that this url needs to be updated periodically, the most recent version
-# can be found at https://tomcat.apache.org/download-80.cgi#8.5.24
-TOMCAT_DOWNLOAD_URL=http://mirrors.gigenet.com/apache/tomcat/tomcat-8/v8.5.24/bin/apache-tomcat-8.5.24.tar.gz
+# You might have to change the url below, the url needs to be updated
+# periodically, the most recent version can be found at
+# https://tomcat.apache.org/download-80.cgi
+TOMCAT_DOWNLOAD_URL=http://mirrors.sonic.net/apache/tomcat/tomcat-8/v8.5.24/bin/apache-tomcat-8.5.24.tar.gz
 TOMCAT_TARGZ="$(echo $TOMCAT_DOWNLOAD_URL | perl -pe 's/.*\///')"
 
 heading(){
