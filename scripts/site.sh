@@ -16,6 +16,7 @@ enable_git_deploment() {
 	echo "Setting up git deployment..."
 
 	ssh -t $user@$ip "
+        sudo chmod g+srwx /srv
 	mkdir /srv/${domain}
 	cat > /srv/${domain}/config <<'.'
 $(cat $TEMPLATES/config)
