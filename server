@@ -98,15 +98,15 @@ add_sshkey() {
         esac
     done
     if [[ -z $sshkeyfile ]] ; then
-        echo 'Add an addition authorized ssh key to your account'
+        echo 'Add an additional authorized ssh key to your account'
         echo
         die '-f <sshkeyfile>'
     fi
-	if [[ ! -f $sshkeyfile ]]; then
+	if [[ ! -f $sshkeyfile ]] ; then
 		die "It looks like $sshkeyfile does not exist!"
 	fi
 
-	cat $sshkey | ssh $user@$ip 'cat >> .ssh/authorized_keys'
+	cat $sshkeyfile | ssh $user@$ip 'cat >> .ssh/authorized_keys'
 	[[ $? -eq 0 ]] && echo 'ssh key added!'
 }
 
