@@ -180,7 +180,7 @@ setup_user
 
 heading 'Finsihed Provisioning!'
 
-echo 'Congradulations! Your server is now setup and ready to go!'
+echo 'Congratulations! Your server is now setup and ready to go!'
 echo "Here's some next steps:"
 echo
 echo 'Install tab completion for the ./server command'
