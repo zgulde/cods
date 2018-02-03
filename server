@@ -26,7 +26,12 @@ upload_file() {
         echo 'Upload a file to the server'
         echo
         echo '-f <file to upload>'
-        die '-d <file detination on the server> (optional)'
+        echo '-d <file detination on the server> (optional)'
+		echo
+		echo 'Examples:'
+		echo '    ./server upload -f ~/Downloads/mycat.png -d /var/www/example.com/uploads/mycat.png'
+		echo '    ./server upload -f ~/projects/example-project/migration.sql'
+		die
     fi
 	if [[ ! -e $file ]]; then
 		echo 'It appears as tough that file does not exist!'
@@ -45,7 +50,12 @@ restart_service() {
 	if [[ -z $service_name ]]; then
         echo 'Restart a service'
         echo
-        die '-s <service name>'
+        echo '-s <service name>'
+		echo
+		echo 'Examples:'
+		echo '    ./server restart -s nginx'
+		echo '    ./server restart -s tomcat'
+		die
 	fi
 	ssh -t $user@$ip "sudo systemctl restart $service_name"
 	[[ $? -eq 0 ]] && echo "$service_name restarted!"
@@ -61,8 +71,12 @@ add_user() {
     if [[ -z $new_user ]] || [[ -z $sshkeyfile ]] ; then
         echo 'Add a new admin user to the server'
         echo
-        echo '-f <ssh key file for the user>'
-        die '-u <new username>'
+        echo '-f <sshkeyfile>'
+        echo '-u <username>'
+		echo
+		echo 'Example:'
+		echo '    ./server adduser -u sally -f ~/sallys-ssh-key.pub'
+		die
     fi
 	if [[ ! -f $sshkeyfile ]]; then
 		echo 'Please enter a valid ssh key file.'
@@ -100,7 +114,11 @@ add_sshkey() {
     if [[ -z $sshkeyfile ]] ; then
         echo 'Add an additional authorized ssh key to your account'
         echo
-        die '-f <sshkeyfile>'
+        echo '-f <sshkeyfile>'
+		echo
+		echo 'Example:'
+		echo '    ./server addkey -f ~/my-other-computer.pub'
+		die
     fi
 	if [[ ! -f $sshkeyfile ]] ; then
 		die "It looks like $sshkeyfile does not exist!"

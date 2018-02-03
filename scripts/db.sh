@@ -22,9 +22,15 @@ create_db() {
 	done
 	if [[ -z $db_name ]] || [[ -z $db_user ]] ; then
 		echo 'Create a database and user that has permissions only on that database'
+		echo 'You will be prompted to choose a password for the new database user,'
+		echo 'this should be an alphanumeric password.'
 		echo
 		echo '-d <db name>'
-		die '-u <db user>'
+		echo '-u <db user>'
+		echo
+		echo 'Example:'
+		echo '    ./server db create -d example_db -u example_user'
+		die
 	fi
 
 	if [[ "$db_pass" != "$confirm_pass" ]]; then
@@ -63,7 +69,12 @@ backup_db() {
 		echo 'name inside of "db-backups"'
 		echo
 		echo '-d <database>'
-		die '-f <outputfile> (optional)'
+		echo '-f <outputfile> (optional)'
+		echo
+		echo 'Examples:'
+		echo '    ./server db backup -d example_db'
+		echo '    ./server db backup -d example_db -f ~/my-db-dump.sql'
+		die
 	fi
 	if [[ -z $outputfile ]]; then
 		outputfile="$BASE_DIR/db-backups/$(date +%Y-%m-%d_%H:%M:%S)-${database}-backup.sql"
@@ -87,7 +98,11 @@ remove_db() {
 		echo 'Remove a database and database user'
 		echo
 		echo '-d <database>'
-		die '-u <username>'
+		echo '-u <username>'
+		echo
+		echo 'Example:'
+		echo '    ./server db remove -d example_db -u example_user'
+		die
 	fi
 
 	ssh -t $user@$ip "mysql -p -e 'DROP DATABASE ${db_name}'

@@ -49,7 +49,11 @@ create_site() {
 	if [[ -z $domain ]] ; then
 		echo 'Setup up the server to host a new site'
 		echo
-		die '-d <domain>'
+		echo '-d <domain> -- domain name of the site to create'
+		echo
+		echo 'Example:'
+		echo '    ./server site create -d example.com'
+		die
 	fi
 
 	if list_sites | grep "^$domain$" > /dev/null ; then
@@ -107,7 +111,11 @@ enable_ssl() {
 	if [[ -z $domain ]] ; then
 		echo 'Enable https for a site'
 		echo
-		die '-d <domain>'
+		echo '-d <domain> -- domain name of the site to enable https for'
+		echo
+		echo 'Example:'
+		echo '    ./server site enablessl -d example.com'
+		die
 	fi
 
 
@@ -146,7 +154,11 @@ remove_site() {
 	if [[ -z $domain ]] ; then
 		echo 'Remove a site from the server'
 		echo
-		die '-d <domain>'
+		echo '-d <domain> -- name of the site to remove'
+		echo
+		echo 'Example:'
+		echo '    ./server site remove -d example.com'
+		die
 	fi
 
 	list_sites | grep "^$domain$" >/dev/null || die "It looks like $site does not exist. Aborting..."
@@ -176,7 +188,11 @@ build_site() {
 	if [[ -z $domain ]] ; then
 		echo 'Trigger a build and deploy for a site'
 		echo
-		die '-d <domain>'
+		echo '-d <domain> -- name of the site to build and deploy'
+		echo
+		echo 'Example:'
+		echo '    ./server site build -d example.com'
+		die
 	fi
 
 	# ensure site exists
@@ -205,8 +221,12 @@ deploy_site() {
 		echo 'for most use cases, git deployment is recommended. See also the `build`'
 		echo 'subcommand.'
 		echo
-		echo '-d <domain>'
-		die '-f <path to the war file>'
+		echo '-d <domain>   -- name of the site to deploy.'
+		echo '-f <filepath> -- path to the war file'
+		echo
+		echo 'Example:'
+		echo '    ./server site deploy -d example.com -f ~/example-project.war'
+		die
 	fi
 
 	# ensure file exists and is a war (or at least has the extension)
@@ -234,7 +254,11 @@ show_info() {
 	if [[ -z $domain ]] ; then
 		echo 'Show information about a site that is setup on the server'
 		echo
-		die '-d <domain>'
+		echo '-d <domain> -- name of the site to show information about'
+		echo
+		echo 'Example:'
+		echo '    ./server site info -d example.com'
+		die
 	fi
 
 	# ensure site exists
@@ -247,7 +271,7 @@ show_info() {
 		nginx config file:     /etc/nginx/sites-available/$site
 		deployment git remote: $user@$ip:/srv/$site/repo.git
 
-		To add the deployment remote (from your project, not from $BASE_DIR):
+		To add the deployment remote (from your project, not from $BASE_DIR) run:
 
 		    git remote add production $user@$ip:/srv/$site/repo.git
 

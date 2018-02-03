@@ -365,6 +365,14 @@ you will need to enter the database administrator password.
 In all of the following examples, it is assumed that your current working
 directory is the directory where you cloned this repository.
 
+For more examples, you can run any command that accepts arguments without
+arguments and a help message will be shown. For example, to see the help for the
+`upload` `server` subcommand:
+
+```
+./server upload
+```
+
 #### View all the available subcommands
 
 ```bash
