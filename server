@@ -167,8 +167,13 @@ if [[ ! -f $ENV_FILE ]]; then
 	exit
 fi
 
-source $ENV_FILE
 source $SCRIPTS/util.sh
+source $ENV_FILE
+# sanity check, make sure we have the values we need from the .env file
+if [[ -z $user || -z $ip ]] ; then
+	echo "It looks like the .env file ($ENV_FILE) is not setup properly."
+	die 'Are both `user` and `ip` set and not blank?'
+fi
 
 command=$1
 shift
