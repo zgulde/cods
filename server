@@ -10,11 +10,6 @@
 # the setup script.
 ##############################################################################
 
-die() {
-    echo "$@"
-    exit 1
-}
-
 auto_renew_certs() {
     ssh -t $user@$ip email=$email "$(< $SCRIPTS/snippets/letsencrypt-cronjob.sh)"
     [[ $? -eq 0 ]] && echo 'Autorenewal enabled!'
@@ -38,7 +33,7 @@ upload_file() {
 		exit 1
 	fi
 
-	scp -r $file $user@$ip:$destination
+	scp -r "$file" "$user@$ip:$destination"
 }
 
 restart_service() {
@@ -76,8 +71,12 @@ add_user() {
 
 	read -sp 'password for the new user: ' password
 	echo
-	read -sp 'confirm password: ' password
+	read -sp 'confirm password: ' confirm_password
 	echo
+
+	if [[ "$password" != "$confirm_password" ]] ; then
+		die 'Passwords do not match! Aborting...'
+	fi
 
 	echo "Creating user ${new_user}..."
 
@@ -98,7 +97,7 @@ add_sshkey() {
             f) sshkeyfile=${OPTARG};;
         esac
     done
-    if [[ -z $sshkeyfile ]] || [[ $# -eq 0 ]] ; then
+    if [[ -z $sshkeyfile ]] ; then
         echo 'Add an addition authorized ssh key to your account'
         echo
         die '-f <sshkeyfile>'
@@ -113,14 +112,13 @@ add_sshkey() {
 
 show_info() {
 	cat <<-info
-	Information about your server:
+		Information about your server:
 
-	ip address: $ip
-	login:	  $user
+		ip address: $ip
+		login:      $user
 
-	MySQL port: 3306
-	ssh port:   22
-
+		MySQL port: 3306
+		ssh port:   22
 	info
 }
 
@@ -169,10 +167,11 @@ if [[ ! -f $ENV_FILE ]]; then
 	exit
 fi
 
+source $ENV_FILE
+source $SCRIPTS/util.sh
+
 command=$1
 shift
-
-source $ENV_FILE
 
 case $command in
 	# sub commands

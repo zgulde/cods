@@ -13,6 +13,7 @@ list_sites() {
 
 enable_git_deploment() {
 	domain=$1
+	[[ -z $domain ]] && die 'Error in enable_git_deployment: $domain not specified'
 	echo "Setting up git deployment..."
 
 	ssh -t $user@$ip "
@@ -62,8 +63,7 @@ create_site() {
 	if [[ "$(dig +short ${domain} | tail -n 1)" != $ip ]]; then
 		echo 'It looks like the dns records for that domain are not setup to'
 		echo 'point to your server.'
-		read -p 'Continue anyway? [y/N] ' confirm
-		echo $confirm | grep -i '^y' >/dev/null || exit 1
+		confirm "Are you sure you want to setup ${domain}?" || die 'Aborting...'
 	fi
 
 	echo "Setting up ${domain}..."
@@ -149,21 +149,11 @@ remove_site() {
 		die '-d <domain>'
 	fi
 
+	list_sites | grep "^$domain$" >/dev/null || die "It looks like $site does not exist. Aborting..."
 	# confirm deletion
-	read -p "Are your sure you want to remove $site? [y/N] " confirm
-	echo "$confirm" | grep -i '^y' >/dev/null
-	if [[ $? -ne 0 ]]; then
-		echo 'site not removed!'
-		exit 1
-	fi
+	confirm "Are you sure you want to remove ${site}?" || die 'Site not removed.'
 
 	ssh -t $user@$ip "
-	ls /etc/nginx/sites-available | grep '^$site$' >/dev/null 2>&1
-	if [[ \$? -ne 0 ]]; then
-		echo 'That site does not exist!'
-		exit 1
-	fi
-
 	sudo sed -i -e '/${site}/d' /opt/tomcat/conf/server.xml
 
 	sudo rm -f /etc/nginx/sites-available/${site}
@@ -190,18 +180,14 @@ build_site() {
 	fi
 
 	# ensure site exists
-	list_sites | grep "^$site$" >/dev/null 2>&1
-	if [[ $? -ne 0 ]]; then
-		echo 'That site does not exist!'
-		exit 1
-	fi
+	list_sites | grep "^$site$" >/dev/null || die "It looks like $site does not exist. Aborting..."
 
 	echo "Running post-receive hook for $site"
+
 	ssh -t $user@$ip "
 	cd /srv/$site/repo.git
 	hooks/post-receive
 	"
-
 }
 
 deploy_site() {
@@ -228,20 +214,15 @@ deploy_site() {
 		echo 'It looks like that file does not exist!'
 		exit 1
 	fi
-	echo $war_filepath | grep '\.war$' >/dev/null
-	if [[ $? -ne 0 ]]; then
-		echo 'must be a valid .war file'
-		exit 1
+	if [[ "$war_filepath" != *.war ]] ; then
+		echo 'It looks like that file is not a valid war file (it does not have the)' >&2
+		die '".war" file extension. Aborting...'
 	fi
 
 	# ensure site exists
-	list_sites | grep "^$domain$" >/dev/null 2>&1
-	if [[ $? -ne 0 ]]; then
-		echo 'That site does not exist!'
-		exit 1
-	fi
+	list_sites | grep "^$domain$" >/dev/null || die "It looks like $site does not exist. Aborting..."
 
-	scp $war_filepath $user@$ip:/opt/tomcat/${domain}/ROOT.war
+	scp "$war_filepath" $user@$ip:/opt/tomcat/${domain}/ROOT.war
 }
 
 show_info() {
@@ -257,11 +238,7 @@ show_info() {
 	fi
 
 	# ensure site exists
-	list_sites | grep "^$site$" >/dev/null 2>&1
-	if [[ $? -ne 0 ]]; then
-		echo 'That site does not exist!'
-		exit 1
-	fi
+	list_sites | grep "^$domain$" >/dev/null || die "It looks like $site does not exist. Aborting..."
 
 	cat <<-.
 		Site: $site
