@@ -61,7 +61,7 @@ short (assuming the server is already setup and provisioned):
 1. Login to the server and create `example.com/application.properties` and edit
    `example.com/config`
 
-1. Add the git remote to your project and push
+1. Add the git deployment remote to your project and push
 
 ## Can I use a subdomain?
 
@@ -97,9 +97,12 @@ Have your database administrator password ready, and run:
 ./server db login
 ```
 
+## How can I run a database migration on my production database?
+## How can I run a seeder file for my production database?
 ## How can I run a sql script on my production database?
 
-You can transfer the script to the server and run it there.
+The easiest thing to do is to transfer the script to the server and run it
+there.
 
 ```
 ./server upload /local/path/to/my-script.sql
@@ -234,3 +237,76 @@ setup.
 
 Once the DNS records are setup properly, or to test if they are, you can remove
 the same line from `/etc/hosts`.
+
+## How can I let my teammate push to deploy the project?
+
+See also the relevant section in the main README.
+
+1. Save your teammate's public ssh key locally on your computer.
+
+    If your teammate has their ssh keys setup on GitHub, you can go to
+
+        https://github.com/USERNAME.keys
+
+    replacing `USERNAME` with your teammate's github username.
+
+    Copy the key(s) to your clipboard, then in a terminal (assuming you are
+    using MacOS)
+
+        pbpaste > ~/my-friends-ssh-key.pub
+
+    This will create a file named `my-friends-ssh-key.pub` in your home
+    directory. (You could choose a different filename if you so desire.)
+
+1. Use the `adduser` subcommand to create the user account on your server.
+
+    You may also wish to create a database admin account for your teammate at
+    this time. See the main README for more details on this step.
+
+1. Have your teammate clone this tool and setup their `.env` file.
+
+    See the main README for details of what this `.env` file should contain
+
+    ```
+    git clone https://github.com/zgulde/tomcat-setup ~/shared-server
+    cd ~/shared-server
+    nano .env
+    ```
+
+1. Have your teammate add the appropriate deployment remote to their project.
+
+    You can obtain the deployment remote (and the git cli command to add it)
+    through the `site info` subcommand.
+
+    For example, if the project was named `example` and was deployed to
+    `example.com`, you might run the following commands:
+
+    ```
+    cd ~/shared-server
+    ./server site info example.com
+    ```
+
+    copy the command for adding the deployment remote, then...
+
+    ```
+    cd ~/IdeaProjects/example
+    ```
+
+    and paste the deployment remote adding command
+
+Now your teammate can push to `production` as well!
+
+## What is my password?
+
+In general, and commands that you run that prompt for a password will need your
+`sudo` password (i.e. the server admin password). The only exception to this is
+any command run with the `db` subcommand, these will all need your database
+admin password.
+
+By default, when a server is setup, a file located at
+`~/my-server/credentials.txt` is created. This file has both your user account's
+sudo password, as well as the admin password for the mysql installation on your
+server.
+
+If you deleted/moved this file, or changed your password, and do not remember
+it, (by design) there is nothing you can do to recover it.

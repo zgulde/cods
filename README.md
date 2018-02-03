@@ -10,8 +10,9 @@ nginx, and mysql.
 * [Git Deployment](#git-deployment)
 * [HTTPS](#https)
 * [Commands](#commands)
-* [Examples](#examples)
+* [Sharing your server with teammates](#sharing-your-server-with-teammates)
 * [Uploads](#uploads)
+* [Development Webserver](#development-webserver)
 * [Bash Completion](#bash-completion)
 
 ## Who this is for
@@ -55,7 +56,8 @@ cd ~/my-awesome-server
 # 4. setup your server to listen for requests for your domain
 ./server site create myblog.com
 
-# 5. deploy the war
+# 5. deploy the war (included here for the quickstart, but your should probably
+#    setup git deployment)
 ./server site deploy myblog.com ~/IdeaProjects/myblog/target/myblog-v0.0.1-SNAPSHOT.war
 ```
 
@@ -321,8 +323,8 @@ you will need to enter the database administrator password.
 - `autorenew`: setup letsencrypt certificates to automatically be renewed
 - `addkey`: add an authorized ssh key to the server for your account
 - `adduser`: add an admin user account to the server
-- `tomcatlog`: view the contents of the tomcat log file, `/opt/tomcat/logs/catalina.out`
-- `followlog`: watch the contents of the tomcat log file in real-time (`tail -f`)
+- `log:cat`: view the contents of the tomcat log file, `/opt/tomcat/logs/catalina.out`
+- `log:tail`: watch the contents of the tomcat log file in real-time (`tail -f`)
 
 ### Site and Database Management Commands
 
@@ -347,7 +349,6 @@ which can be seen by running the command by itself.
 - `create`: create a new database and a user with privileges on only that
   database
 - `backup`: create a backup of a database
-- `run`: run a sql script for a specific database
 - `remove`: remove a database and user
 
 ### Examples
@@ -448,7 +449,7 @@ the `war` file.
 1. Clone this repo
 
     ```bash
-    git clone <url> ~/shared-server
+    git clone https://github.com/zgulde/tomcat-setup ~/shared-server
     ```
 
 1. Create a `.env` file with the following contents:
