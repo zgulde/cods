@@ -7,7 +7,7 @@ complete guide to codeup students on deploying their spring boot applications.
 See also the [FAQs](faq.md)
 
 Note that if you are looking to add a site to an existing server, you should
-skip the "Domain Name + First Time Server Setup" section.
+skip the "First Time Server Setup" section.
 
 ## Overview
 
@@ -106,16 +106,7 @@ Spring boot will also allow us to package our application as a `war`.
 
     Make sure to add and commit the `.build_config` file!
 
-## Domain Name + First Time Server Setup
-
-1. Buy a domain name (we recommend namecheap), and point the DNS nameservers for
-   that domain to digital ocean
-
-    ```
-    ns1.digitalocean.com
-    ns2.digitalocean.com
-    ns3.digitalocean.com
-    ```
+## First Time Server Setup
 
 1. Sign up for digital ocean
 
@@ -129,11 +120,6 @@ Spring boot will also allow us to package our application as a `war`.
     ```
     cat ~/.ssh/id_rsa.pub | pbcopy
     ```
-
-1. [Configure your domain's DNS settings with digital ocean.](https://cloud.digitalocean.com/networking)
-
-    - Add an 'A' record that points to your droplet
-    - optionally, add the 'www' subdomain
 
 1. Clone the deployment tool
 
@@ -150,12 +136,31 @@ Spring boot will also allow us to package our application as a `war`.
     ./server
     ```
 
+After the last step above, a file located at `~/my-server/credentials.txt` will
+be created. This file contains the admin password for your server, as well as
+admin password for the mysql installation on the server.
+
 ## Site Setup
+
+1. Buy a domain name (we recommend namecheap), and point the DNS nameservers for
+   that domain to digital ocean
+
+    ```
+    ns1.digitalocean.com
+    ns2.digitalocean.com
+    ns3.digitalocean.com
+    ```
+
+1. [Configure your domain's DNS settings with digital ocean.](https://cloud.digitalocean.com/networking)
+
+    - Add an 'A' record that points to your droplet
+    - optionally, add the 'www' subdomain
+
 
 1. Create a database for your site
 
     ```
-    ./server db create blog_db blog_user
+    ./server db create -d blog_db -u blog_user
     ```
 
     You will be prompted to choose a password for the new user, then we will
@@ -170,7 +175,7 @@ Spring boot will also allow us to package our application as a `war`.
     your *server admin* password.
 
     ```
-    ./server site create example.com
+    ./server site create -d example.com
     ```
 
     If the DNS records are improperly configured, the script will warn you, you
@@ -178,7 +183,7 @@ Spring boot will also allow us to package our application as a `war`.
     records are properly configured.
 
     The output of this command will contain instructions for adding a git remote
-    for deploment. Take note of this command, we will be using it later on.
+    for deployment. Take note of this command, we will be using it later on.
 
 1. Log in to the server to finalize deployment setup
 
@@ -218,13 +223,25 @@ Spring boot will also allow us to package our application as a `war`.
 
     You can now log out of the server.
 
-1. Deploy the site
+1. Add the deployment remote to your project and push to deploy the site
 
-    Add the git remote (from the site setup command) to your project, and push
-    to your new remote.
+    You can find your deployment remote (and a copy-pasteable command to add it
+    to your project) by running:
+
+    ```
+    ./server site info -d example.com
+    ```
+
+    Replacing `example.com` with the name of the site you just setup.
+
+    Copy the command to add the `production` remote, then:
 
     ```
     cd ~/IdeaProjects/my-project
-    git remote add production ...
+    ```
+
+    paste the command to add the `production` remote, and push
+
+    ```
     git push production master
     ```

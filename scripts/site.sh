@@ -13,6 +13,7 @@ list_sites() {
 
 enable_git_deploment() {
 	domain=$1
+	[[ -z $domain ]] && die 'Error in enable_git_deployment: $domain not specified'
 	echo "Setting up git deployment..."
 
 	ssh -t $user@$ip "
@@ -40,10 +41,19 @@ $(sed -e s/{{site}}/$domain/g $TEMPLATES/post-receive.sh)
 }
 
 create_site() {
-	domain=$1
-
-	if [[ -z $domain ]]; then
-		read -p 'Enter the site name without the www: ' domain
+	while getopts 'd:' opt ; do
+		case $opt in
+			d) domain=${OPTARG};;
+		esac
+	done
+	if [[ -z $domain ]] ; then
+		echo 'Setup up the server to host a new site'
+		echo
+		echo '-d <domain> -- domain name of the site to create'
+		echo
+		echo 'Example:'
+		echo '    ./server site create -d example.com'
+		die
 	fi
 
 	if list_sites | grep "^$domain$" > /dev/null ; then
@@ -57,8 +67,7 @@ create_site() {
 	if [[ "$(dig +short ${domain} | tail -n 1)" != $ip ]]; then
 		echo 'It looks like the dns records for that domain are not setup to'
 		echo 'point to your server.'
-		read -p 'Continue anyway? [y/N] ' confirm
-		grep -i '^y' <<< $confirm || exit 1
+		confirm "Are you sure you want to setup ${domain}?" || die 'Aborting...'
 	fi
 
 	echo "Setting up ${domain}..."
@@ -94,10 +103,21 @@ create_site() {
 }
 
 enable_ssl() {
-	domain=$1
-	if [[ -z $domain ]]; then
-		read -p 'Enter the domain: ' domain
+	while getopts 'd:' opt ; do
+		case $opt in
+			d) domain=${OPTARG};;
+		esac
+	done
+	if [[ -z $domain ]] ; then
+		echo 'Enable https for a site'
+		echo
+		echo '-d <domain> -- domain name of the site to enable https for'
+		echo
+		echo 'Example:'
+		echo '    ./server site enablessl -d example.com'
+		die
 	fi
+
 
 	echo 'Before running this command, make sure that the DNS records for your domain'
 	echo 'are configured to point to your server.'
@@ -126,26 +146,26 @@ enable_ssl() {
 }
 
 remove_site() {
-	site=$1
-	if [[ -z "$site" ]]; then
-		read -p 'Enter the name of the site to remove: ' site
+	while getopts 'd:' opt ; do
+		case $opt in
+			d) domain=${OPTARG};;
+		esac
+	done
+	if [[ -z $domain ]] ; then
+		echo 'Remove a site from the server'
+		echo
+		echo '-d <domain> -- name of the site to remove'
+		echo
+		echo 'Example:'
+		echo '    ./server site remove -d example.com'
+		die
 	fi
 
+	list_sites | grep "^$domain$" >/dev/null || die "It looks like $site does not exist. Aborting..."
 	# confirm deletion
-	read -p "Are your sure you want to remove $site? [y/N] " confirm
-	echo "$confirm" | grep -i '^y' >/dev/null
-	if [[ $? -ne 0 ]]; then
-		echo 'site not removed!'
-		exit 1
-	fi
+	confirm "Are you sure you want to remove ${site}?" || die 'Site not removed.'
 
 	ssh -t $user@$ip "
-	ls /etc/nginx/sites-available | grep '^$site$' >/dev/null 2>&1
-	if [[ \$? -ne 0 ]]; then
-		echo 'That site does not exist!'
-		exit 1
-	fi
-
 	sudo sed -i -e '/${site}/d' /opt/tomcat/conf/server.xml
 
 	sudo rm -f /etc/nginx/sites-available/${site}
@@ -160,41 +180,53 @@ remove_site() {
 }
 
 build_site() {
-	site=$1
-
-	if [[ -z "$site" ]]; then
-		read -p 'Enter the name of the site you wish to trigger a build for: ' site
+	while getopts 'd:' opt ; do
+		case $opt in
+			d) domain=${OPTARG};;
+		esac
+	done
+	if [[ -z $domain ]] ; then
+		echo 'Trigger a build and deploy for a site'
+		echo
+		echo '-d <domain> -- name of the site to build and deploy'
+		echo
+		echo 'Example:'
+		echo '    ./server site build -d example.com'
+		die
 	fi
 
 	# ensure site exists
-	list_sites | grep "^$site$" >/dev/null 2>&1
-	if [[ $? -ne 0 ]]; then
-		echo 'That site does not exist!'
-		exit 1
-	fi
+	list_sites | grep "^$site$" >/dev/null || die "It looks like $site does not exist. Aborting..."
 
 	echo "Running post-receive hook for $site"
+
 	ssh -t $user@$ip "
 	cd /srv/$site/repo.git
 	hooks/post-receive
 	"
-
 }
 
 deploy_site() {
-	site=$1
-	war_filepath="$2"
+	while getopts 'f:d:' opt ; do
+		case $opt in
+			f) war_filepath=${OPTARG};;
+			d) domain=${OPTARG};;
+		esac
+	done
 
-	if [[ -z "$site" ]]; then
-		read -p 'Enter the name of the site you want to deploy to: ' site
-	fi
-
-	if [[ -z "$war_filepath"  ]]; then
-		read -ep 'Enter the path to the war file: ' war_filepath
-		# parse the home directory correctly
-		if grep '^~' <<< "$war_filepath"; then
-			war_filepath=$(perl -pe "s!~!$HOME!" <<< $war_filepath)
-		fi
+	if [[ -z $domain ]] || [[ -z $war_filepath ]] ; then
+		echo 'Deploy a pre-built war file.'
+		echo
+		echo "You should probably only do this if you really know what you're doing,"
+		echo 'for most use cases, git deployment is recommended. See also the `build`'
+		echo 'subcommand.'
+		echo
+		echo '-d <domain>   -- name of the site to deploy.'
+		echo '-f <filepath> -- path to the war file'
+		echo
+		echo 'Example:'
+		echo '    ./server site deploy -d example.com -f ~/example-project.war'
+		die
 	fi
 
 	# ensure file exists and is a war (or at least has the extension)
@@ -202,34 +234,35 @@ deploy_site() {
 		echo 'It looks like that file does not exist!'
 		exit 1
 	fi
-	grep '\.war$' >/dev/null <<< $war_filepath
-	if [[ $? -ne 0 ]]; then
-		echo 'must be a valid .war file'
-		exit 1
+	if [[ "$war_filepath" != *.war ]] ; then
+		echo 'It looks like that file is not a valid war file (it does not have the)' >&2
+		die '".war" file extension. Aborting...'
 	fi
 
 	# ensure site exists
-	list_sites | grep "^$site$" >/dev/null 2>&1
-	if [[ $? -ne 0 ]]; then
-		echo 'That site does not exist!'
-		exit 1
-	fi
+	list_sites | grep "^$domain$" >/dev/null || die "It looks like $site does not exist. Aborting..."
 
-	scp $war_filepath $user@$ip:/opt/tomcat/$site/ROOT.war
+	scp "$war_filepath" $user@$ip:/opt/tomcat/${domain}/ROOT.war
 }
 
 show_info() {
-	site=$1
-	if [[ -z $site ]]; then
-		read -p 'Site name: ' site
+	while getopts 'd:' opt ; do
+		case $opt in
+			d) domain=${OPTARG};;
+		esac
+	done
+	if [[ -z $domain ]] ; then
+		echo 'Show information about a site that is setup on the server'
+		echo
+		echo '-d <domain> -- name of the site to show information about'
+		echo
+		echo 'Example:'
+		echo '    ./server site info -d example.com'
+		die
 	fi
 
 	# ensure site exists
-	list_sites | grep "^$site$" >/dev/null 2>&1
-	if [[ $? -ne 0 ]]; then
-		echo 'That site does not exist!'
-		exit 1
-	fi
+	list_sites | grep "^$domain$" >/dev/null || die "It looks like $site does not exist. Aborting..."
 
 	cat <<-.
 		Site: $site
@@ -238,7 +271,7 @@ show_info() {
 		nginx config file:     /etc/nginx/sites-available/$site
 		deployment git remote: $user@$ip:/srv/$site/repo.git
 
-		To add the deployment remote (from your project, not from $BASE_DIR):
+		To add the deployment remote (from your project, not from $BASE_DIR) run:
 
 		    git remote add production $user@$ip:/srv/$site/repo.git
 
@@ -250,17 +283,18 @@ show_help() {
 	site -- command for managing sites setup on your server
 	usage
 
-	    ./server site <command>
+	    ./server site <command> [options]
 
 	where <command> is one of the following:
 
-	    list
-	    create    [sitename]
-	    remove    [sitename]
-	    build     [sitename]
-	    enablessl [sitename]
-	    info      [sitename]
-	    deploy    [sitename [/path/to/site.war]]
+	    list -- list the sites setup on your server
+
+	    create    -d <domain>
+	    remove    -d <domain>
+	    build     -d <domain>
+	    enablessl -d <domain>
+	    info      -d <domain>
+	    deploy    -d <domain> -f <warfile>
 
 	help
 }

@@ -10,8 +10,9 @@ nginx, and mysql.
 * [Git Deployment](#git-deployment)
 * [HTTPS](#https)
 * [Commands](#commands)
-* [Examples](#examples)
+* [Sharing your server with teammates](#sharing-your-server-with-teammates)
 * [Uploads](#uploads)
+* [Development Webserver](#development-webserver)
 * [Bash Completion](#bash-completion)
 
 ## Who this is for
@@ -25,7 +26,7 @@ This project is probably **not** for you if:
 
 - You need to deploy anything that is not a `war`
 - You want to use a database that is not MySQL
-- You want to use a webserver other than tomcat
+- You want to use a webserver other than tomcat behind nginx
 
 ## Prerequisites
 
@@ -50,13 +51,14 @@ cd ~/my-awesome-server
 ./server
 
 # 3. create a database and user for the application
-./server db create blog_db blog_user
+./server db create -d blog_db -u blog_user
 
 # 4. setup your server to listen for requests for your domain
-./server site create myblog.com
+./server site create -d myblog.com
 
-# 5. deploy the war
-./server site deploy myblog.com ~/IdeaProjects/myblog/target/myblog-v0.0.1-SNAPSHOT.war
+# 5. deploy the war (included here for the quickstart, but your should probably
+#    setup git deployment)
+./server site deploy -d myblog.com -f /path/to/myblog-v0.0.1-SNAPSHOT.war
 ```
 
 ## Usage
@@ -128,7 +130,7 @@ While theoretically you might not need to do this, most applications will need
 to talk to a database in some form or fashion.
 
 ```bash
-./server db create some_db some_user
+./server db create -d some_db -u some_user
 ```
 
 This command will create a database and a user that has all permissions on that
@@ -145,7 +147,7 @@ This will `scp` the file to the appropriate location on your server. Once you
 run this command, you should be able to see your site live!
 
 ```bash
-./server site deploy example.com /path/to/the/war/file.war
+./server site deploy -d example.com -f /path/to/the/war/file.war
 ```
 
 Of course, before you run this you will need to have packaged your application
@@ -257,7 +259,7 @@ You can also manually trigger a build and deploy without needing to push to the
 git remote on your server.
 
 ```
-./server site build example.com
+./server site build -d example.com
 ```
 
 This will run the same script that runs when you push to the remote.
@@ -278,7 +280,7 @@ Agreement](https://letsencrypt.org/documents/LE-SA-v1.1.1-August-1-2016.pdf).**
 Simply run
 
 ```bash
-./server site enablessl myawesomesite.com
+./server site enablessl -d myawesomesite.com
 ```
 
 After enabling https for a site, you can enable the automatic renewal of certificates:
@@ -298,11 +300,23 @@ this script is run it will perform the initial server setup and
 provisioning. Once the server is setup you will be able to run the various
 subcommands.
 
-Any commands that require arguments can either be passed on the command line, or
-the command can be run without arguments and you will be prompted for them.
-
 To see all the available subcommands, run the `server` command without any
-arguments.
+arguments:
+
+```
+./server
+```
+
+The same applies for the `site` and `db` subcommands, to see their available
+subcommands, just run them by themselves:
+
+```
+./server site
+./server db
+```
+
+Any subcommands that require arguments can be run without arguments to see
+detailed help for the command.
 
 In general, any password prompts will be for your server admin password (i.e.
 your sudo password), unless you are running the `db` subcommand, in which case
@@ -321,13 +335,10 @@ you will need to enter the database administrator password.
 - `autorenew`: setup letsencrypt certificates to automatically be renewed
 - `addkey`: add an authorized ssh key to the server for your account
 - `adduser`: add an admin user account to the server
-- `tomcatlog`: view the contents of the tomcat log file, `/opt/tomcat/logs/catalina.out`
-- `followlog`: watch the contents of the tomcat log file in real-time (`tail -f`)
+- `log:cat`: view the contents of the tomcat log file, `/opt/tomcat/logs/catalina.out`
+- `log:tail`: watch the contents of the tomcat log file in real-time (`tail -f`)
 
 ### Site and Database Management Commands
-
-The `site`, `db`, and `devserver` subcommands themselves contain subcommands
-which can be seen by running the command by itself.
 
 `site`
 
@@ -347,13 +358,20 @@ which can be seen by running the command by itself.
 - `create`: create a new database and a user with privileges on only that
   database
 - `backup`: create a backup of a database
-- `run`: run a sql script for a specific database
 - `remove`: remove a database and user
 
 ### Examples
 
 In all of the following examples, it is assumed that your current working
 directory is the directory where you cloned this repository.
+
+For more examples, you can run any command that accepts arguments without
+arguments and a help message will be shown. For example, to see the help for the
+`upload` `server` subcommand:
+
+```
+./server upload
+```
 
 #### View all the available subcommands
 
@@ -382,37 +400,14 @@ directory is the directory where you cloned this repository.
 #### Create a site
 
 ```bash
-./server site create example.com
+./server site create -d example.com
 ```
-
-OR
-
-```
-./server site create
-```
-
-and you will be prompted for the domain name.
 
 #### Upload a file to a site's uploads directory
 
 ```bash
-./server upload ~/Downloads/kittens.png /var/www/example.com/uploads
+./server upload -f ~/Downloads/kittens.png -d /var/www/example.com/uploads
 ```
-
-#### Deploy a `war` to a site
-
-```bash
-./server site deploy example.com ~/JavaProjects/my-awesome-project/target/my-awesome-project.war
-```
-
-OR
-
-```bash
-./server site deploy
-```
-
-and you will be prompted for the site to deploy to, as well as the filepath for
-the `war` file.
 
 ## Sharing your server with teammates
 
@@ -428,7 +423,7 @@ the `war` file.
 1. Run the appropriate `./server` command
 
     ```bash
-    ./server adduser sally ~/sallys_ssh_key.pub
+    ./server adduser -u sally -f ~/sallys_ssh_key.pub
     ```
 
 1. Choose (or have your teamate choose) a password for the new user
@@ -448,20 +443,29 @@ the `war` file.
 1. Clone this repo
 
     ```bash
-    git clone <url> ~/shared-server
+    git clone https://github.com/zgulde/tomcat-setup ~/shared-server
     ```
 
-1. Create a `.env` file with the following contents:
+1. Create a `.env` file
+
+    Create a file named `.env` inside the project you just cloned:
+
+    ```
+    cd ~/shared-server
+    nano .env
+    ```
+
+    This file should have the following contents:
 
     ```
     ip=<the-servers-ip-address>
     user=<the-user-you-just-created>
     ```
 
-    Replace the values in `<>`s with their appropriate values. Note there needs
-    to be **no spaces** around the `=` sign.
+    Replace the values in `<>`s with their appropriate values. *Note there needs
+    to be **no spaces** around the `=` sign.*
 
-    Example `.env`
+    An example `.env` file might look like this:
 
     ```
     ip=123.123.123.123
@@ -497,6 +501,9 @@ see the built in help
 ```
 
 for more details.
+
+*Currently this setup assumes the upstream server is running locally on port
+8080, and this is not configurable.*
 
 ## Bash Completion
 
