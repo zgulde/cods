@@ -215,6 +215,10 @@ deploy_site() {
 	if [[ -z $domain ]] || [[ -z $war_filepath ]] ; then
 		echo 'Deploy a pre-built war file.'
 		echo
+		echo "You should probably only do this if you really know what you're doing,"
+		echo 'for most use cases, git deployment is recommended. See also the `build`'
+		echo 'subcommand.'
+		echo
 		echo '-d <domain>'
 		die '-f <path to the war file>'
 	fi
