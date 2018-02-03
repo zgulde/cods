@@ -6,6 +6,8 @@
 * [Can I use a subdomain?](#can-i-use-a-subdomain)
 * [How do I login to my server?](#how-do-i-login-to-my-server)
 * [How do I login to my database?](#how-do-i-login-to-my-database)
+* [How can I run a database migration on my production database?](#how-can-i-run-a-database-migration-on-my-production-database)
+* [How can I run a seeder file for my production database?](#how-can-i-run-a-seeder-file-for-my-production-database)
 * [How can I run a sql script on my production database?](#how-can-i-run-a-sql-script-on-my-production-database)
 * [How do I enable https?](#how-do-i-enable-https)
 * [Can I redeploy my project without a `git push`?](#can-i-redeploy-my-project-without-a-git-push)
@@ -15,6 +17,8 @@
 * [Can I upload a `war` file directly (i.e. without using the git deployment)?](#can-i-upload-a-war-file-directly-ie-without-using-the-git-deployment)
 * [My site's not working.](#my-sites-not-working)
 * [Can I view my site if the DNS records aren't properly configured?](#can-i-view-my-site-if-the-dns-records-arent-properly-configured)
+* [How can I let my teammate push to deploy the project?](#how-can-i-let-my-teammate-push-to-deploy-the-project)
+* [What is my password?](#what-is-my-password)
 
 All the example command below assume you have already `cd`d into the directory
 that contains your server setup. E.g.
@@ -54,8 +58,8 @@ short (assuming the server is already setup and provisioned):
 1. Create the site and database on the server
 
     ```
-    ./server site create example.com
-    ./server db create example_db example_user
+    ./server site create -d example.com
+    ./server db create -d example_db -u example_user
     ```
 
 1. Login to the server and create `example.com/application.properties` and edit
@@ -105,7 +109,7 @@ The easiest thing to do is to transfer the script to the server and run it
 there.
 
 ```
-./server upload /local/path/to/my-script.sql
+./server upload -f /local/path/to/my-script.sql
 ./server login
 
 # from the server
@@ -117,7 +121,7 @@ mysql -p < my-script.sql # you'll be promted for your db password
 **You can only do this if your DNS records are properly configured.**
 
 ```
-./server site enablessl example.com
+./server site enablessl -d example.com
 ```
 
 See the `HTTPS` section in the main README for more details
@@ -130,7 +134,7 @@ is external to your project (i.e. not in the project's git repository), you can
 redeploy the project by running:
 
 ```
-./server site build example.com
+./server site build -d example.com
 ```
 
 This will trigger the same script that runs whenever you push to the deployment
@@ -149,7 +153,7 @@ Run
 Run
 
 ```
-./server site info example.com
+./server site info -d example.com
 ```
 
 Replacing `example.com` with the site you setup.
@@ -160,7 +164,7 @@ Yes, build the war, then run:
 
 ```
 from ~/my-server
-./server site deploy example.com ~/IdeaProjects/example-project/target/example-1.0-SNAPSHOT.war
+./server site deploy -d example.com -f /path/to/the/file.war
 ```
 
 Replacing `example` with the relevant values for your project.
@@ -195,7 +199,7 @@ of your application.
 **Check the logs!**
 
 ```
-./server tomcatlog
+./server log:cat
 ```
 
 Will dump out the tomcat log file located on your server at
@@ -283,7 +287,7 @@ See also the relevant section in the main README.
 
     ```
     cd ~/shared-server
-    ./server site info example.com
+    ./server site info -d example.com
     ```
 
     copy the command for adding the deployment remote, then...

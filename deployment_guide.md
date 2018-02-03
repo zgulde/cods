@@ -160,7 +160,7 @@ admin password for the mysql installation on the server.
 1. Create a database for your site
 
     ```
-    ./server db create blog_db blog_user
+    ./server db create -d blog_db -u blog_user
     ```
 
     You will be prompted to choose a password for the new user, then we will
@@ -175,7 +175,7 @@ admin password for the mysql installation on the server.
     your *server admin* password.
 
     ```
-    ./server site create example.com
+    ./server site create -d example.com
     ```
 
     If the DNS records are improperly configured, the script will warn you, you
@@ -229,7 +229,7 @@ admin password for the mysql installation on the server.
     to your project) by running:
 
     ```
-    ./server site info example.com
+    ./server site info -d example.com
     ```
 
     Replacing `example.com` with the name of the site you just setup.
