@@ -127,7 +127,7 @@ show_usage() {
 	server -- command for server management
 	usage
 
-	    ./server <command>
+	    ./server <command> [options]
 
 	where <command> is one of the following:
 

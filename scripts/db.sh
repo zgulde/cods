@@ -104,7 +104,7 @@ show_usage() {
 	db -- command for interacting with databases on your server
 	usage
 
-	    ./server db <command>
+	    ./server db <command> [options]
 
 	where <command> is one of the following:
 

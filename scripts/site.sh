@@ -259,7 +259,7 @@ show_help() {
 	site -- command for managing sites setup on your server
 	usage
 
-	    ./server site <command>
+	    ./server site <command> [options]
 
 	where <command> is one of the following:
 
