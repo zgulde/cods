@@ -86,8 +86,8 @@ Spring boot will also allow us to package our application as a `war`.
     ./mvnw package
     ```
 
-    *Note: instead of modifying the `pom.xml`, you could also pass the
-    `-DskipTests` flag to the maven package command.*
+    If this command produces any errors, read the error messages and fix them
+    before proceeding.
 
 1. Setup the `.build_config` file
 
@@ -104,7 +104,21 @@ Spring boot will also allow us to package our application as a `war`.
     setup, make sure the name of the war file matches up with what you defined
     in your `pom.xml`.*
 
-    Make sure to add and commit the `.build_config` file!
+    You can test that your `.build_config` file is setup correctly by running
+    the following commands in your terminal from the root of your project:
+
+    ```
+    source .build_config
+    eval $BUILD_COMMAND
+    [[ -f $WAR_FILE ]] && echo 'Good to Go!' || echo 'WAR_FILE not found!'
+    ```
+
+    You should see no output from the first command, your project should build
+    successfully after the second, and your should see "Good to Go!" output
+    after the third.
+
+    Once everything is ready to go, make sure to add and commit the
+    `.build_config` file!
 
 ## First Time Server Setup
 
