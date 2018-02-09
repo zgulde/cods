@@ -66,7 +66,7 @@ backup_db() {
 	if [[ -z $database ]]; then
 		echo 'Create a backup of a database. Optionally specify a filename to save'
 		echo 'the backup to. Will default to a file with the current time and the database'
-		echo 'name inside of "db-backups"'
+		echo "name inside of '$BASE_DIR/db-backups'"
 		echo
 		echo '-d <database>'
 		echo '-f <outputfile> (optional)'

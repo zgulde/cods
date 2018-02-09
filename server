@@ -137,6 +137,9 @@ show_info() {
 
 		MySQL port: 3306
 		ssh port:   22
+
+		base directory: $BASE_DIR
+		command:        $0
 	info
 }
 
