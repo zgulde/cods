@@ -29,7 +29,7 @@ create_db() {
 		echo '-u <db user>'
 		echo
 		echo 'Example:'
-		echo '    ./server db create -d example_db -u example_user'
+		echo "    $(basename $0) db create -d example_db -u example_user"
 		die
 	fi
 
@@ -72,8 +72,8 @@ backup_db() {
 		echo '-f <outputfile> (optional)'
 		echo
 		echo 'Examples:'
-		echo '    ./server db backup -d example_db'
-		echo '    ./server db backup -d example_db -f ~/my-db-dump.sql'
+		echo "    $(basename $0) db backup -d example_db"
+		echo "    $(basename $0) db backup -d example_db -f ~/my-db-dump.sql"
 		die
 	fi
 	if [[ -z $outputfile ]]; then
@@ -101,7 +101,7 @@ remove_db() {
 		echo '-u <username>'
 		echo
 		echo 'Example:'
-		echo '    ./server db remove -d example_db -u example_user'
+		echo "    $(basename $0) db remove -d example_db -u example_user"
 		die
 	fi
 
@@ -119,7 +119,7 @@ show_usage() {
 	db -- command for interacting with databases on your server
 	usage
 
-	    ./server db <command> [options]
+	    $(basename $0) db <command> [options]
 
 	where <command> is one of the following:
 

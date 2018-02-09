@@ -29,8 +29,8 @@ upload_file() {
         echo '-d <file detination on the server> (optional)'
 		echo
 		echo 'Examples:'
-		echo '    ./server upload -f ~/Downloads/mycat.png -d /var/www/example.com/uploads/mycat.png'
-		echo '    ./server upload -f ~/projects/example-project/migration.sql'
+		echo "    $(basename $0) upload -f ~/Downloads/mycat.png -d /var/www/example.com/uploads/mycat.png"
+		echo "    $(basename $0) upload -f ~/projects/example-project/migration.sql"
 		die
     fi
 	if [[ ! -e $file ]]; then
@@ -53,8 +53,8 @@ restart_service() {
         echo '-s <service name>'
 		echo
 		echo 'Examples:'
-		echo '    ./server restart -s nginx'
-		echo '    ./server restart -s tomcat'
+		echo "    $(basename $0) restart -s nginx"
+		echo "    $(basename $0) restart -s tomcat"
 		die
 	fi
 	ssh -t $user@$ip "sudo systemctl restart $service_name"
@@ -75,7 +75,7 @@ add_user() {
         echo '-u <username>'
 		echo
 		echo 'Example:'
-		echo '    ./server adduser -u sally -f ~/sallys-ssh-key.pub'
+		echo "    $(basename $0) adduser -u sally -f ~/sallys-ssh-key.pub"
 		die
     fi
 	if [[ ! -f $sshkeyfile ]]; then
@@ -117,7 +117,7 @@ add_sshkey() {
         echo '-f <sshkeyfile>'
 		echo
 		echo 'Example:'
-		echo '    ./server addkey -f ~/my-other-computer.pub'
+		echo "    $(basename $0) addkey -f ~/my-other-computer.pub"
 		die
     fi
 	if [[ ! -f $sshkeyfile ]] ; then
@@ -142,10 +142,10 @@ show_info() {
 
 show_usage() {
 	cat <<-help_message
-	server -- command for server management
+	$(basename $0) -- command for server management
 	usage
 
-	    ./server <command> [options]
+	    $(basename $0) <command> [options]
 
 	where <command> is one of the following:
 
@@ -172,7 +172,11 @@ show_usage() {
 
 # find out where this script is located so we can be sure we're running
 # everything from the correct location
-BASE_DIR="$( cd "$( dirname "$0" )" && pwd )"
+SCRIPT_PATH=$0
+while [[ -L $SCRIPT_PATH ]] ; do # resolve symlinks
+	SCRIPT_PATH="$(readlink $SCRIPT_PATH)"
+done
+BASE_DIR="$( cd "$( dirname "$SCRIPT_PATH" )" && pwd )"
 
 ENV_FILE="$BASE_DIR/.env"
 TEMPLATES="$BASE_DIR/templates"

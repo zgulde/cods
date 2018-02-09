@@ -52,7 +52,7 @@ create_site() {
 		echo '-d <domain> -- domain name of the site to create'
 		echo
 		echo 'Example:'
-		echo '    ./server site create -d example.com'
+		echo "    $(basename $0) site create -d example.com"
 		die
 	fi
 
@@ -114,7 +114,7 @@ enable_ssl() {
 		echo '-d <domain> -- domain name of the site to enable https for'
 		echo
 		echo 'Example:'
-		echo '    ./server site enablessl -d example.com'
+		echo "    $(basename $0) site enablessl -d example.com"
 		die
 	fi
 
@@ -157,7 +157,7 @@ remove_site() {
 		echo '-d <domain> -- name of the site to remove'
 		echo
 		echo 'Example:'
-		echo '    ./server site remove -d example.com'
+		echo "    $(basename $0) site remove -d example.com"
 		die
 	fi
 
@@ -191,7 +191,7 @@ build_site() {
 		echo '-d <domain> -- name of the site to build and deploy'
 		echo
 		echo 'Example:'
-		echo '    ./server site build -d example.com'
+		echo "    $(basename $0) site build -d example.com"
 		die
 	fi
 
@@ -225,7 +225,7 @@ deploy_site() {
 		echo '-f <filepath> -- path to the war file'
 		echo
 		echo 'Example:'
-		echo '    ./server site deploy -d example.com -f ~/example-project.war'
+		echo "    $(basename $0) site deploy -d example.com -f ~/example-project.war"
 		die
 	fi
 
@@ -257,7 +257,7 @@ show_info() {
 		echo '-d <domain> -- name of the site to show information about'
 		echo
 		echo 'Example:'
-		echo '    ./server site info -d example.com'
+		echo "    $(basename $0) site info -d example.com"
 		die
 	fi
 
@@ -283,7 +283,7 @@ show_help() {
 	site -- command for managing sites setup on your server
 	usage
 
-	    ./server site <command> [options]
+	    $(basename $0) site <command> [options]
 
 	where <command> is one of the following:
 
