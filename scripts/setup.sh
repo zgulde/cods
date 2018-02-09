@@ -182,42 +182,50 @@ heading 'Finsihed Server Provisioning!'
 
 COMMAND_NAME=$(basename $BASE_DIR)
 heading "Setting up '$COMMAND_NAME' command..."
-
-echo "Linking ~/opt/bin/$COMMAND_NAME to $BASE_DIR/server..."
-mkdir -p ~/opt/bin
-ln -s $BASE_DIR/server ~/opt/bin/$COMMAND_NAME
-echo 'Adding ~/opt/bin to your PATH...'
-if [[ $(uname -s) == Darwin ]] ; then
-	RC_FILE=~/.bash_profile
+if which $COMMAND_NAME >/dev/null ; then
+	echo "it looks like you already have a command named $COMMAND_NAME"
+	echo 'We will skip this part of the setup.'
 else
-	RC_FILE=~/.bashrc
-fi
-if grep /opt/bin $RC_FILE >/dev/null ; then
-	echo '+--- NOTICE --------------------------------------------------------------'
-	echo "| It looks like you are already referencing ~/opt/bin in your $RC_FILE"
-	echo '| This script will not make any modifications, but in order to have access'
-	echo "| to the '$COMMAND_NAME' command, make sure that ~/opt/bin is on your PATH"
-	echo '+-------------------------------------------------------------------------'
-else
-	echo "Appending to your PATH in $RC_FILE..."
-	echo "# added by $BASE_DIR/setup.sh" >> $RC_FILE
-	echo "export PATH=\"\$PATH:\"$HOME/opt/bin" >> $RC_FILE
+	echo "Linking ~/opt/bin/$COMMAND_NAME to $BASE_DIR/server..."
+	mkdir -p ~/opt/bin
+	ln -s $BASE_DIR/server ~/opt/bin/$COMMAND_NAME
+	echo 'Adding ~/opt/bin to your PATH...'
+	if [[ $(uname -s) == Darwin ]] ; then
+		RC_FILE=~/.bash_profile
+	else
+		RC_FILE=~/.bashrc
+	fi
+	if grep /opt/bin $RC_FILE >/dev/null ; then
+		echo '+--- NOTICE --------------------------------------------------------------'
+		echo "| It looks like you are already referencing ~/opt/bin in your $RC_FILE"
+		echo '| This script will not make any modifications, but in order to have access'
+		echo "| to the '$COMMAND_NAME' command, make sure that ~/opt/bin is on your PATH"
+		echo '+-------------------------------------------------------------------------'
+	else
+		echo "Appending to your PATH in $RC_FILE..."
+		echo "# added by $BASE_DIR/setup.sh" >> $RC_FILE
+		echo "export PATH=\"\$PATH:\"$HOME/opt/bin" >> $RC_FILE
+	fi
 fi
 
-echo 'Congratulations! Your server is now setup and ready to go!'
-echo "Here's some next steps:"
-echo '- Setup a site and database'
-echo
-echo "    $COMMAND_NAME server site create"
-echo "    $COMMAND_NAME db create"
-echo
-echo '- Login to your server'
-echo
-echo "    $COMMAND_NAME login"
-echo
-echo "Check out the documentation in $BASE_DIR"
-echo '  - README.md'
-echo '  - deployment_guide.md'
-echo '  - faq.md'
-echo
-echo 'Enjoy!'
+heading 'All Done!'
+cat <<.
+You should probably re-source your $RC_FILE in order to have access to the
+'$COMMAND_NAME' command. You can run this command in your current session and
+then be good to go:
+
+    source $RC_FILE
+
+Next steps:
+- For a quick start, run the command to see all the available options:
+
+    $COMMAND_NAME
+
+- check out the documentation on GitHub or locally, located in $BASE_DIR
+
+	- deployment_guide.md: for a walkthrough of deploying a spring-boot application
+	- README.md:           for in depth documentation
+	- faq.md:              for some frequently asked questions
+
+Enjoy!
+.
