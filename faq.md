@@ -129,9 +129,16 @@ See the `HTTPS` section in the main README for more details
 ## Can I redeploy my project without a `git push`?
 ## I made a typo when setting up the database credentials. What do?
 
-Login to the server and fix the typo. In general, if you change something that
-is external to your project (i.e. not in the project's git repository), you can
-redeploy the project by running:
+Login to the server and fix the typo.
+
+```
+./server login
+nano /srv/example.com/application.properties
+exit
+```
+
+In general, if you change something that is external to your project (i.e. not
+in the project's git repository), you can redeploy the project by running:
 
 ```
 ./server site build -d example.com
