@@ -178,23 +178,42 @@ setup_user
 
 [[ $? -eq 0 ]] && echo 'User created and ssh locked down!'
 
-heading 'Finsihed Provisioning!'
+heading 'Finsihed Server Provisioning!'
+
+COMMAND_NAME=$(basename $BASE_DIR)
+heading "Setting up '$COMMAND_NAME' command..."
+
+echo "Linking ~/opt/bin/$COMMAND_NAME to $BASE_DIR/server..."
+mkdir -p ~/opt/bin
+ln -s $BASE_DIR/server ~/opt/bin/$COMMAND_NAME
+echo 'Adding ~/opt/bin to your PATH...'
+if [[ $(uname -s) == Darwin ]] ; then
+	RC_FILE=~/.bash_profile
+else
+	RC_FILE=~/.bashrc
+fi
+if grep /opt/bin $RC_FILE >/dev/null ; then
+	echo '+--- NOTICE --------------------------------------------------------------'
+	echo "| It looks like you are already referencing ~/opt/bin in your $RC_FILE"
+	echo '| This script will not make any modifications, but in order to have access'
+	echo "| to the '$COMMAND_NAME' command, make sure that ~/opt/bin is on your PATH"
+	echo '+-------------------------------------------------------------------------'
+else
+	echo "Appending to your PATH in $RC_FILE..."
+	echo "# added by $BASE_DIR/setup.sh" >> $RC_FILE
+	echo "export PATH=\"\$PATH:\"$HOME/opt/bin" >> $RC_FILE
+fi
 
 echo 'Congratulations! Your server is now setup and ready to go!'
 echo "Here's some next steps:"
+echo '- Setup a site and database'
 echo
-echo 'Install tab completion for the ./server command'
+echo "    $COMMAND_NAME server site create"
+echo "    $COMMAND_NAME db create"
 echo
-echo "    source $SCRIPTS/install-bash-completion.sh"
+echo '- Login to your server'
 echo
-echo 'Setup a site and database'
-echo
-echo '    ./server site create'
-echo '    ./server db create'
-echo ''
-echo 'Login to your server'
-echo
-echo '    ./server login'
+echo "    $COMMAND_NAME login"
 echo
 echo "Check out the documentation in $BASE_DIR"
 echo '  - README.md'
