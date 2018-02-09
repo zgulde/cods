@@ -1,8 +1,12 @@
 ##############################################################################
 # Server provisioning script
 #
-# this script will be run on the server by the setup script. It contains most of
-# the common server setup, most notably, the tomcat and nginx configuration.
+# Contains most of the common server setup, most notably the tomcat and nginx
+# config. Anything that is required for the first time server setup and requires
+# root access, but does *not* require external information (e.g. the ip address
+# or the user's username) lives here.
+#
+# This script will be run on the server by the setup script.
 ##############################################################################
 
 # You might have to change the url below, the url needs to be updated
