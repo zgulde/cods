@@ -16,25 +16,34 @@ auto_renew_certs() {
 }
 
 upload_file() {
-    while getopts 'f:d:' opt; do
-        case $opt in
-            f) file=${OPTARG};;
-            d) destination=${OPTARG};;
-        esac
-    done
+	while [[ $# -gt 0 ]] ; do
+		arg=$1 ; shift
+		case $arg in
+			-d|--destination) destination=$1 ; shift;;
+			--destination=*) destination=${arg#*=};;
+			-f|--file) file=$1 ; shift;;
+			--file=*) file=${arg#*=} ; file="${file/#\~/$HOME}";;
+			*) echo "Unknown argument: $arg" ; exit 1;;
+		esac
+	done
     if [[ -z $file ]] ; then
-        echo 'Upload a file to the server'
-        echo
-        echo '-f <file to upload>'
-        echo '-d <file detination on the server> (optional)'
-		echo
-		echo 'Examples:'
-		echo "    $(basename $0) upload -f ~/Downloads/mycat.png -d /var/www/example.com/uploads/mycat.png"
-		echo "    $(basename $0) upload -f ~/projects/example-project/migration.sql"
+		cat <<-.
+        Upload a file to the server. Optionally specify a destination, otherwise
+		will default to your home directory
+
+        -f|--file <filepath>           -- path to the file to upload
+        -d|--destination <destination> -- (optional) destination for the file on
+		                                  the server
+
+		Examples:
+		    $(basename $0) upload -f ~/Downloads/mycat.png -d /var/www/example.com/uploads/mycat.png
+		    $(basename $0) upload --file=migration.sql
+			$(basename $0) upload --file ~/IdeaProjects/blog/seeder.sql
+		.
 		die
     fi
 	if [[ ! -e $file ]]; then
-		echo 'It appears as tough that file does not exist!'
+		echo 'It appears as though that file does not exist!'
 		exit 1
 	fi
 
@@ -42,40 +51,53 @@ upload_file() {
 }
 
 restart_service() {
-    while getopts 's:' opt ; do
-        case $opt in
-            s) service_name=${OPTARG};;
-        esac
-    done
-	if [[ -z $service_name ]]; then
-        echo 'Restart a service'
-        echo
-        echo '-s <service name>'
-		echo
-		echo 'Examples:'
-		echo "    $(basename $0) restart -s nginx"
-		echo "    $(basename $0) restart -s tomcat"
+	while [[ $# -gt 0 ]] ; do
+	    arg=$1 ; shift
+	    case $arg in
+			-s|--service) service=$1 ; shift;;
+			--service=*) service=${arg#*=};;
+			*) echo "Unknown argument: $arg" ; exit 1;;
+	    esac
+	done
+	if [[ -z $service ]]; then
+		cat <<-.
+        Restart a service
+
+        -s,--service <service> -- name of the service to restart
+
+		Examples:
+		    $(basename $0) restart -s nginx
+		    $(basename $0) restart --service=tomcat
+		.
 		die
 	fi
-	ssh -t $user@$ip "sudo systemctl restart $service_name"
-	[[ $? -eq 0 ]] && echo "$service_name restarted!"
+	ssh -t $user@$ip "sudo systemctl restart $service"
+	[[ $? -eq 0 ]] && echo "$service restarted!"
 }
 
 add_user() {
-    while getopts 'u:f:' opt ; do
-        case $opt in
-            u) new_user=${OPTARG};;
-            f) sshkeyfile=${OPTARG};;
-        esac
-    done
+	while [[ $# -gt 0 ]] ; do
+	    arg=$1 ; shift
+	    case $arg in
+	        -f|--sshkeyfile) sshkeyfile=$1 ; shift;;
+	        --sshkeyfile=*) sshkeyfile=${arg#*=} ; sshkeyfile="${sshkeyfile/#\~/$HOME}";;
+			-u|--user) new_user=$1 ; shift;;
+			--user=*) new_user=${arg#*=};;
+			*) echo "Unknown argument: $arg" ; exit 1;;
+	    esac
+	done
     if [[ -z $new_user ]] || [[ -z $sshkeyfile ]] ; then
-        echo 'Add a new admin user to the server'
-        echo
-        echo '-f <sshkeyfile>'
-        echo '-u <username>'
-		echo
-		echo 'Example:'
-		echo "    $(basename $0) adduser -u sally -f ~/sallys-ssh-key.pub"
+		cat <<-.
+        Add a new admin user to the server. When running this command, you will
+		be prompted for a password for the new user.
+
+        -f,--sshkeyfile <sshkeyfile> -- path to the new user's public key
+        -u,--user <username>         -- username for the new user
+
+		Examples:
+		    $(basename $0) adduser -u sally -f ~/sallys-ssh-key.pub
+			$(basename $0) adduser --user=sally --sshkeyfile=~/key.pub
+		.
 		die
     fi
 	if [[ ! -f $sshkeyfile ]]; then
@@ -105,19 +127,24 @@ add_user() {
 }
 
 add_sshkey() {
-    local sshkeyfile
-    while getopts 'f:' opt ; do
-        case $opt in
-            f) sshkeyfile=${OPTARG};;
-        esac
-    done
+	while [[ $# -gt 0 ]] ; do
+	    arg=$1 ; shift
+	    case $arg in
+	        -f|--sshkeyfile) sshkeyfile=$1 ; shift;;
+	        --sshkeyfile=*) sshkeyfile=${arg#*=} ; sshkeyfile="${sshkeyfile/#\~/$HOME}";;
+	        *) echo "Unknown argument: $arg" ; exit 1;;
+	    esac
+	done
     if [[ -z $sshkeyfile ]] ; then
-        echo 'Add an additional authorized ssh key to your account'
-        echo
-        echo '-f <sshkeyfile>'
-		echo
-		echo 'Example:'
-		echo "    $(basename $0) addkey -f ~/my-other-computer.pub"
+		cat <<-.
+        Add an additional authorized ssh key to your account
+
+        -f <sshkeyfile> -- path to the public ssh key to add
+
+		Examples:
+		    $(basename $0) addkey -f ~/.ssh/my-other-computer.pub
+		    $(basename $0) addkey --sshkeyfile ~/my-other-computer.pub
+		.
 		die
     fi
 	if [[ ! -f $sshkeyfile ]] ; then

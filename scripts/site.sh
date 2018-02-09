@@ -41,18 +41,24 @@ $(sed -e s/{{site}}/$domain/g $TEMPLATES/post-receive.sh)
 }
 
 create_site() {
-	while getopts 'd:' opt ; do
-		case $opt in
-			d) domain=${OPTARG};;
-		esac
+	while [[ $# -gt 0 ]] ; do
+	    arg=$1 ; shift
+	    case $arg in
+	        -d|--domain) domain=$1 ; shift;;
+	        --domain=*) domain=${arg#*=};;
+	        *) echo "Unknown argument: $arg" ; exit 1;;
+	    esac
 	done
 	if [[ -z $domain ]] ; then
-		echo 'Setup up the server to host a new site'
-		echo
-		echo '-d <domain> -- domain name of the site to create'
-		echo
-		echo 'Example:'
-		echo "    $(basename $0) site create -d example.com"
+		cat <<-.
+		Setup up the server to host a new site
+
+		-d|--domain <domain> -- domain name of the site to create
+
+		Example:
+		    $(basename $0) site create -d example.com
+		    $(basename $0) site create --domain=example.com
+		.
 		die
 	fi
 
@@ -103,18 +109,23 @@ create_site() {
 }
 
 enable_ssl() {
-	while getopts 'd:' opt ; do
-		case $opt in
-			d) domain=${OPTARG};;
-		esac
+	while [[ $# -gt 0 ]] ; do
+	    arg=$1 ; shift
+	    case $arg in
+	        -d|--domain) domain=$1 ; shift;;
+	        --domain=*) domain=${arg#*=};;
+	        *) echo "Unknown argument: $arg" ; exit 1;;
+	    esac
 	done
 	if [[ -z $domain ]] ; then
-		echo 'Enable https for a site'
-		echo
-		echo '-d <domain> -- domain name of the site to enable https for'
-		echo
-		echo 'Example:'
-		echo "    $(basename $0) site enablessl -d example.com"
+		cat <<-.
+		Enable https for a site
+
+		-d|--domain <domain> -- domain name of the site to enable https for
+
+		Example:
+		    $(basename $0) site enablessl -d example.com
+		.
 		die
 	fi
 
@@ -146,18 +157,23 @@ enable_ssl() {
 }
 
 remove_site() {
-	while getopts 'd:' opt ; do
-		case $opt in
-			d) domain=${OPTARG};;
-		esac
+	while [[ $# -gt 0 ]] ; do
+	    arg=$1 ; shift
+	    case $arg in
+	        -d|--domain) domain=$1 ; shift;;
+	        --domain=*) domain=${arg#*=};;
+	        *) echo "Unknown argument: $arg" ; exit 1;;
+	    esac
 	done
 	if [[ -z $domain ]] ; then
-		echo 'Remove a site from the server'
-		echo
-		echo '-d <domain> -- name of the site to remove'
-		echo
-		echo 'Example:'
-		echo "    $(basename $0) site remove -d example.com"
+		cat <<-.
+		Remove a site from the server
+
+		-d|--domain <domain> -- name of the site to remove
+
+		Example:
+		    $(basename $0) site remove -d example.com
+		.
 		die
 	fi
 
@@ -180,18 +196,24 @@ remove_site() {
 }
 
 build_site() {
-	while getopts 'd:' opt ; do
-		case $opt in
-			d) domain=${OPTARG};;
-		esac
+	while [[ $# -gt 0 ]] ; do
+	    arg=$1 ; shift
+	    case $arg in
+	        -d|--domain) domain=$1 ; shift;;
+	        --domain=*) domain=${arg#*=};;
+	        *) echo "Unknown argument: $arg" ; exit 1;;
+	    esac
 	done
 	if [[ -z $domain ]] ; then
-		echo 'Trigger a build and deploy for a site'
-		echo
-		echo '-d <domain> -- name of the site to build and deploy'
-		echo
-		echo 'Example:'
-		echo "    $(basename $0) site build -d example.com"
+		cat <<-.
+		Trigger a build and deploy for a site
+
+		-d|--domain <domain> -- name of the site to build and deploy
+
+		Examples:
+		    $(basename $0) site build -d example.com
+		    $(basename $0) site build --domain=example.com
+		.
 		die
 	fi
 
@@ -207,25 +229,31 @@ build_site() {
 }
 
 deploy_site() {
-	while getopts 'f:d:' opt ; do
-		case $opt in
-			f) war_filepath=${OPTARG};;
-			d) domain=${OPTARG};;
-		esac
+	while [[ $# -gt 0 ]] ; do
+	    arg=$1 ; shift
+	    case $arg in
+	        -f|--filepath) war_filepath=$1 ; shift;;
+	        --filepath=*) war_filepath=${arg#*=} ; war_filepath="${war_filepath/#\~/$HOME}";;
+			-d|--domain) domain=$1 ; shift;;
+			--domain=*) domain=${arg#*=};;
+	        *) echo "Unknown argument: $arg" ; exit 1;;
+	    esac
 	done
-
 	if [[ -z $domain ]] || [[ -z $war_filepath ]] ; then
-		echo 'Deploy a pre-built war file.'
-		echo
-		echo "You should probably only do this if you really know what you're doing,"
-		echo 'for most use cases, git deployment is recommended. See also the `build`'
-		echo 'subcommand.'
-		echo
-		echo '-d <domain>   -- name of the site to deploy.'
-		echo '-f <filepath> -- path to the war file'
-		echo
-		echo 'Example:'
-		echo "    $(basename $0) site deploy -d example.com -f ~/example-project.war"
+		cat <<-.
+
+		Deploy a pre-built war file.
+
+		You should probably only do this if you really know what youre doing,
+		for most use cases, git deployment is recommended. See also the 'build'
+		subcommand.
+
+		-d|--domain <domain>     -- name of the site to deploy
+		-f|--filepath <filepath> -- path to the war file
+
+		Example:
+		    $(basename $0) site deploy -d example.com -f ~/example-project.war
+		.
 		die
 	fi
 
@@ -246,18 +274,23 @@ deploy_site() {
 }
 
 show_info() {
-	while getopts 'd:' opt ; do
-		case $opt in
-			d) domain=${OPTARG};;
-		esac
+	while [[ $# -gt 0 ]] ; do
+	    arg=$1 ; shift
+	    case $arg in
+	        -d|--domain) domain=$1 ; shift;;
+	        --domain=*) domain=${arg#*=};;
+	        *) echo "Unknown argument: $arg" ; exit 1;;
+	    esac
 	done
 	if [[ -z $domain ]] ; then
-		echo 'Show information about a site that is setup on the server'
-		echo
-		echo '-d <domain> -- name of the site to show information about'
-		echo
-		echo 'Example:'
-		echo "    $(basename $0) site info -d example.com"
+		cat <<-.
+		Show information about a site that is setup on the server
+
+		-d|--domain <domain> -- name of the site to show information about
+
+		Example:
+		    $(basename $0) site info -d example.com
+		.
 		die
 	fi
 
@@ -271,7 +304,7 @@ show_info() {
 		nginx config file:     /etc/nginx/sites-available/$site
 		deployment git remote: $user@$ip:/srv/$site/repo.git
 
-		To add the deployment remote (from your project, not from $BASE_DIR) run:
+		To add the deployment remote for this site, run:
 
 		    git remote add production $user@$ip:/srv/$site/repo.git
 
