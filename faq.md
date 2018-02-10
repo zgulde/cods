@@ -321,3 +321,17 @@ server.
 
 If you deleted/moved this file, or changed your password, and do not remember
 it, (by design) there is nothing you can do to recover it.
+
+## Can I use tab completion to help me out?
+
+Yes! Add the following line to the end of your `.bashrc` (if you're on Linux) or
+`.bash_profile` (if you're on Mac):
+
+```
+eval "$(myserver bash-completion)"
+```
+
+Where `myserver` is the name of your server command.
+
+Close any open terminals, and when you start a new one, you will be able to use
+tab completion for all subcommands.
