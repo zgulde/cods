@@ -17,6 +17,14 @@ enable_git_deploment() {
 	[[ -z $domain ]] && die 'Error in enable_git_deployment: $domain not specified'
 	echo "Setting up git deployment..."
 
+	# figure out whether we have a java site or a static one
+	ssh -t $user@$ip "grep proxy_pass /etc/nginx/sites-available/$domain" >/dev/null
+	if [[ $? -eq 0 ]] ; then
+		template=$TEMPLATES/post-receive.sh
+	else
+		template=$TEMPLATES/post-receive-static.sh
+	fi
+
 	ssh -t $user@$ip "
         sudo chmod g+srwx /srv
 	mkdir /srv/${domain}
@@ -25,7 +33,7 @@ $(cat $TEMPLATES/config)
 .
 	git init --bare --shared=group /srv/${domain}/repo.git
 	cat > /srv/${domain}/repo.git/hooks/post-receive <<'.'
-$(sed -e s/{{site}}/$domain/g $TEMPLATES/post-receive.sh)
+$(sed -e s/{{site}}/$domain/g $template)
 .
 	chmod +x /srv/${domain}/repo.git/hooks/post-receive
 	"
@@ -128,6 +136,47 @@ create_site() {
 	fi
 }
 
+create_static_site() {
+	while [[ $# -gt 0 ]] ; do
+	    arg=$1 ; shift
+	    case $arg in
+	        -d|--domain) domain=$1 ; shift;;
+	        --domain=*) domain=${arg#*=};;
+	        *) echo "Unknown argument: $arg" ; exit 1;;
+	    esac
+	done
+	if [[ -z $domain ]] ; then
+		cat <<-.
+		Create a static site.
+
+		-d|--domain <domain> -- domain name of the site to create
+		.
+		die
+	fi
+
+	ssh -t $user@$ip "
+	set -e
+	echo 'Configuring nginx...'
+
+	sudo mkdir -p /var/www/${domain}
+	sudo chgrp --recursive www-data /var/www/${domain}
+	sudo chmod g+srw /var/www/${domain}
+
+	echo '$(sed -e s/{{domain}}/${domain}/g -e s/{{user}}/${user}/g $TEMPLATES/static-site.nginx.conf)' |\
+		sudo tee /etc/nginx/sites-available/${domain} >/dev/null
+	sudo ln -s /etc/nginx/sites-available/${domain} /etc/nginx/sites-enabled/${domain}
+	echo 'Restarting nginx...'
+	sudo systemctl restart nginx
+	"
+	[[ $? -eq 0 ]] && echo "${domain} created!"
+
+	enable_git_deploment $domain
+	if [[ $ssl == yes ]] ; then
+		echo "Enabling SSL for $domain..."
+		enable_ssl --domain $domain
+	fi
+}
+
 enable_ssl() {
 	while [[ $# -gt 0 ]] ; do
 	    arg=$1 ; shift
@@ -151,9 +200,22 @@ enable_ssl() {
 		die
 	fi
 
+	# figure out whether we have a java site or a static one
+	ssh -t $user@$ip "grep proxy_pass /etc/nginx/sites-available/$domain" >/dev/null
+	if [[ $? -eq 0 ]] ; then
+		template=$TEMPLATES/ssl-site.nginx.conf
+	else
+		template=$TEMPLATES/static-ssl-site.nginx.conf
+	fi
+
 	echo 'Requesting SSL certificate... (this might take a second)'
 	ssh -t $user@$ip "
 	set -e
+	if egrep 'ssl\s*on; /etc/nginx/sites-available/$domain' >/dev/null ; then
+		echo 'It looks like SSL is already setup for $domain'
+		echo 'Doing nothing.'
+		exit 1
+	fi
 	mkdir -p /srv/${domain}
 	sudo letsencrypt certonly\
 		--authenticator webroot\
@@ -164,7 +226,7 @@ enable_ssl() {
 		--renew-by-default >> /srv/letsencrypt.log
 
 	echo 'Setting up nginx to serve ${domain} over https...'
-	echo '$(sed -e s/{{domain}}/${domain}/g -e s/{{user}}/${user}/g $TEMPLATES/ssl-site.nginx.conf)' |\
+	echo '$(sed -e s/{{domain}}/${domain}/g -e s/{{user}}/${user}/g $template)' |\
 		sudo tee /etc/nginx/sites-available/${domain} >/dev/null
 	sudo systemctl restart nginx
 	"
@@ -193,19 +255,19 @@ remove_site() {
 		die
 	fi
 
-	list_sites | grep "^$domain$" >/dev/null || die "It looks like $site does not exist. Aborting..."
+	list_sites | grep "^$domain$" >/dev/null || die "It looks like $domain does not exist. Aborting..."
 	# confirm deletion
-	confirm "Are you sure you want to remove ${site}?" || die 'Site not removed.'
+	confirm "Are you sure you want to remove ${domain}?" || die 'domain not removed.'
 
 	ssh -t $user@$ip "
-	sudo sed -i -e '/${site}/d' /opt/tomcat/conf/server.xml
+	sudo sed -i -e '/${domain}/d' /opt/tomcat/conf/server.xml
 
-	sudo rm -f /etc/nginx/sites-available/${site}
-	sudo rm -f /etc/nginx/sites-enabled/${site}
-	sudo rm -rf /opt/tomcat/${site}
-	sudo rm -rf /opt/tomcat/conf/Catalina/${site}
-	sudo rm -rf /var/www/${site}
-	sudo rm -rf /srv/${site}
+	sudo rm -f /etc/nginx/sites-available/${domain}
+	sudo rm -f /etc/nginx/sites-enabled/${domain}
+	sudo rm -rf /opt/tomcat/${domain}
+	sudo rm -rf /opt/tomcat/conf/Catalina/${domain}
+	sudo rm -rf /var/www/${domain}
+	sudo rm -rf /srv/${domain}
 	"
 
 	[[ $? -eq 0 ]] && echo 'site removed!'
@@ -315,13 +377,13 @@ show_info() {
 	cat <<-.
 		Site: $domain
 
-		uploads directory:     /var/www/$site/uploads
-		nginx config file:     /etc/nginx/sites-available/$site
-		deployment git remote: $user@$ip:/srv/$site/repo.git
+		uploads directory:     /var/www/$domain/uploads
+		nginx config file:     /etc/nginx/domains-available/$domain
+		deployment git remote: $user@$ip:/srv/$domain/repo.git
 
-		To add the deployment remote for this site, run:
+		To add the deployment remote for this domain, run:
 
-		    git remote add production $user@$ip:/srv/$site/repo.git
+		    git remote add production $user@$ip:/srv/$domain/repo.git
 
 	.
 }
@@ -337,12 +399,13 @@ show_help() {
 
 	    list -- list the sites setup on your server
 
-	    create    -d <domain>
-	    remove    -d <domain>
-	    build     -d <domain>
-	    enablessl -d <domain>
-	    info      -d <domain>
-	    deploy    -d <domain> -f <warfile>
+	    create:java   -d <domain>
+	    create:static -d <domain>
+	    remove        -d <domain>
+	    build         -d <domain>
+	    enablessl     -d <domain>
+	    info          -d <domain>
+	    deploy        -d <domain> -f <warfile>
 
 	help
 }
@@ -351,12 +414,13 @@ command=$1
 shift
 
 case $command in
-	list|ls)   list_sites;;
-	create)	   create_site $@;;
-	remove|rm) remove_site $@;;
-	build)	   build_site $@;;
-	enablessl) enable_ssl $@;;
-	info)      show_info $@;;
-	deploy)	   deploy_site $@;;
-	*)         show_help;;
+	list|ls)       list_sites;;
+	create:java)   create_site $@;;
+	create:static) create_static_site $@;;
+	remove|rm)     remove_site $@;;
+	build)	       build_site $@;;
+	enablessl)     enable_ssl $@;;
+	info)          show_info $@;;
+	deploy)	       deploy_site $@;;
+	*)             show_help;;
 esac

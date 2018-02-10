@@ -1,6 +1,6 @@
 SERVER_SUBCOMMANDS='site db devserver login upload restart reboot info adduser addkey autorenew log:tail log:cat ping credentials bash-completion'
 DB_SUBCOMMANDS='create backup run remove rm list ls login'
-SITE_SUBCOMMANDS='list ls create remove rm build enablessl info deploy'
+SITE_SUBCOMMANDS='list ls create:java create:static remove rm build enablessl info deploy'
 
 _{{scriptname}}() {
 	local cur prev opts
