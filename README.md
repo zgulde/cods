@@ -316,7 +316,15 @@ subcommands, just run them by themselves:
 ```
 
 Any subcommands that require arguments can be run without arguments to see
-detailed help for the command.
+detailed help for the command. All command line arguments have a long form, and
+most have a short form as well. You can pass commnad line arguments in one of 3
+ways:
+
+```
+-a value
+--arg value
+--arg=value
+```
 
 In general, any password prompts will be for your server admin password (i.e.
 your sudo password), unless you are running the `db` subcommand, in which case
@@ -337,6 +345,7 @@ you will need to enter the database administrator password.
 - `adduser`: add an admin user account to the server
 - `log:cat`: view the contents of the tomcat log file, `/opt/tomcat/logs/catalina.out`
 - `log:tail`: watch the contents of the tomcat log file in real-time (`tail -f`)
+- `bash-completion`: generate the bash completion script for the command
 
 ### Site and Database Management Commands
 
