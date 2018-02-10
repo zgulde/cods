@@ -61,13 +61,13 @@ restart_service() {
 	done
 	if [[ -z $service ]]; then
 		cat <<-.
-        Restart a service
+		Restart a service
 
-        -s,--service <service> -- name of the service to restart
+		-s|--service <service> -- name of the service to restart
 
 		Examples:
 		    $(basename $0) restart -s nginx
-		    $(basename $0) restart --service=tomcat
+		    $(basename $0) restart --service tomcat
 		.
 		die
 	fi
@@ -88,15 +88,15 @@ add_user() {
 	done
     if [[ -z $new_user ]] || [[ -z $sshkeyfile ]] ; then
 		cat <<-.
-        Add a new admin user to the server. When running this command, you will
+		Add a new admin user to the server. When running this command, you will
 		be prompted for a password for the new user.
 
-        -f,--sshkeyfile <sshkeyfile> -- path to the new user's public key
-        -u,--user <username>         -- username for the new user
+		-f|--sshkeyfile <sshkeyfile> -- path to the new user's public key
+		-u|--user <username>         -- username for the new user
 
 		Examples:
 		    $(basename $0) adduser -u sally -f ~/sallys-ssh-key.pub
-			$(basename $0) adduser --user=sally --sshkeyfile=~/key.pub
+		    $(basename $0) adduser --user=sally --sshkeyfile=~/key.pub
 		.
 		die
     fi
@@ -137,9 +137,9 @@ add_sshkey() {
 	done
     if [[ -z $sshkeyfile ]] ; then
 		cat <<-.
-        Add an additional authorized ssh key to your account
+		Add an additional authorized ssh key to your account
 
-        -f <sshkeyfile> -- path to the public ssh key to add
+		-f|--sshkeyfile <sshkeyfile> -- path to the public ssh key to add
 
 		Examples:
 		    $(basename $0) addkey -f ~/.ssh/my-other-computer.pub

@@ -46,18 +46,23 @@ create_site() {
 	    case $arg in
 	        -d|--domain) domain=$1 ; shift;;
 	        --domain=*) domain=${arg#*=};;
+			--enable-ssl) ssl=yes;;
 	        *) echo "Unknown argument: $arg" ; exit 1;;
 	    esac
 	done
 	if [[ -z $domain ]] ; then
 		cat <<-.
-		Setup up the server to host a new site
+		Setup up the server to host a new site. Optionally also enable ssl.
+		You should only enable ssl if you know your DNS records are properly
+		configured, otherwise you can do this with the separate 'enablessl'
+		site subcommand.
 
 		-d|--domain <domain> -- domain name of the site to create
+		--enable-ssl         -- (optional) enable ssl for the setup site
 
 		Example:
 		    $(basename $0) site create -d example.com
-		    $(basename $0) site create --domain=example.com
+		    $(basename $0) site create --domain=example.com --enable-ssl
 		.
 		die
 	fi
@@ -106,6 +111,10 @@ create_site() {
 	[[ $? -eq 0 ]] && echo "${domain} created!"
 
 	enable_git_deploment $domain
+	if [[ $ssl == yes ]] ; then
+		echo "Enabling SSL for $domain..."
+		enable_ssl --domain $domain
+	fi
 }
 
 enable_ssl() {
@@ -119,7 +128,9 @@ enable_ssl() {
 	done
 	if [[ -z $domain ]] ; then
 		cat <<-.
-		Enable https for a site
+		Enable https for a site. Before running this command, you should make
+		sure that the DNS records for your domain are configured to point to
+		your server, otherwise this command *will* fail.
 
 		-d|--domain <domain> -- domain name of the site to enable https for
 
@@ -129,13 +140,7 @@ enable_ssl() {
 		die
 	fi
 
-
-	echo 'Before running this command, make sure that the DNS records for your domain'
-	echo 'are configured to point to your server.'
-	echo 'If they are not properly configured, this command *will* fail.'
-	echo
-	read -p 'Press Enter to continue, or Ctrl-C to exit'
-
+	echo 'Requesting SSL certificate... (this might take a second)'
 	ssh -t $user@$ip "
 	set -e
 	mkdir -p /srv/${domain}
