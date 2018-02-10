@@ -1,15 +1,8 @@
-##############################################################################
-# Script that provides tab completion for the ./server command
-#
-# Note that if any new subcommands are added, or existing ones are renamed, this
-# file will need to be updated so that the tab completion is up to date
-##############################################################################
-
-SERVER_SUBCOMMANDS='site db devserver login upload restart reboot info adduser addkey autorenew tomcatlog followlog ping'
+SERVER_SUBCOMMANDS='site db devserver login upload restart reboot info adduser addkey autorenew log:tail log:cat ping credentials bash-completion'
 DB_SUBCOMMANDS='create backup run remove rm list ls login'
 SITE_SUBCOMMANDS='list ls create remove rm build enablessl info deploy'
 
-_server() {
+_{{scriptname}}() {
 	local cur prev opts
 
 	COMPREPLY=()
@@ -18,12 +11,19 @@ _server() {
 	prev="${COMP_WORDS[COMP_CWORD-1]}"
 
 	case $prev in
-		*server) opts=$SERVER_SUBCOMMANDS;;
-		db) opts=$DB_SUBCOMMANDS;;
-		site) opts=$SITE_SUBCOMMANDS;;
+		{{scriptname}})
+			COMPREPLY=( $(compgen -W "$SERVER_SUBCOMMANDS" -- $cur) )
+			;;
+		db)
+			COMPREPLY=( $(compgen -W "$DB_SUBCOMMANDS" -- $cur) )
+			;;
+		site)
+			COMPREPLY=( $(compgen -W "$SITE_SUBCOMMANDS" -- $cur) )
+			;;
+		*)
+			COMPREPLY=( $(compgen -X '' -f "${cur}") )
+			;;
 	esac
-
-	COMPREPLY=( $(compgen -W "$opts" -- $cur) )
 }
 
-complete -F _server ./server
+complete -o bashdefault -o filenames -F _{{scriptname}} {{scriptname}}

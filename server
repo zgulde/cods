@@ -248,7 +248,17 @@ case $command in
 	log:cat)   ssh -t $user@$ip 'sudo cat /opt/tomcat/logs/catalina.out';;
 	log:tail)  ssh -t $user@$ip 'sudo tail -f /opt/tomcat/logs/catalina.out';;
 	ping)      ping -c5 $ip;;
-	cred)      cat $BASE_DIR/credentials.txt;;
+
+	credentials)
+		if [[ -f $BASE_DIR/credentials.txt ]] ; then
+			cat $BASE_DIR/credentials.txt
+		else
+			echo 'No credentials found.'
+		fi;;
+
+	bash-completion)
+		sed -e s/{{scriptname}}/$(basename $0)/g $SCRIPTS/bash_completion.sh
+		;;
 
 	*) show_usage;;
 esac
