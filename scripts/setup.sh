@@ -88,8 +88,8 @@ echo
 read -p 'email: ' email
 echo
 
-password=$(LC_ALL=C tr -cd 'a-zA-Z0-9' < /dev/urandom | head -c 16)
-db_password=$(LC_ALL=C tr -cd 'a-zA-Z0-9' < /dev/urandom | head -c 16)
+password="$(mkpassword)"
+db_password="$(mkpassword)"
 
 echo "Here are your auto-generated passwords for the server:"
 echo

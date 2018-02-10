@@ -19,3 +19,7 @@ die() {
     exit 1
 }
 
+mkpassword() {
+	local length=${1:-20}
+	echo "$(LC_ALL=C tr -cd 'a-zA-Z0-9' < /dev/urandom | head -c $length)"
+}
