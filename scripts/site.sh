@@ -241,7 +241,6 @@ deploy_site() {
 	done
 	if [[ -z $domain ]] || [[ -z $war_filepath ]] ; then
 		cat <<-.
-
 		Deploy a pre-built war file.
 
 		You should probably only do this if you really know what youre doing,
@@ -298,7 +297,7 @@ show_info() {
 	list_sites | grep "^$domain$" >/dev/null || die "It looks like $site does not exist. Aborting..."
 
 	cat <<-.
-		Site: $site
+		Site: $domain
 
 		uploads directory:     /var/www/$site/uploads
 		nginx config file:     /etc/nginx/sites-available/$site
