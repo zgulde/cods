@@ -11,7 +11,7 @@ heading(){
 confirm() {
 	local message=${1:-'Continue?'}
 	read -p "${message} [y/N] " input
-	[[ ${input,,} = y* ]]
+	[[ $(tr '[:upper:]' '[:lower:]' <<< $input) == y* ]]
 }
 
 die() {
