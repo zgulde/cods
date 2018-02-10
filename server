@@ -117,7 +117,7 @@ add_user() {
 	echo "Creating user ${new_user}..."
 
 	ssh -t $user@$ip "
-	sudo useradd --create-home --shell /bin/bash --groups sudo,tomcat,git $new_user
+	sudo useradd --create-home --shell /bin/bash --groups sudo,tomcat,git,www-data $new_user
 	echo '$new_user:$password' | sudo chpasswd
 	sudo mkdir -p /home/$new_user/.ssh
 	cat <<< '$(cat $sshkeyfile)' | sudo tee /home/$new_user/.ssh/authorized_keys >/dev/null

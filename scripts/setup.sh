@@ -162,7 +162,7 @@ mkdir -p /srv
 chgrp git /srv
 chmod g+srwx /srv
 # create a user and add the ssh key
-useradd --create-home --shell /bin/bash --groups sudo,tomcat,git $user
+useradd --create-home --shell /bin/bash --groups sudo,tomcat,git,www-data $user
 echo '$user:$password' | chpasswd
 # copy over ssh key config for the new user
 mkdir -p /home/$user/.ssh
