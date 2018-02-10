@@ -28,17 +28,17 @@ upload_file() {
 	done
     if [[ -z $file ]] ; then
 		cat <<-.
-        Upload a file to the server. Optionally specify a destination, otherwise
+		Upload a file to the server. Optionally specify a destination, otherwise
 		will default to your home directory
 
-        -f|--file <filepath>           -- path to the file to upload
-        -d|--destination <destination> -- (optional) destination for the file on
+		-f|--file <filepath>           -- path to the file to upload
+		-d|--destination <destination> -- (optional) destination for the file on
 		                                  the server
 
 		Examples:
 		    $(basename $0) upload -f ~/Downloads/mycat.png -d /var/www/example.com/uploads/mycat.png
 		    $(basename $0) upload --file=migration.sql
-			$(basename $0) upload --file ~/IdeaProjects/blog/seeder.sql
+		    $(basename $0) upload --file ~/IdeaProjects/blog/seeder.sql
 		.
 		die
     fi
