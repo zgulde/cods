@@ -13,6 +13,7 @@ list_sites() {
 
 enable_git_deploment() {
 	domain=$1
+	springboot=$2
 	[[ -z $domain ]] && die 'Error in enable_git_deployment: $domain not specified'
 	echo "Setting up git deployment..."
 
@@ -28,6 +29,12 @@ $(sed -e s/{{site}}/$domain/g $TEMPLATES/post-receive.sh)
 .
 	chmod +x /srv/${domain}/repo.git/hooks/post-receive
 	"
+	if [[ -n $springboot ]] ; then
+		ssh $user@$ip "
+		sed -i -e '/application.properties/ { s/^# //g; }' /srv/${domain}/config
+		echo '# put your configuration here' > /srv/${domain}/application.properties
+		"
+	fi
 	echo "git deployment configured!"
 	echo "Here is your deployment remote:"
 	echo
@@ -47,18 +54,22 @@ create_site() {
 	        -d|--domain) domain=$1 ; shift;;
 	        --domain=*) domain=${arg#*=};;
 			--enable-ssl) ssl=yes;;
+			--sb|--spring-boot) springboot=yes;;
 	        *) echo "Unknown argument: $arg" ; exit 1;;
 	    esac
 	done
 	if [[ -z $domain ]] ; then
 		cat <<-.
-		Setup up the server to host a new site. Optionally also enable ssl.
+		Setup up the server to host a new site. Optionally also enable ssl or
+		setup the site as a spring boot site (this just enables some common
+		configuration).
 		You should only enable ssl if you know your DNS records are properly
 		configured, otherwise you can do this with the separate 'enablessl'
 		site subcommand.
 
 		-d|--domain <domain> -- domain name of the site to create
 		--enable-ssl         -- (optional) enable ssl for the setup site
+		--spring-boot        -- (optional) designate that this is a spring boot site
 
 		Example:
 		    $(basename $0) site create -d example.com
@@ -110,7 +121,7 @@ create_site() {
 	"
 	[[ $? -eq 0 ]] && echo "${domain} created!"
 
-	enable_git_deploment $domain
+	enable_git_deploment $domain $springboot
 	if [[ $ssl == yes ]] ; then
 		echo "Enabling SSL for $domain..."
 		enable_ssl --domain $domain
