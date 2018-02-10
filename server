@@ -105,16 +105,13 @@ add_user() {
 		exit 1
 	fi
 
-	read -sp 'password for the new user: ' password
-	echo
-	read -sp 'confirm password: ' confirm_password
-	echo
+	password="$(mkpassword)"
+	echo "${new_user} password: $password" >> $BASE_DIR/credentials.txt
 
-	if [[ "$password" != "$confirm_password" ]] ; then
-		die 'Passwords do not match! Aborting...'
-	fi
-
-	echo "Creating user ${new_user}..."
+	echo "Password for ${new_user}: $password"
+	echo "[NOTICE]"
+	echo "    credentials for ${new_user} have been added to $BASE_DIR/credentials.txt"
+	echo "Creating user ${new_user}... (enter *your* sudo password when prompted)"
 
 	ssh -t $user@$ip "
 	sudo useradd --create-home --shell /bin/bash --groups sudo,tomcat,git,www-data $new_user
