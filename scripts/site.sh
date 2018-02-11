@@ -20,20 +20,17 @@ enable_git_deploment() {
 	# figure out whether we have a java site or a static one
 	ssh -t $user@$ip "grep proxy_pass /etc/nginx/sites-available/$domain" >/dev/null
 	if [[ $? -eq 0 ]] ; then
-		template=$TEMPLATES/post-receive.sh
+		template=post-receive.sh
 	else
-		template=$TEMPLATES/post-receive-static.sh
+		template=post-receive-static.sh
 	fi
 
 	ssh -t $user@$ip "
 	mkdir /srv/${domain}
-	cat > /srv/${domain}/config <<'.'
-$(cat $TEMPLATES/config)
-.
+	cp /srv/.templates/config /srv/${domain}/config
 	git init --bare --shared=group /srv/${domain}/repo.git
-	cat > /srv/${domain}/repo.git/hooks/post-receive <<'.'
-$(sed -e s/{{site}}/$domain/g $template)
-.
+	cp /srv/.templates/$template /srv/${domain}/repo.git/hooks/post-receive
+	sed -i -e s/{{site}}/$domain/g /srv/${domain}/repo.git/hooks/post-receive
 	chmod +x /srv/${domain}/repo.git/hooks/post-receive
 	"
 	if [[ -n $springboot ]] ; then
@@ -120,8 +117,8 @@ create_site() {
 
 	# nginx config
 	echo 'Configuring nginx...'
-	echo '$(sed -e s/{{domain}}/${domain}/g -e s/{{user}}/${user}/g $TEMPLATES/site.nginx.conf)' |\
-		sudo tee /etc/nginx/sites-available/${domain} >/dev/null
+	sudo cp /srv/.templates/site.nginx.conf /etc/nginx/sites-available/${domain}
+	sudo sed -i -e s/{{domain}}/${domain}/g /etc/nginx/sites-available/${domain}
 	sudo ln -s /etc/nginx/sites-available/${domain} /etc/nginx/sites-enabled/${domain}
 	echo 'Restarting nginx...'
 	sudo systemctl restart nginx
@@ -161,8 +158,8 @@ create_static_site() {
 	sudo chgrp --recursive www-data /var/www/${domain}
 	sudo chmod g+srw /var/www/${domain}
 
-	echo '$(sed -e s/{{domain}}/${domain}/g -e s/{{user}}/${user}/g $TEMPLATES/static-site.nginx.conf)' |\
-		sudo tee /etc/nginx/sites-available/${domain} >/dev/null
+	sudo cp /srv/.templates/static-site.nginx.conf /etc/nginx/sites-available/${domain}
+	sudo sed -i -e s/{{domain}}/${domain}/g /etc/nginx/sites-available/${domain}
 	sudo ln -s /etc/nginx/sites-available/${domain} /etc/nginx/sites-enabled/${domain}
 	echo 'Restarting nginx...'
 	sudo systemctl restart nginx
@@ -202,9 +199,9 @@ enable_ssl() {
 	# figure out whether we have a java site or a static one
 	ssh -t $user@$ip "grep proxy_pass /etc/nginx/sites-available/$domain" >/dev/null
 	if [[ $? -eq 0 ]] ; then
-		template=$TEMPLATES/ssl-site.nginx.conf
+		template=ssl-site.nginx.conf
 	else
-		template=$TEMPLATES/static-ssl-site.nginx.conf
+		template=static-ssl-site.nginx.conf
 	fi
 
 	echo 'Requesting SSL certificate... (this might take a second)'
@@ -225,8 +222,8 @@ enable_ssl() {
 		--renew-by-default >> /srv/letsencrypt.log
 
 	echo 'Setting up nginx to serve ${domain} over https...'
-	echo '$(sed -e s/{{domain}}/${domain}/g -e s/{{user}}/${user}/g $template)' |\
-		sudo tee /etc/nginx/sites-available/${domain} >/dev/null
+	sudo cp /srv/.templates/$template /etc/nginx/sites-available/${domain}
+	sudo sed -i -e s/{{domain}}/${domain}/g /etc/nginx/sites-available/${domain}
 	sudo systemctl restart nginx
 	"
 

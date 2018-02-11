@@ -138,6 +138,10 @@ if [[ $? -ne 0 ]]; then
 	exit 1
 fi
 
+heading 'Copying over templates'
+
+scp -r $BASE_DIR/templates root@$ip:/srv/.templates
+
 heading 'securing mysql installation...'
 
 # secure the mysql install
