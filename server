@@ -209,6 +209,7 @@ BASE_DIR="$( cd "$( dirname "$SCRIPT_PATH" )" && pwd )"
 ENV_FILE="$BASE_DIR/.env"
 TEMPLATES="$BASE_DIR/templates"
 SCRIPTS="$BASE_DIR/scripts"
+SNIPPETS="$SCRIPTS/snippets"
 
 if [[ ! -f $ENV_FILE ]]; then
 	echo 'No .env file found!'

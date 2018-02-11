@@ -11,56 +11,17 @@ list_sites() {
 	ssh $user@$ip 'ls -1 /etc/nginx/sites-available' | grep -v '^default$'
 }
 
-enable_git_deploment() {
-	domain=$1
-	springboot=$2
-	[[ -z $domain ]] && die 'Error in enable_git_deployment: $domain not specified'
-	echo "Setting up git deployment..."
-
-	# figure out whether we have a java site or a static one
-	ssh -t $user@$ip "grep proxy_pass /etc/nginx/sites-available/$domain" >/dev/null
-	if [[ $? -eq 0 ]] ; then
-		template=post-receive.sh
-	else
-		template=post-receive-static.sh
-	fi
-
-	ssh -t $user@$ip "
-	mkdir /srv/${domain}
-	cp /srv/.templates/config /srv/${domain}/config
-	git init --bare --shared=group /srv/${domain}/repo.git
-	cp /srv/.templates/$template /srv/${domain}/repo.git/hooks/post-receive
-	sed -i -e s/{{site}}/$domain/g /srv/${domain}/repo.git/hooks/post-receive
-	chmod +x /srv/${domain}/repo.git/hooks/post-receive
-	"
-	if [[ -n $springboot ]] ; then
-		ssh $user@$ip "
-		sed -i -e '/application.properties/ { s/^# //g; }' /srv/${domain}/config
-		echo '# put your configuration here' > /srv/${domain}/application.properties
-		"
-	fi
-	echo "git deployment configured!"
-	echo "Here is your deployment remote:"
-	echo
-	echo "	$user@$ip:/srv/${domain}/repo.git"
-	echo
-	echo "You can run something like:"
-	echo
-	echo "	git remote add production $user@$ip:/srv/${domain}/repo.git"
-	echo
-	echo "To add the remote."
-}
-
 create_site() {
 	while [[ $# -gt 0 ]] ; do
-	    arg=$1 ; shift
-	    case $arg in
-	        -d|--domain) domain=$1 ; shift;;
-	        --domain=*) domain=${arg#*=};;
+		arg=$1 ; shift
+		case $arg in
+			-d|--domain) domain=$1 ; shift;;
+			--domain=*) domain=${arg#*=};;
 			--enable-ssl) ssl=yes;;
 			--sb|--spring-boot) springboot=yes;;
-	        *) echo "Unknown argument: $arg" ; exit 1;;
-	    esac
+			--static) static_site=yes;;
+			*) echo "Unknown argument: $arg" ; exit 1;;
+		esac
 	done
 	if [[ -z $domain ]] ; then
 		cat <<-.
@@ -72,12 +33,14 @@ create_site() {
 		site subcommand.
 
 		-d|--domain <domain> -- domain name of the site to create
-		--enable-ssl         -- (optional) enable ssl for the setup site
+		--enable-ssl         -- (optional) enable ssl after setting up the site
 		--spring-boot        -- (optional) designate that this is a spring boot site
+		--static             -- (optional) setup a static site
 
-		Example:
+		Examples:
 		    $(basename $0) site create -d example.com
-		    $(basename $0) site create --domain=example.com --enable-ssl
+		    $(basename $0) site create --domain=example.com --enable-ssl --spring-boot
+		    $(basename $0) site create --domain example.com --static
 		.
 		die
 	fi
@@ -85,7 +48,7 @@ create_site() {
 	if list_sites | grep "^$domain$" > /dev/null ; then
 		echo 'It looks like that site is already setup. Doing nothing.'
 		echo 'If you wish to re-create the site, first remove the site, then'
-		echo 're-create it.'
+		echo 'create it.'
 		exit 1
 	fi
 
@@ -96,77 +59,25 @@ create_site() {
 		confirm "Are you sure you want to setup ${domain}?" || die 'Aborting...'
 	fi
 
+	if [[ $static_site == yes ]] ; then
+		site_create_snippet="$SNIPPETS/create-static-site.sh"
+	else
+		site_create_snippet="$SNIPPETS/create-java-site.sh"
+	fi
+
 	echo "Setting up ${domain}..."
-
 	ssh -t $user@$ip "
 	set -e
-	# tomcat config
-	echo 'Configuring tomcat...'
-	sudo perl -i -pe 's!^.*--## Virtual Hosts ##--.*\$!$&\n\
-	<Host name=\"${domain}\" appBase=\"${domain}\" unpackWARs=\"true\" autoDeploy=\"true\" />!' \
-		/opt/tomcat/conf/server.xml
-	sudo mkdir -p /opt/tomcat/${domain}
-	sudo chown -R tomcat:tomcat /opt/tomcat/${domain}
-	sudo chmod -R g+w /opt/tomcat/${domain}
-	echo 'Restarting tomcat...'
-	sudo systemctl restart tomcat
-
-	sudo mkdir -p /var/www/${domain}/uploads
-	sudo chmod g+rw /var/www/${domain}/uploads
-	sudo chown -R tomcat:tomcat /var/www/${domain}/uploads
-
-	# nginx config
-	echo 'Configuring nginx...'
-	sudo cp /srv/.templates/site.nginx.conf /etc/nginx/sites-available/${domain}
-	sudo sed -i -e s/{{domain}}/${domain}/g /etc/nginx/sites-available/${domain}
-	sudo ln -s /etc/nginx/sites-available/${domain} /etc/nginx/sites-enabled/${domain}
-	echo 'Restarting nginx...'
-	sudo systemctl restart nginx
+	domain=${domain}
+	$(< $site_create_snippet)
+	$(< $SNIPPETS/enable-git-deployment.sh)
 	"
+
 	[[ $? -eq 0 ]] && echo "${domain} created!"
 
-	enable_git_deploment $domain $springboot
-	if [[ $ssl == yes ]] ; then
-		echo "Enabling SSL for $domain..."
-		enable_ssl --domain $domain
+	if [[ $springboot == yes ]] ; then
+		ssh $user@$ip "domain=${domain} $(< $SNIPPETS/springboot-extra-config.sh)"
 	fi
-}
-
-create_static_site() {
-	while [[ $# -gt 0 ]] ; do
-	    arg=$1 ; shift
-	    case $arg in
-	        -d|--domain) domain=$1 ; shift;;
-	        --domain=*) domain=${arg#*=};;
-	        *) echo "Unknown argument: $arg" ; exit 1;;
-	    esac
-	done
-	if [[ -z $domain ]] ; then
-		cat <<-.
-		Create a static site.
-
-		-d|--domain <domain> -- domain name of the site to create
-		.
-		die
-	fi
-
-	ssh -t $user@$ip "
-	set -e
-	echo 'Configuring nginx...'
-
-	sudo mkdir -p /var/www/${domain}
-	sudo chgrp --recursive www-data /var/www/${domain}
-	sudo chmod g+srw /var/www/${domain}
-
-	sudo cp /srv/.templates/static-site.nginx.conf /etc/nginx/sites-available/${domain}
-	sudo sed -i -e s/{{domain}}/${domain}/g /etc/nginx/sites-available/${domain}
-	sudo ln -s /etc/nginx/sites-available/${domain} /etc/nginx/sites-enabled/${domain}
-	echo 'Restarting nginx...'
-	sudo systemctl restart nginx
-	"
-	[[ $? -eq 0 ]] && echo "${domain} created!"
-
-	enable_git_deploment $domain
 	if [[ $ssl == yes ]] ; then
 		echo "Enabling SSL for $domain..."
 		enable_ssl --domain $domain
@@ -196,37 +107,12 @@ enable_ssl() {
 		die
 	fi
 
-	# figure out whether we have a java site or a static one
-	ssh -t $user@$ip "grep proxy_pass /etc/nginx/sites-available/$domain" >/dev/null
-	if [[ $? -eq 0 ]] ; then
-		template=ssl-site.nginx.conf
-	else
-		template=static-ssl-site.nginx.conf
-	fi
-
-	echo 'Requesting SSL certificate... (this might take a second)'
 	ssh -t $user@$ip "
 	set -e
-	if egrep 'ssl\s*on; /etc/nginx/sites-available/$domain' >/dev/null ; then
-		echo 'It looks like SSL is already setup for $domain'
-		echo 'Doing nothing.'
-		exit 1
-	fi
-	mkdir -p /srv/${domain}
-	sudo letsencrypt certonly\
-		--authenticator webroot\
-		--webroot-path=/var/www/${domain}\
-		--domain ${domain}\
-		--agree-tos\
-		--email $email\
-		--renew-by-default >> /srv/letsencrypt.log
-
-	echo 'Setting up nginx to serve ${domain} over https...'
-	sudo cp /srv/.templates/$template /etc/nginx/sites-available/${domain}
-	sudo sed -i -e s/{{domain}}/${domain}/g /etc/nginx/sites-available/${domain}
-	sudo systemctl restart nginx
+	domain=${domain}
+	email=${email}
+	$(< $SNIPPETS/enable-ssl.sh)
 	"
-
 	[[ $? -eq 0 ]] && echo "https enabled for ${domain}!"
 }
 
@@ -292,12 +178,12 @@ build_site() {
 	fi
 
 	# ensure site exists
-	list_sites | grep "^$site$" >/dev/null || die "It looks like $site does not exist. Aborting..."
+	list_sites | grep "^$domain$" >/dev/null || die "It looks like $domain does not exist. Aborting..."
 
-	echo "Running post-receive hook for $site"
+	echo "Running post-receive hook for $domain..."
 
 	ssh -t $user@$ip "
-	cd /srv/$site/repo.git
+	cd /srv/${domain}/repo.git
 	hooks/post-receive
 	"
 }
@@ -368,7 +254,7 @@ show_info() {
 	fi
 
 	# ensure site exists
-	list_sites | grep "^$domain$" >/dev/null || die "It looks like $site does not exist. Aborting..."
+	list_sites | grep "^$domain$" >/dev/null || die "It looks like $domain does not exist. Aborting..."
 
 	cat <<-.
 		Site: $domain
@@ -395,8 +281,7 @@ show_help() {
 
 	    list -- list the sites setup on your server
 
-	    create:java   -d <domain>
-	    create:static -d <domain>
+	    create        -d <domain> [--static] [--enable-ssl] [--spring-boot]
 	    remove        -d <domain>
 	    build         -d <domain>
 	    enablessl     -d <domain>
@@ -411,8 +296,7 @@ shift
 
 case $command in
 	list|ls)       list_sites;;
-	create:java)   create_site $@;;
-	create:static) create_static_site $@;;
+	create)        create_site $@;;
 	remove|rm)     remove_site $@;;
 	build)	       build_site $@;;
 	enablessl)     enable_ssl $@;;
