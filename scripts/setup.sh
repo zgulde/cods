@@ -199,11 +199,13 @@ else
 		echo "| It looks like you are already referencing ~/opt/bin in your $RC_FILE"
 		echo '| This script will not make any modifications, but in order to have access'
 		echo "| to the '$COMMAND_NAME' command, make sure that ~/opt/bin is on your PATH"
+		echo "| If you've run the ./server command before for a different server, you"
+		echo "| should be all good to go."
 		echo '+-------------------------------------------------------------------------'
 	else
 		echo "Appending to your PATH in $RC_FILE..."
 		echo "# added by $BASE_DIR/scripts/setup.sh" >> $RC_FILE
-		echo "export PATH=\"\$PATH:\"$HOME/opt/bin" >> $RC_FILE
+		echo "export PATH=\"\$PATH:\$HOME/opt/bin\"" >> $RC_FILE
 	fi
 fi
 
