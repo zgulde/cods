@@ -419,16 +419,35 @@ need to set up automatic certificate renewal once.
 1. Clone this repo
 
     ```bash
-    git clone https://github.com/zgulde/tomcat-setup ~/shared-server
+    git clone https://github.com/gocodeup/tomcat-setup ~/shared-server
     ```
+
+1. Setup the command
+
+    ```
+    ln -s ~/shared-server/server ~/opt/bin/shared-server
+    ```
+
+    Replacing `shared-server` with the name of the directory you cloned this
+    project into
+
+    *If you've run the `./server` before for a different server, go to the next
+    step.*
+
+    Make sure `~/opt/bin` in on your `PATH`. You should have a line like this:
+
+    ```
+    export PATH="$PATH:$HOME/opt/bin"
+    ```
+
+    In your `.bashrc` (Linux) or `.bash_profile` (Mac)
 
 1. Create a `.env` file
 
     Create a file named `.env` inside the project you just cloned:
 
     ```
-    cd ~/shared-server
-    nano .env
+    nano ~/shared-server/.env
     ```
 
     This file should have the following contents:
