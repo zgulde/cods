@@ -168,7 +168,19 @@ systemctl restart nginx
 
 echo 'Nginx configured and restarted!'
 
-heading 'configuring firewall...'
+heading 'Configuring /srv directory'
+
+# create the git group and directory structure for deployment
+groupadd git
+mkdir -p /srv
+chgrp git /srv
+chmod g+srwx /srv
+# configuration for systemd-tmpfiles
+# see https://github.com/zgulde/tomcat-setup/issues/14
+cp /usr/lib/tmpfiles.d/home.conf /etc/tmpfiles.d/home.conf
+sed -i -e '/\/srv/ { s/0755/2775/g; }' /etc/tmpfiles.d/home.conf
+
+heading 'Configuring Firewall...'
 # firewall setup
 ufw default deny incoming
 ufw default allow outgoing

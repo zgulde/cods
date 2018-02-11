@@ -26,7 +26,6 @@ enable_git_deploment() {
 	fi
 
 	ssh -t $user@$ip "
-        sudo chmod g+srwx /srv
 	mkdir /srv/${domain}
 	cat > /srv/${domain}/config <<'.'
 $(cat $TEMPLATES/config)
