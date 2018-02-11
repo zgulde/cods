@@ -1,4 +1,4 @@
-# Deployment
+# Deployment Guide
 
 This document is meant to supplement the [documentation included with the
 deployment tool](https://github.com/gocodeup/tomcat-setup), and to be a mostly
@@ -11,11 +11,55 @@ skip the "First Time Server Setup" section.
 
 ## Overview
 
-1. Change the application to be buildable as a `war`.
-1. Setup + Provision the server
-1. Setup a database and site and configure git deployment
+1. [First Time Server Setup](#first-time-server-setup)
+1. [Get Your Application Ready For Deployment](#get-your-application-ready-for-deployment)
+1. [Site Setup](#site-setup)
 
-## Build A War From your application
+## First Time Server Setup
+
+1. Sign up for digital ocean
+
+1. Create a droplet on digitalocean.com
+
+    Choose the $5/month, 1GB RAM droplet. Make sure to add your ssh key to the
+    droplet! The command below will copy your public key to your clipboard.
+
+    ```
+    cat ~/.ssh/id_rsa.pub | pbcopy
+    ```
+
+1. Clone the deployment tool
+
+    ```
+    git clone git@github.com:gocodeup/tomcat-setup.git ~/myserver
+    ```
+
+1. Perform the initial setup
+
+    ```
+    cd ~/myserver
+    ./server
+    ```
+
+    The script will prompt you for the server's IP address, so have it ready.
+
+    Read the prompts that appear, and provide the necessary information.
+
+After the last step above, a file located at `~/myserver/credentials.txt` will
+be created. This file contains the admin password for your server, as well as
+admin password for the mysql installation on the server.
+
+You can access the credentials to your server by running:
+
+```
+myserver credentials
+```
+
+*If you are worried about storing the credentials in plain text, you can delete
+this file and save your passwords in a password manager. However, if you lose
+your passwords, they are _not_ recoverable!*
+
+## Get Your Application Ready For Deployment
 
 This tool is setup to host any web application that is packaged as a `war`.
 Previously we have just been running the `main` method in our application, but
@@ -34,6 +78,8 @@ Spring boot will also allow us to package our application as a `war`.
 
     This will start your application up from the command line, and more closely
     mimicks the environment your application will be running in in production.
+
+    Press Ctrl + C to stop the server.
 
 1. Tell our application to be bundled as a war
 
@@ -65,6 +111,9 @@ Spring boot will also allow us to package our application as a `war`.
 
     - add the `extends` to the class definition
     - add the `configure` method
+
+    *Note that you will need to replace `BlogApplication` with the name of your
+    class with the main method.*
 
 1. Make sure the `war` builds successfully
 
@@ -100,16 +149,21 @@ Spring boot will also allow us to package our application as a `war`.
     WAR_FILE=target/blog-0.0.1-SNAPSHOT.war
     ```
 
-    *Your war file path could be different depending on how your project is
-    setup, make sure the name of the war file matches up with what you defined
-    in your `pom.xml`.*
+    Your war file path could be different depending on how you named your
+    project. To determine what the filepath should be, you should look for the
+    `.war` file that is created in the `target` directory, or run this command
+    from the root of your project:
+
+    ```
+    find target -name \*.war
+    ```
 
     You can test that your `.build_config` file is setup correctly by running
     the following commands in your terminal from the root of your project:
 
     ```
     source .build_config
-    eval $BUILD_COMMAND
+    eval "$BUILD_COMMAND"
     [[ -f $WAR_FILE ]] && echo 'Good to Go!' || echo 'WAR_FILE not found!'
     ```
 
@@ -119,40 +173,6 @@ Spring boot will also allow us to package our application as a `war`.
 
     Once everything is ready to go, make sure to add and commit the
     `.build_config` file!
-
-## First Time Server Setup
-
-1. Sign up for digital ocean
-
-1. Create a droplet on digitalocean.com
-
-    Choose the $10/month, 1GB RAM droplet. *Note: choosing a smaller size
-    droplet here can lead to out-of-memory crashes!*
-
-    add your ssh key to the droplet
-
-    ```
-    cat ~/.ssh/id_rsa.pub | pbcopy
-    ```
-
-1. Clone the deployment tool
-
-    ```
-    git clone git@github.com:gocodeup/tomcat-setup.git ~/my-server
-    ```
-
-1. Provision the server with the setup script
-
-    The script will prompt you for the server's IP address, so have it ready.
-
-    ```
-    cd ~/my-server
-    ./server
-    ```
-
-After the last step above, a file located at `~/my-server/credentials.txt` will
-be created. This file contains the admin password for your server, as well as
-admin password for the mysql installation on the server.
 
 ## Site Setup
 
@@ -168,20 +188,13 @@ admin password for the mysql installation on the server.
 1. [Configure your domain's DNS settings with digital ocean.](https://cloud.digitalocean.com/networking)
 
     - Add an 'A' record that points to your droplet
-    - optionally, add the 'www' subdomain
-
+    - optionally, add the 'www' subdomain, or all subdomains
 
 1. Create a database for your site
 
     ```
-    ./server db create -d blog_db -u blog_user
+    myserver db create --name blog_db --user blog_user
     ```
-
-    You will be prompted to choose a password for the new user, then we will
-    require your *database admin* password to setup the user.
-
-    The user and password you create here are what you should eventually put in
-    your production `application.properties` file.
 
 1. Setup your site
 
@@ -189,37 +202,45 @@ admin password for the mysql installation on the server.
     your *server admin* password.
 
     ```
-    ./server site create -d example.com
+    myserver site create --domain example.com --spring-boot
     ```
 
     If the DNS records are improperly configured, the script will warn you, you
     can go ahead and continue, you just won't be able to see your site until the
     records are properly configured.
 
-    The output of this command will contain instructions for adding a git remote
-    for deployment. Take note of this command, we will be using it later on.
+    We'll pass the `--spring-boot` flag to automatically take care of some
+    common configuration for a spring boot application.
 
-1. Log in to the server to finalize deployment setup
+1. Create the production `application.properties` file
 
-    Login to the server.
+    Since `application.properties` file is ignored by git (as it should be), we
+    will need to manually create this file on the server. The database name and
+    user that go in this file should match up with the values you used when
+    running the `db create` command.
 
-    ```
-    ./server login
-    ```
-
-    Create the production `application.properties` file.
-
-    This file should be located in `/srv/example.com/application.properties` on
-    your server, and should contain your production credentials.
+    You can find the password for your database user by running:
 
     ```
-    cd /srv
-    cd example.com
-    nano application.properties
+    myserver credentials
     ```
 
     It's usually easiest to start by copying your local `application.properties`
-    and pasting it into `nano`, then changing the relevant values.
+    to the server
+
+    ```
+    cd ~/IdeaProjects/springboot-blog
+    myserver upload --file src/main/resources/application.properties --destination /srv/example.com/
+    ```
+
+    Then changing the relevant values
+
+    ```
+    myserver run nano /srv/example.com/application.properties
+    ```
+
+    *Make sure to replace `example.com` with the name of your actual site in the
+    two commands above.*
 
     To save and exit nano:
 
@@ -227,34 +248,19 @@ admin password for the mysql installation on the server.
     1. Type `y`
     1. Press Enter
 
-    Next, uncomment (i.e. delete the `# ` at the beginning of the line) the two
-    lines in `/srv/example.com/config` that reference the
-    `application.properties` file.
-
-    ```
-    nano config
-    ```
-
-    You can now log out of the server.
-
 1. Add the deployment remote to your project and push to deploy the site
 
     You can find your deployment remote (and a copy-pasteable command to add it
     to your project) by running:
 
     ```
-    ./server site info -d example.com
+    myserver site info --domain=example.com
     ```
 
     Replacing `example.com` with the name of the site you just setup.
 
-    Copy the command to add the `production` remote, then:
-
-    ```
-    cd ~/IdeaProjects/my-project
-    ```
-
-    paste the command to add the `production` remote, and push
+    Copy and paste the command to add the `production` remote, and push up to
+    production
 
     ```
     git push production master
