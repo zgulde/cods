@@ -202,7 +202,7 @@ else
 		echo '+-------------------------------------------------------------------------'
 	else
 		echo "Appending to your PATH in $RC_FILE..."
-		echo "# added by $BASE_DIR/setup.sh" >> $RC_FILE
+		echo "# added by $BASE_DIR/scripts/setup.sh" >> $RC_FILE
 		echo "export PATH=\"\$PATH:\"$HOME/opt/bin" >> $RC_FILE
 	fi
 fi
