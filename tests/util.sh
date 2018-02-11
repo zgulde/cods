@@ -1,29 +1,4 @@
-#!/bin/bash
-
-# find out where this script is located so we can be sure we're running
-# everything from the correct location
-SCRIPT_PATH=$0
-while [[ -L $SCRIPT_PATH ]] ; do # resolve symlinks
-	SCRIPT_PATH="$(readlink $SCRIPT_PATH)"
-done
-BASE_DIR="$( cd "$( dirname "$SCRIPT_PATH" )" && pwd )"
-
-ENV_FILE="$BASE_DIR/.env"
-TEMPLATES="$BASE_DIR/templates"
-SCRIPTS="$BASE_DIR/scripts"
-SNIPPETS="$SCRIPTS/snippets"
-
-if [[ ! -f $ENV_FILE ]]; then
-	echo 'No .env file found!'
-	echo 'Running initial setup...'
-	source $SCRIPTS/setup.sh
-	exit
-fi
-
 source $SCRIPTS/util.sh
-source $ENV_FILE
-
-##############################################################################
 
 echo 'testing valid_username function...'
 
@@ -84,3 +59,4 @@ rc=$?
 [[ $output == $message ]] || die 'Expected die to display passed message'
 
 echo '[PASS]'
+
