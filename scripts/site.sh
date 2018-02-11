@@ -20,6 +20,7 @@ create_site() {
 			--enable-ssl) ssl=yes;;
 			--sb|--spring-boot) springboot=yes;;
 			--static) static_site=yes;;
+			--force) force_creation=yes;;
 			*) echo "Unknown argument: $arg" ; exit 1;;
 		esac
 	done
@@ -53,7 +54,7 @@ create_site() {
 	fi
 
 	# verify dns records
-	if [[ "$(dig +short ${domain} | tail -n 1)" != $ip ]]; then
+	if [[ "$(dig +short ${domain} | tail -n 1)" != $ip && -z $force_creation ]]; then
 		echo 'It looks like the dns records for that domain are not setup to'
 		echo 'point to your server.'
 		confirm "Are you sure you want to setup ${domain}?" || die 'Aborting...'
@@ -122,6 +123,7 @@ remove_site() {
 	    case $arg in
 	        -d|--domain) domain=$1 ; shift;;
 	        --domain=*) domain=${arg#*=};;
+			--force) force=yes;;
 	        *) echo "Unknown argument: $arg" ; exit 1;;
 	    esac
 	done
@@ -139,7 +141,9 @@ remove_site() {
 
 	list_sites | grep "^$domain$" >/dev/null || die "It looks like $domain does not exist. Aborting..."
 	# confirm deletion
-	confirm "Are you sure you want to remove ${domain}?" || die 'domain not removed.'
+	if [[ -z $force ]] ; then
+		confirm "Are you sure you want to remove ${domain}?" || die 'domain not removed.'
+	fi
 
 	ssh -t $user@$ip "
 	sudo sed -i -e '/${domain}/d' /opt/tomcat/conf/server.xml
