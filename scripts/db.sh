@@ -26,9 +26,9 @@ create_db() {
 	done
 	if [[ -z $dbname ]] || [[ -z $dbuser ]] ; then
 		cat <<-.
-		Create a database and user that has permissions only on that database
-		You will be prompted to choose a password for the new database user,
-		this should be an alphanumeric password.
+		Create a database and user that has permissions only on that database.
+		A random password will be generated for the new user and stored in
+		$BASE_DIR/credentials.txt
 
 		-n|--name <dbname> -- name of the database to create
 		-u|--user <dbuser> -- name of the database user to create
@@ -40,15 +40,18 @@ create_db() {
 		die
 	fi
 
-	if [[ "$db_pass" != "$confirm_pass" ]]; then
-		echo 'ERROR: passwords do not match!'
-		exit 1
-	fi
+	db_pass="$(mkpassword)"
+	echo "Db User $dbuser: $db_pass" >> $BASE_DIR/credentials.txt
 
 	cat <<-message
 	creating database:
 	    database: $dbname
 	    user:     $dbuser
+
+	password for $dbuser: $db_pass
+
+	[NOTICE]
+	    credentials for $dbuser have been added to $BASE_DIR/credentials.txt
 
 	When prompted, enter your *database administrator* password to continue
 	message
