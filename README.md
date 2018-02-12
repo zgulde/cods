@@ -30,14 +30,17 @@ cd ~/my-awesome-server
 # 2. initial server setup
 ./server
 
-# 3. create a database and user for the application
-my-awesome-server db create --name blog_db --user blog_user
+# you now have a command named 'my-awesome-server' to interact with your server
+# (command name is based on the name of the directory it is cloned in)
 
-# 4. setup your server to listen for requests for your domain
+# 3. create a database and user for the application
+my-awesome-server db create --name=blog_db --user=blog_user
+
+# 4. setup your server to listen for requests for your domain (nginx + tomcat)
 my-awesome-server site create --domain myblog.com
 
-# 5. deploy the war (included here for the quickstart, but your should probably
-#    setup git deployment)
+# 5. deploy the war (included here for the quickstart, but you should probably
+#    look at git deployment)
 my-awesome-server site deploy -d myblog.com -f /path/to/myblog-v0.0.1-SNAPSHOT.war
 ```
 
