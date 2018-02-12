@@ -55,13 +55,49 @@ stat=$(stat --format='%G:%U' /opt/tomcat/test.com)
 test
 echo ' done.'
 
-echo '  Cleaning up...'
+echo -n '  Cleaning up...'
 remove_site --domain test.com --force >>$logfile 2>&1
-echo '[TESTING] Finshed.'
+echo ' ok.'
 
-# echo '[TESTING] Static Site Creation'
-# echo 'Creating site...'
-# create_site --domain test.com --static --force
-# echo 'Cleaning up...'
-# remove_site --domain test.com --force >>$logfile 2>&1
-# echo '[PASS]'
+echo '[TESTING] Static Site Creation'
+echo -n '  Creating site...'
+create_site --domain test.com --static --force >>$logfile 2>&1
+echo ' ok.'
+echo -n '  Running tests...'
+
+ssh -T $user@$ip >/dev/null <<'test'
+fail() { echo -e "  \033[01;31m[FAIL]\033[0m $@" >&2 ; }
+
+[[ -d /var/www/test.com ]] ||\
+	fail 'Expected a directory for static site content to be created'
+stat=$(stat --format='%G' /var/www/test.com)
+[[ $stat == 'www-data' ]] ||\
+	fail "Expected site directory to be owned by www-data, instead found $stat"
+[[ -f /etc/nginx/sites-available/test.com ]] ||\
+	fail 'Expected /etc/nginx/sites-available/test.com to exist'
+[[ -L /etc/nginx/sites-enabled/test.com ]] ||\
+	fail 'Expected /etc/nginx/sites-enabled/test.com to be a symlink'
+[[ $(readlink /etc/nginx/sites-enabled/test.com) == /etc/nginx/sites-available/test.com ]] ||\
+	fail 'Expected a link to the config file in sites-enabled from sites-available'
+# make sure we used the right template
+grep proxy_pass /etc/nginx/sites-available/test.com >/dev/null &&\
+	fail 'Expected not to find "proxy_pass" in nginx site config'
+egrep 'listen\s*443;' /etc/nginx/sites-available/test.com >/dev/null &&\
+	fail 'Expected not to find ssl nginx configuration.'
+egrep 'server_name\s*test.com' /etc/nginx/sites-available/test.com ||\
+	fail "Expected to see a server name of test.com, instead found '$(grep server_name)'"
+
+[[ -d /srv/test.com ]] || fail 'Expected to find /srv/test.com directory'
+[[ -f /srv/test.com/config ]] || fail 'Expected to find /srv/test.com/config file'
+[[ -d /srv/test.com/repo.git ]] || fail 'Expected to find a repository for test.com'
+[[ -x /srv/test.com/repo.git/hooks/post-receive ]] ||\
+	fail 'Expected to find an executable post-receive hook'
+
+test
+
+echo ' done.'
+echo -n '  Cleaning up...'
+remove_site --domain test.com --force >>$logfile 2>&1
+echo ' ok.'
+
+echo '[TESTING] Finshed.'
