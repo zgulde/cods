@@ -1,10 +1,5 @@
 #!/bin/bash
 
-fail() {
-	echo "[FAIL] $@"
-	exit 1
-}
-
 # find out where this script is located so we can be sure we're running
 # everything from the correct location
 SCRIPT_PATH=$0

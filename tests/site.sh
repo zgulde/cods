@@ -7,11 +7,13 @@ eval "$(< $SCRIPTS/site.sh)" >/dev/null
 ( create_site > /dev/null ) && fail 'It should exit with a non-zero status when invoked with no arguments'
 
 echo '[TESTING] Site Creation (nginx + tomcat + git deployment)'
-echo 'Creating test site...'
+echo -n '  Creating test site...'
 create_site --domain test.com --spring-boot --force >>$logfile 2>&1
+echo ' ok.'
 
+echo -n '  Running tests...'
 ssh -T $user@$ip >/dev/null <<'test'
-fail() { echo "[FAIL] $@" >&2 ; exit 1; }
+fail() { echo -e "  \033[01;31m[FAIL]\033[0m $@" >&2 ; }
 
 [[ -d /var/www/test.com/uploads ]] ||\
 	fail 'Expected an uploads directory to be created'
@@ -43,7 +45,7 @@ stat=$(stat --format='%G:%U' /opt/tomcat/test.com)
 [[ -f /srv/test.com/config ]] || fail 'Expected to find a config file for test.com'
 (
 	grep '^source=application.properties$' /srv/test.com/config &&\
-	grep '^destination=src/main/resources/application.properties' /srv/test.com/config
+	grep '^destination=src/main/resources/application.properties$' /srv/test.com/config
 ) >/dev/null || fail 'Expected to find config file pre-modified for a spring-boot app'
 
 [[ -d /srv/test.com/repo.git ]] || fail 'Expected to find a repository for test.com'
@@ -51,10 +53,11 @@ stat=$(stat --format='%G:%U' /opt/tomcat/test.com)
 	fail 'Expected to find an executable post-receive hook'
 
 test
+echo ' done.'
 
-echo 'Cleaning up...'
+echo '  Cleaning up...'
 remove_site --domain test.com --force >>$logfile 2>&1
-echo '[PASS]'
+echo '[TESTING] Finshed.'
 
 # echo '[TESTING] Static Site Creation'
 # echo 'Creating site...'
