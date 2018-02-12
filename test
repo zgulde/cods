@@ -27,9 +27,11 @@ source $SCRIPTS/util.sh
 command=$1 ; shift
 
 case $command in
-	util) source $TESTS/util.sh;;
-	site) source $TESTS/site.sh;;
-	* ) echo 'util | site';;
+	util)  source $TESTS/util.sh;;
+	site)  source $TESTS/site.sh;;
+	setup) source $TESTS/setup.sh;;
+
+	* ) echo 'util | site | setup';;
 esac
 
 # # enable passwordless sudo
