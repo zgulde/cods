@@ -1,4 +1,4 @@
-SERVER_SUBCOMMANDS='site db devserver login upload restart reboot info adduser addkey autorenew log:tail log:cat ping credentials bash-completion'
+SERVER_SUBCOMMANDS='site db devserver login upload restart reboot info adduser addkey autorenew log:tail log:cat ping credentials bash-completion destroy'
 DB_SUBCOMMANDS='create backup run remove rm list ls login'
 SITE_SUBCOMMANDS='list ls create remove rm build enablessl info deploy'
 

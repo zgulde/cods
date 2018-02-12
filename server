@@ -50,6 +50,27 @@ upload_file() {
 	scp -r "$file" "$user@$ip:$destination"
 }
 
+destroy_server() {
+	cat <<-.
+	This command will remove any knowledge this setup or your local machine has
+	of the server. It will *not* remove the server from your VPS provider.
+
+	Are you absolutely sure you want to do this?
+
+	Type "destroy the server" to continue
+	.
+	IFS= read input
+	if [[ "$input" != "destroy the server" ]] ; then
+		die 'Aborting...'
+	else
+		echo 'Destroying...'
+		rm -v $BASE_DIR/.env
+		rm -v $BASE_DIR/credentials.txt
+		echo "Removing $ip from ~/.ssh/known_hosts"
+		sed -i -e /^$ip/d $HOME/.ssh/known_hosts
+	fi
+}
+
 restart_service() {
 	while [[ $# -gt 0 ]] ; do
 	    arg=$1 ; shift
@@ -181,14 +202,18 @@ show_usage() {
 
 	    devserver -- development web server
 
-	    login     -- login to the server
-	    info      -- display information about the server
-	    ping      -- ping the server
-	    autorenew -- setup ssl certs to be automatically renewed
-	    reboot    -- reboot the server
-	    run       -- run arbitrary commands
-	    log:cat   -- view the contents (cat) of /opt/tomcat/logs/catalina.out
-	    log:tail  -- follow (tail -f) the contents of /opt/tomcat/logs/catalina.out
+	    login       -- login to the server
+	    info        -- display information about the server
+	    ping        -- ping the server
+	    autorenew   -- setup ssl certs to be automatically renewed
+	    reboot      -- reboot the server
+	    run         -- run arbitrary commands
+	    log:cat     -- view the contents (cat) of /opt/tomcat/logs/catalina.out
+	    log:tail    -- follow (tail -f) the contents of /opt/tomcat/logs/catalina.out
+	    credentials -- view server credentials (found in $BASE_DIR/credentials.txt)
+	    destroy     -- destroy the server
+
+	    bash-completion -- generate bash tab completion script
 
 	    upload  -f <file> [-d <destination>]
 	    restart -s <service>
@@ -248,6 +273,7 @@ case $command in
 	log:tail)  ssh -t $user@$ip 'sudo tail -f /opt/tomcat/logs/catalina.out';;
 	ping)      ping -c5 $ip;;
 	run)       ssh -t $user@$ip "$@";;
+	destroy) destroy_server;;
 
 	credentials)
 		if [[ -f $BASE_DIR/credentials.txt ]] ; then
