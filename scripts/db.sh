@@ -28,7 +28,7 @@ create_db() {
 		cat <<-.
 		Create a database and user that has permissions only on that database.
 		A random password will be generated for the new user and stored in
-		$BASE_DIR/credentials.txt
+		$DATA_DIR/credentials.txt
 
 		-n|--name <dbname> -- name of the database to create
 		-u|--user <dbuser> -- name of the database user to create
@@ -41,7 +41,7 @@ create_db() {
 	fi
 
 	db_pass="$(mkpassword)"
-	echo "Db User $dbuser: $db_pass" >> $BASE_DIR/credentials.txt
+	echo "Db User $dbuser: $db_pass" >> $DATA_DIR/credentials.txt
 
 	cat <<-message
 	creating database:
@@ -51,7 +51,7 @@ create_db() {
 	password for $dbuser: $db_pass
 
 	[NOTICE]
-	    credentials for $dbuser have been added to $BASE_DIR/credentials.txt
+	    credentials for $dbuser have been added to $DATA_DIR/credentials.txt
 
 	When prompted, enter your *database administrator* password to continue
 	message
@@ -81,7 +81,7 @@ backup_db() {
 		cat <<-.
 		Create a backup of a database. Optionally specify a filename to save the
 		backup to. Will default to a file with the current time and the database
-		name inside of $BASE_DIR/db-backups
+		name inside of $DATA_DIR/db-backups
 
 		-n|--name    <dbname>     -- name of the database to backup
 		-o|--outfile <outputfile> -- (optional) where to save the sql dump
@@ -94,7 +94,7 @@ backup_db() {
 		die
 	fi
 	if [[ -z $outputfile ]]; then
-		outputfile="$BASE_DIR/db-backups/$(date +%Y-%m-%d_%H:%M:%S)-${database}-backup.sql"
+		outputfile="$DATA_DIR/db-backups/$(date +%Y-%m-%d_%H:%M:%S)-${database}-backup.sql"
 	fi
 
 	read -sp 'Database Password: ' db_pass

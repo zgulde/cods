@@ -23,9 +23,10 @@ heading(){
 	echo '----------------------------------'
 }
 
-if [[ -e ./.env ]]; then
+if [[ -e $ENV_FILE ]]; then
 	echo 'It looks like things are already setup, aborting...'
-	echo 'To redo the setup process, delete the ".env" file'
+	echo 'To redo the setup process, try running the "destroy" subcommand.'
+	echo "Alternatively, remove $ENV_FILE"
 	exit 1
 fi
 
@@ -93,10 +94,10 @@ db_password="$(mkpassword)"
 
 echo "Here are your auto-generated passwords for the server:"
 echo
-echo "Sudo Password: $password" | tee -a "$BASE_DIR/credentials.txt"
-echo "DB Password:   $db_password" | tee -a "$BASE_DIR/credentials.txt"
+echo "Sudo Password: $password" | tee -a "$DATA_DIR/credentials.txt"
+echo "DB Password:   $db_password" | tee -a "$DATA_DIR/credentials.txt"
 echo
-echo 'These have been saved to "credentials.txt".'
+echo "These have been saved to $DATA_DIR/credentials.txt."
 echo
 echo '+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Warning ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+'
 echo '| For security purposes, it is advised you delete the credentials.txt  |'
@@ -115,7 +116,7 @@ user=$user
 email=$email
 EOF
 
-echo '".env" file created!'
+echo "$ENV_FILE file created!"
 
 heading 'running provision script'
 
@@ -179,54 +180,19 @@ setup_user
 
 heading 'Finsihed Server Provisioning!'
 
-COMMAND_NAME=$(basename $BASE_DIR)
 heading "Setting up '$COMMAND_NAME' command..."
-if which $COMMAND_NAME >/dev/null ; then
-	echo "it looks like you already have a command named $COMMAND_NAME"
-	echo 'We will skip this part of the setup.'
-else
-	echo "Linking ~/opt/bin/$COMMAND_NAME to $BASE_DIR/server..."
-	mkdir -p ~/opt/bin
-	ln -s $BASE_DIR/server ~/opt/bin/$COMMAND_NAME
-	echo 'Adding ~/opt/bin to your PATH...'
-	if [[ $(uname -s) == Darwin ]] ; then
-		RC_FILE=~/.bash_profile
-	else
-		RC_FILE=~/.bashrc
-	fi
-	if grep /opt/bin $RC_FILE >/dev/null ; then
-		echo '+--- NOTICE --------------------------------------------------------------'
-		echo "| It looks like you are already referencing ~/opt/bin in your $RC_FILE"
-		echo '| This script will not make any modifications, but in order to have access'
-		echo "| to the '$COMMAND_NAME' command, make sure that ~/opt/bin is on your PATH"
-		echo "| If you've run the ./server command before for a different server, you"
-		echo "| should be all good to go."
-		echo '+-------------------------------------------------------------------------'
-	else
-		echo "Appending to your PATH in $RC_FILE..."
-		echo "# added by $BASE_DIR/scripts/setup.sh" >> $RC_FILE
-		echo "export PATH=\"\$PATH:\$HOME/opt/bin\"" >> $RC_FILE
-	fi
-fi
+
+echo "Linking /usr/local/bin/$COMMAND_NAME to $BASE_DIR/server..."
+ln -s $BASE_DIR/server /usr/local/bin/$COMMAND_NAME
 
 heading 'All Done!'
+
 cat <<.
-You should probably re-source your $RC_FILE in order to have access to the
-'$COMMAND_NAME' command. You can run this command in your current session and
-then be good to go:
-
-    source $RC_FILE
-
 Next steps:
+
 - For a quick start, run the command to see all the available options:
 
     $COMMAND_NAME
-
-- check out the documentation on GitHub or locally, located in $BASE_DIR
-
-	- deployment_guide.md: for a walkthrough of deploying a spring-boot application
-	- README.md:           for in depth documentation
-	- faq.md:              for some frequently asked questions
 
 Enjoy!
 .

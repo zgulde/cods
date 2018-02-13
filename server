@@ -55,6 +55,10 @@ destroy_server() {
 	This command will remove any knowledge this setup or your local machine has
 	of the server. It will *not* remove the server from your VPS provider.
 
+	*** IF YOU HAVE DATABASE BACKUPS, THIS WILL REMOVE THEM ***
+
+	You might want to copy/move $DATA_DIR/db-backups
+
 	Are you absolutely sure you want to do this?
 
 	Type "destroy the server" to continue
@@ -64,8 +68,8 @@ destroy_server() {
 		die 'Aborting...'
 	else
 		echo 'Destroying...'
-		rm -v $BASE_DIR/.env
-		rm -v $BASE_DIR/credentials.txt
+		rm -rfv $DATA_DIR
+		rm -v /usr/local/bin/$SCRIPT_NAME
 		echo "Removing $ip from ~/.ssh/known_hosts"
 		sed -i -e /^$ip/d $HOME/.ssh/known_hosts
 	fi
@@ -127,7 +131,7 @@ add_user() {
 	fi
 
 	password="$(mkpassword)"
-	echo "User ${new_user}: $password" >> $BASE_DIR/credentials.txt
+	echo "User ${new_user}: $password" >> $DATA_DIR/credentials.txt
 
 	echo "Password for ${new_user}: $password"
 	echo "[NOTICE]"
@@ -183,8 +187,10 @@ show_info() {
 		MySQL port: 3306
 		ssh port:   22
 
-		base directory: $BASE_DIR
-		command:        $0
+		data directory:   $DATA_DIR
+		database backups: $DATA_DIR/db-backups/
+		command:          $0
+		base directory:   $BASE_DIR
 	info
 }
 
@@ -210,7 +216,7 @@ show_usage() {
 	    run         -- run arbitrary commands
 	    log:cat     -- view the contents (cat) of /opt/tomcat/logs/catalina.out
 	    log:tail    -- follow (tail -f) the contents of /opt/tomcat/logs/catalina.out
-	    credentials -- view server credentials (found in $BASE_DIR/credentials.txt)
+	    credentials -- view server credentials (found in $DATA_DIR/credentials.txt)
 	    destroy     -- destroy the server
 
 	    bash-completion -- generate bash tab completion script
@@ -225,28 +231,23 @@ show_usage() {
 
 # find out where this script is located so we can be sure we're running
 # everything from the correct location
-SCRIPT_PATH=$0
+SCRIPT_PATH="$0"
+SCRIPT_NAME="$(basename $SCRIPT_PATH)"
 while [[ -L $SCRIPT_PATH ]] ; do # resolve symlinks
 	SCRIPT_PATH="$(readlink $SCRIPT_PATH)"
 done
 BASE_DIR="$( cd "$( dirname "$SCRIPT_PATH" )" && pwd )"
 
-ENV_FILE="$BASE_DIR/.env"
+DATA_DIR="$HOME/.cods/$SCRIPT_NAME"
+ENV_FILE="$DATA_DIR/env.sh"
 TEMPLATES="$BASE_DIR/templates"
 SCRIPTS="$BASE_DIR/scripts"
 SNIPPETS="$SCRIPTS/snippets"
 
-if [[ ! -f $ENV_FILE ]]; then
-	echo 'No .env file found!'
-	echo 'Running initial setup...'
-	source $SCRIPTS/setup.sh
-	exit
-fi
-
 source $SCRIPTS/util.sh
 source $ENV_FILE
 # sanity check, make sure we have the values we need from the .env file
-if [[ -z $user || -z $ip ]] ; then
+if [[ ! -f $ENV_FILE || -z $user || -z $ip ]] ; then
 	echo "It looks like the .env file ($ENV_FILE) is not setup properly."
 	die 'Are both `user` and `ip` set and not blank?'
 fi
@@ -276,8 +277,8 @@ case $command in
 	destroy) destroy_server;;
 
 	credentials)
-		if [[ -f $BASE_DIR/credentials.txt ]] ; then
-			cat $BASE_DIR/credentials.txt
+		if [[ -f $DATA_DIR/credentials.txt ]] ; then
+			cat $DATA_DIR/credentials.txt
 		else
 			echo 'No credentials found.'
 		fi;;
