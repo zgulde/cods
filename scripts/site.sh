@@ -264,7 +264,7 @@ show_info() {
 		Site: $domain
 
 		uploads directory:     /var/www/$domain/uploads
-		nginx config file:     /etc/nginx/domains-available/$domain
+		nginx config file:     /etc/nginx/sites-available/$domain
 		deployment git remote: $user@$ip:/srv/$domain/repo.git
 
 		To add the deployment remote for this domain, run:
