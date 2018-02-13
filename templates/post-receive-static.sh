@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SITE_DIR=/srv/{{site}}
-TARGET_LOCATION=/var/www/{{site}}
+TARGET_LOCATION=/srv/{{site}}/public
 TMP_REPO=$(mktemp -d)
 
 log() {

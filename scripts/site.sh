@@ -152,7 +152,6 @@ remove_site() {
 	sudo rm -f /etc/nginx/sites-enabled/${domain}
 	sudo rm -rf /opt/tomcat/${domain}
 	sudo rm -rf /opt/tomcat/conf/Catalina/${domain}
-	sudo rm -rf /var/www/${domain}
 	sudo rm -rf /srv/${domain}
 	"
 
@@ -263,7 +262,7 @@ show_info() {
 	cat <<-.
 		Site: $domain
 
-		uploads directory:     /var/www/$domain/uploads
+		public directory:     /srv/$domain/public
 		nginx config file:     /etc/nginx/sites-available/$domain
 		deployment git remote: $user@$ip:/srv/$domain/repo.git
 

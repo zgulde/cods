@@ -9,7 +9,6 @@ else
 	template=post-receive-static.sh
 fi
 
-mkdir /srv/${domain}
 cp /srv/.templates/config /srv/${domain}/config
 git init --bare --shared=group /srv/${domain}/repo.git
 cp /srv/.templates/$template /srv/${domain}/repo.git/hooks/post-receive

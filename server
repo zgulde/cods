@@ -274,6 +274,7 @@ case $command in
 	log:tail)  ssh -t $user@$ip 'sudo tail -f /opt/tomcat/logs/catalina.out';;
 	ping)      ping -c5 $ip;;
 	run)       ssh -t $user@$ip "$@";;
+	root)      ssh -t $user@$ip "sudo -s";;
 	destroy) destroy_server;;
 
 	credentials)

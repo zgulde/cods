@@ -161,7 +161,6 @@ server {
 	return 444;
 }
 nginx_conf
-mkdir -p /var/www
 rm -rf /var/www/*
 systemctl restart nginx
 

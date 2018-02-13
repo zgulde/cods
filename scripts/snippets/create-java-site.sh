@@ -1,5 +1,6 @@
 # variables: $domain
 
+
 # tomcat config
 echo 'Configuring tomcat...'
 sudo perl -i -pe "s!^.*--## Virtual Hosts ##--.*\$!$&\n\
@@ -9,9 +10,10 @@ sudo mkdir -p /opt/tomcat/${domain}
 sudo chown -R tomcat:tomcat /opt/tomcat/${domain}
 sudo chmod -R g+w /opt/tomcat/${domain}
 
-sudo mkdir -p /var/www/${domain}/uploads
-sudo chmod g+rw /var/www/${domain}/uploads
-sudo chown -R tomcat:tomcat /var/www/${domain}/uploads
+sudo mkdir -p /srv/${domain}/public
+sudo chmod g+srw /srv/${domain}
+sudo chgrp tomcat /srv/${domain}/public
+sudo chmod g+srw /srv/${domain}/public
 
 # nginx config
 echo 'Configuring nginx...'

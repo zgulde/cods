@@ -7,10 +7,9 @@ if egrep 'ssl\s*on;' /etc/nginx/sites-available/$domain >/dev/null ; then
 fi
 
 echo 'Requesting SSL certificate... (this might take a second)'
-mkdir -p /srv/${domain}
 sudo letsencrypt certonly\
 	--authenticator webroot\
-	--webroot-path=/var/www/${domain}\
+	--webroot-path=/srv/${domain}/public\
 	--domain ${domain}\
 	--agree-tos\
 	--email $email\
