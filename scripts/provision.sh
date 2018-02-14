@@ -67,8 +67,7 @@ groupadd tomcat
 useradd -g tomcat -s /bin/false -d /opt/tomcat tomcat
 
 # configure the tomcat install
-chown -R tomcat /opt/tomcat
-chown -R tomcat:tomcat /opt/tomcat/webapps
+chown -R tomcat:tomcat /opt/tomcat
 rm -rf /opt/tomcat/webapps/*
 rm -rf /opt/tomcat/server/webapps/*
 rm -f /opt/tomcat/conf/Catalina/localhost/host-manager.xml
