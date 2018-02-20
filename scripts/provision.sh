@@ -12,7 +12,7 @@
 # You might have to change the url below, the url needs to be updated
 # periodically, the most recent version can be found at
 # https://tomcat.apache.org/download-80.cgi
-TOMCAT_DOWNLOAD_URL=http://apache.mirrors.ionfish.org/tomcat/tomcat-8/v8.5.28/bin/apache-tomcat-8.5.28.tar.gz
+TOMCAT_DOWNLOAD_URL=http://apache.mirrors.hoobly.com/tomcat/tomcat-8/v8.5.28/bin/apache-tomcat-8.5.28.tar.gz
 TOMCAT_TARGZ="$(echo $TOMCAT_DOWNLOAD_URL | perl -pe 's/.*\///')"
 
 heading(){
