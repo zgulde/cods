@@ -15,6 +15,19 @@
 TOMCAT_DOWNLOAD_URL=http://apache.mirrors.hoobly.com/tomcat/tomcat-8/v8.5.28/bin/apache-tomcat-8.5.28.tar.gz
 TOMCAT_TARGZ="$(echo $TOMCAT_DOWNLOAD_URL | perl -pe 's/.*\///')"
 
+# check for the tomcat install first
+# this step is the most likely to go wrong (the url updates with some
+# frequency), so we'll do it first so we don't have to wait on the rest of the
+# script to fail
+cd /tmp
+wget $TOMCAT_DOWNLOAD_URL
+if [[ ! -f $TOMCAT_TARGZ ]] ; then
+	echo "$TOMCAT_TARGZ not found! You may need to update this url:"
+	echo "$TOMCAT_DOWNLOAD_URL"
+	echo
+	exit 1
+fi
+
 heading(){
 	echo '----------------------------------'
 	echo "> $@"
@@ -50,8 +63,6 @@ heading "Installing tomcat..."
 
 # download the tar from apache and extract it to /opt/tomcat
 mkdir -p /opt/tomcat
-cd /tmp
-wget $TOMCAT_DOWNLOAD_URL
 tar xzvf $TOMCAT_TARGZ --strip-components=1 -C /opt/tomcat
 rm $TOMCAT_TARGZ
 
