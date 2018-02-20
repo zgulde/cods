@@ -132,9 +132,9 @@ if [[ $? -ne 0 ]]; then
 	echo
 	echo 'To re-provision, you should:'
 	echo '  1. Re-image your server'
-	echo '  2. Remove the ".env" and "credentials.txt" file from this directory'
+	echo "  2. Remove ~/.cods/$COMMAND_NAME"
 	echo '  3. Edit "~/.ssh/known_hosts" and remove the entry for the servers ip'
-	echo '  4. Re-run this script'
+	echo '  4. Run the init script again'
 	echo
 	exit 1
 fi
