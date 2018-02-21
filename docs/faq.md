@@ -20,14 +20,8 @@
 * [How can I let my teammate push to deploy the project?](#how-can-i-let-my-teammate-push-to-deploy-the-project)
 * [What is my password?](#what-is-my-password)
 
-All the example command below assume you have already `cd`d into the directory
-that contains your server setup. E.g.
-
-```
-cd ~/my-server
-```
-
-before running any commands below.
+All the example command below assume your server management command is named
+`myserver`.
 
 ## How do I deploy changes to my site?
 
@@ -43,7 +37,7 @@ version of the master branch locally, and push that to your production remote.
 
 No! You can host multiple sites on the same server. The server setup and
 provisioning is a one time process, once your server is setup, you can create
-additional sites with the `./server site` (and probably also `./server db`)
+additional sites with the `myserver site` (and probably also `myserver db`)
 commands.
 
 ## How do I setup a new site?
@@ -58,8 +52,8 @@ short (assuming the server is already setup and provisioned):
 1. Create the site and database on the server
 
     ```
-    ./server site create -d example.com
-    ./server db create -d example_db -u example_user
+    myserver site create -n example.com
+    myserver db create -n example_db -u example_user
     ```
 
 1. Login to the server and create `example.com/application.properties` and edit
@@ -78,7 +72,7 @@ applications at `example.com`, `blog.example.com`, or even
 Run
 
 ```
-./server login
+myserver login
 ```
 
 ---
@@ -98,7 +92,7 @@ replacing `USERNAME` and `IP_ADDRESS` with your values
 Have your database administrator password ready, and run:
 
 ```
-./server db login
+myserver db login
 ```
 
 ## How can I run a database migration on my production database?
@@ -109,8 +103,8 @@ The easiest thing to do is to transfer the script to the server and run it
 there.
 
 ```
-./server upload -f /local/path/to/my-script.sql
-./server login
+myserver upload -f /local/path/to/my-script.sql
+myserver login
 
 # from the server
 mysql -p < my-script.sql # you'll be promted for your db password
@@ -121,7 +115,7 @@ mysql -p < my-script.sql # you'll be promted for your db password
 **You can only do this if your DNS records are properly configured.**
 
 ```
-./server site enablessl -d example.com
+myserver site enablessl -d example.com
 ```
 
 See the `HTTPS` section in the main README for more details
@@ -132,7 +126,7 @@ See the `HTTPS` section in the main README for more details
 Login to the server and fix the typo.
 
 ```
-./server login
+myserver login
 nano /srv/example.com/application.properties
 exit
 ```
@@ -141,7 +135,7 @@ In general, if you change something that is external to your project (i.e. not
 in the project's git repository), you can redeploy the project by running:
 
 ```
-./server site build -d example.com
+myserver site build -d example.com
 ```
 
 This will trigger the same script that runs whenever you push to the deployment
@@ -152,7 +146,7 @@ remote.
 Run
 
 ```
-./server info
+myserver info
 ```
 
 ## What is my git deployment remote?
@@ -160,7 +154,7 @@ Run
 Run
 
 ```
-./server site info -d example.com
+myserver site info -d example.com
 ```
 
 Replacing `example.com` with the site you setup.
@@ -171,7 +165,7 @@ Yes, build the war, then run:
 
 ```
 from ~/my-server
-./server site deploy -d example.com -f /path/to/the/file.war
+myserver site deploy -d example.com -f /path/to/the/file.war
 ```
 
 Replacing `example` with the relevant values for your project.
@@ -189,8 +183,8 @@ Did you:
 - Change the `packaging` in your `pom.xml`? Change it from `jar` to `war` and
   make sure to commit the change.
 - Add the `.build_config` file and commit it?
-- Setup the site on the server? I.e. run `./server site create`
-- Setup a database on the server? I.e. run `./server db create`
+- Setup the site on the server? I.e. run `myserver site create`
+- Setup a database on the server? I.e. run `myserver db create`
 - Setup the production `application.properties` file on your server?
 - Setup the `config` file on your server?
 - Push your changes?
@@ -206,7 +200,7 @@ of your application.
 **Check the logs!**
 
 ```
-./server log:cat
+myserver log:cat
 ```
 
 Will dump out the tomcat log file located on your server at
@@ -279,9 +273,9 @@ See also the relevant section in the main README.
     See the main README for details of what this `.env` file should contain
 
     ```
-    git clone https://github.com/zgulde/tomcat-setup ~/shared-server
-    cd ~/shared-server
-    nano .env
+    git clone https://github.com/gocodeup/tomcat-setup ~/shared-server
+    nano ~/shared-server/.env
+    ln -s ~/shared-server/server ~/opt/bin/shared-server
     ```
 
 1. Have your teammate add the appropriate deployment remote to their project.
@@ -289,18 +283,12 @@ See also the relevant section in the main README.
     You can obtain the deployment remote (and the git cli command to add it)
     through the `site info` subcommand.
 
-    For example, if the project was named `example` and was deployed to
-    `example.com`, you might run the following commands:
+    For example, if the project was named `example-application` and was deployed
+    to `example.com`, you might run the following commands:
 
     ```
-    cd ~/shared-server
-    ./server site info -d example.com
-    ```
-
-    copy the command for adding the deployment remote, then...
-
-    ```
-    cd ~/IdeaProjects/example
+    cd ~/IdeaProjects/example-application
+    shared-server site info --domain example.com
     ```
 
     and paste the deployment remote adding command
@@ -308,6 +296,10 @@ See also the relevant section in the main README.
 Now your teammate can push to `production` as well!
 
 ## What is my password?
+
+```
+myserver credentials
+```
 
 In general, and commands that you run that prompt for a password will need your
 `sudo` password (i.e. the server admin password). The only exception to this is
@@ -317,7 +309,22 @@ admin password.
 By default, when a server is setup, a file located at
 `~/my-server/credentials.txt` is created. This file has both your user account's
 sudo password, as well as the admin password for the mysql installation on your
-server.
+server, and any further generated passwords. The command above simply displays
+the contents of the `credentials.txt` file.
 
 If you deleted/moved this file, or changed your password, and do not remember
 it, (by design) there is nothing you can do to recover it.
+
+## Can I use tab completion to help me out?
+
+Yes! Add the following line to the end of your `.bashrc` (if you're on Linux) or
+`.bash_profile` (if you're on Mac):
+
+```
+eval "$(myserver bash-completion)"
+```
+
+Where `myserver` is the name of your server command.
+
+Close any open terminals, and when you start a new one, you will be able to use
+tab completion for all subcommands.

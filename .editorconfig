@@ -19,3 +19,7 @@ tab_width = 4
 indent_style = tab
 indent_size = 4
 tab_width = 4
+[test]
+indent_style = tab
+indent_size = 4
+tab_width = 4

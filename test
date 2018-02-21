@@ -1,0 +1,29 @@
+#!/bin/bash
+
+TESTS="$BASE_DIR/tests"
+
+if [[ ! -f $ENV_FILE ]]; then
+	echo 'No .env file found!'
+	echo 'Currently we can only test everything with an already setup environment.'
+	echo 'exiting...'
+	exit 1
+fi
+
+source $ENV_FILE
+source $SCRIPTS/util.sh
+
+command=$1 ; shift
+
+case $command in
+	util)  source $TESTS/util.sh;;
+	site)  source $TESTS/site.sh;;
+	setup) source $TESTS/setup.sh;;
+
+	* ) echo 'util | site | setup';;
+esac
+
+# # enable passwordless sudo
+# # WE SHOULD BE VERY CAREFUL WITH THIS
+# # that being said, this is probably the most sane way to preform automated
+# # testing, as every command will prompt for a sudo password
+# ssh $user@$ip "echo '$user ALL=(ALL) NOPASSWD: ALL' | sudo EDITOR='tee -a' visudo"

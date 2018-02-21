@@ -16,66 +16,113 @@ auto_renew_certs() {
 }
 
 upload_file() {
-    while getopts 'f:d:' opt; do
-        case $opt in
-            f) file=${OPTARG};;
-            d) destination=${OPTARG};;
-        esac
-    done
+	while [[ $# -gt 0 ]] ; do
+		arg=$1 ; shift
+		case $arg in
+			-d|--destination) destination=$1 ; shift;;
+			--destination=*) destination=${arg#*=};;
+			-f|--file) file=$1 ; shift;;
+			--file=*) file=${arg#*=} ; file="${file/#\~/$HOME}";;
+			*) echo "Unknown argument: $arg" ; exit 1;;
+		esac
+	done
     if [[ -z $file ]] ; then
-        echo 'Upload a file to the server'
-        echo
-        echo '-f <file to upload>'
-        echo '-d <file detination on the server> (optional)'
-		echo
-		echo 'Examples:'
-		echo "    $(basename $0) upload -f ~/Downloads/mycat.png -d /var/www/example.com/uploads/mycat.png"
-		echo "    $(basename $0) upload -f ~/projects/example-project/migration.sql"
+		cat <<-.
+		Upload a file to the server. Optionally specify a destination, otherwise
+		will default to your home directory
+
+		-f|--file <filepath>           -- path to the file to upload
+		-d|--destination <destination> -- (optional) destination for the file on
+		                                  the server
+
+		Examples:
+		    $(basename $0) upload -f ~/Downloads/mycat.png -d /var/www/example.com/uploads/mycat.png
+		    $(basename $0) upload --file=migration.sql
+		    $(basename $0) upload --file ~/IdeaProjects/blog/seeder.sql
+		.
 		die
     fi
 	if [[ ! -e $file ]]; then
-		echo 'It appears as tough that file does not exist!'
+		echo 'It appears as though that file does not exist!'
 		exit 1
 	fi
 
 	scp -r "$file" "$user@$ip:$destination"
 }
 
+destroy_server() {
+	cat <<-.
+	This command will remove any knowledge this setup or your local machine has
+	of the server. It will *not* remove the server from your VPS provider.
+
+	*** IF YOU HAVE DATABASE BACKUPS, THIS WILL REMOVE THEM ***
+
+	You might want to copy/move $DATA_DIR/db-backups
+
+	Are you absolutely sure you want to do this?
+
+	Type "destroy the server" to continue
+	.
+	IFS= read input
+	if [[ "$input" != "destroy the server" ]] ; then
+		die 'Aborting...'
+	else
+		echo 'Destroying...'
+		rm -rfv $DATA_DIR
+		rm -v /usr/local/bin/$SCRIPT_NAME
+		echo "Removing $ip from ~/.ssh/known_hosts"
+		sed -i -e /^$ip/d $HOME/.ssh/known_hosts
+	fi
+}
+
 restart_service() {
-    while getopts 's:' opt ; do
-        case $opt in
-            s) service_name=${OPTARG};;
-        esac
-    done
-	if [[ -z $service_name ]]; then
-        echo 'Restart a service'
-        echo
-        echo '-s <service name>'
-		echo
-		echo 'Examples:'
-		echo "    $(basename $0) restart -s nginx"
-		echo "    $(basename $0) restart -s tomcat"
+	while [[ $# -gt 0 ]] ; do
+	    arg=$1 ; shift
+	    case $arg in
+			-s|--service) service=$1 ; shift;;
+			--service=*) service=${arg#*=};;
+			*) echo "Unknown argument: $arg" ; exit 1;;
+	    esac
+	done
+	if [[ -z $service ]]; then
+		cat <<-.
+		Restart a service
+
+		-s|--service <service> -- name of the service to restart
+
+		Examples:
+		    $(basename $0) restart -s nginx
+		    $(basename $0) restart --service tomcat
+		.
 		die
 	fi
-	ssh -t $user@$ip "sudo systemctl restart $service_name"
-	[[ $? -eq 0 ]] && echo "$service_name restarted!"
+	ssh -t $user@$ip "sudo systemctl restart $service"
+	[[ $? -eq 0 ]] && echo "$service restarted!"
 }
 
 add_user() {
-    while getopts 'u:f:' opt ; do
-        case $opt in
-            u) new_user=${OPTARG};;
-            f) sshkeyfile=${OPTARG};;
-        esac
-    done
+	while [[ $# -gt 0 ]] ; do
+	    arg=$1 ; shift
+	    case $arg in
+	        -f|--sshkeyfile) sshkeyfile=$1 ; shift;;
+	        --sshkeyfile=*) sshkeyfile=${arg#*=} ; sshkeyfile="${sshkeyfile/#\~/$HOME}";;
+			-u|--user) new_user=$1 ; shift;;
+			--user=*) new_user=${arg#*=};;
+			*) echo "Unknown argument: $arg" ; exit 1;;
+	    esac
+	done
     if [[ -z $new_user ]] || [[ -z $sshkeyfile ]] ; then
-        echo 'Add a new admin user to the server'
-        echo
-        echo '-f <sshkeyfile>'
-        echo '-u <username>'
-		echo
-		echo 'Example:'
-		echo "    $(basename $0) adduser -u sally -f ~/sallys-ssh-key.pub"
+		cat <<-.
+		Add a new admin user to the server.
+		A password will be randomly generated for the new user.
+
+		-f|--sshkeyfile <sshkeyfile> -- path to the new user's public key
+		-u|--user <username>         -- username for the new user
+
+		Examples:
+		    $(basename $0) adduser -u sally -f ~/sallys-ssh-key.pub
+		    $(basename $0) adduser --user=sally --sshkeyfile=~/key.pub
+		.
 		die
     fi
 	if [[ ! -f $sshkeyfile ]]; then
@@ -83,19 +130,16 @@ add_user() {
 		exit 1
 	fi
 
-	read -sp 'password for the new user: ' password
-	echo
-	read -sp 'confirm password: ' confirm_password
-	echo
+	password="$(mkpassword)"
+	echo "User ${new_user}: $password" >> $DATA_DIR/credentials.txt
 
-	if [[ "$password" != "$confirm_password" ]] ; then
-		die 'Passwords do not match! Aborting...'
-	fi
-
-	echo "Creating user ${new_user}..."
+	echo "Password for ${new_user}: $password"
+	echo "[NOTICE]"
+	echo "    credentials for ${new_user} have been added to $BASE_DIR/credentials.txt"
+	echo "Creating user ${new_user}... (enter *your* sudo password when prompted)"
 
 	ssh -t $user@$ip "
-	sudo useradd --create-home --shell /bin/bash --groups sudo,tomcat,git $new_user
+	sudo useradd --create-home --shell /bin/bash --groups sudo,tomcat,git,www-data $new_user
 	echo '$new_user:$password' | sudo chpasswd
 	sudo mkdir -p /home/$new_user/.ssh
 	cat <<< '$(cat $sshkeyfile)' | sudo tee /home/$new_user/.ssh/authorized_keys >/dev/null
@@ -105,19 +149,24 @@ add_user() {
 }
 
 add_sshkey() {
-    local sshkeyfile
-    while getopts 'f:' opt ; do
-        case $opt in
-            f) sshkeyfile=${OPTARG};;
-        esac
-    done
+	while [[ $# -gt 0 ]] ; do
+	    arg=$1 ; shift
+	    case $arg in
+	        -f|--sshkeyfile) sshkeyfile=$1 ; shift;;
+	        --sshkeyfile=*) sshkeyfile=${arg#*=} ; sshkeyfile="${sshkeyfile/#\~/$HOME}";;
+	        *) echo "Unknown argument: $arg" ; exit 1;;
+	    esac
+	done
     if [[ -z $sshkeyfile ]] ; then
-        echo 'Add an additional authorized ssh key to your account'
-        echo
-        echo '-f <sshkeyfile>'
-		echo
-		echo 'Example:'
-		echo "    $(basename $0) addkey -f ~/my-other-computer.pub"
+		cat <<-.
+		Add an additional authorized ssh key to your account
+
+		-f|--sshkeyfile <sshkeyfile> -- path to the public ssh key to add
+
+		Examples:
+		    $(basename $0) addkey -f ~/.ssh/my-other-computer.pub
+		    $(basename $0) addkey --sshkeyfile ~/my-other-computer.pub
+		.
 		die
     fi
 	if [[ ! -f $sshkeyfile ]] ; then
@@ -138,8 +187,10 @@ show_info() {
 		MySQL port: 3306
 		ssh port:   22
 
-		base directory: $BASE_DIR
-		command:        $0
+		data directory:   $DATA_DIR
+		database backups: $DATA_DIR/db-backups/
+		command:          $0
+		base directory:   $BASE_DIR
 	info
 }
 
@@ -157,13 +208,18 @@ show_usage() {
 
 	    devserver -- development web server
 
-	    login     -- login to the server
-	    info      -- display information about the server
-	    ping      -- ping the server
-	    autorenew -- setup ssl certs to be automatically renewed
-	    reboot    -- reboot the server
-	    log:cat   -- view the contents (cat) of /opt/tomcat/logs/catalina.out
-	    log:tail  -- follow (tail -f) the contents of /opt/tomcat/logs/catalina.out
+	    login       -- login to the server
+	    info        -- display information about the server
+	    ping        -- ping the server
+	    autorenew   -- setup ssl certs to be automatically renewed
+	    reboot      -- reboot the server
+	    run         -- run arbitrary commands
+	    log:cat     -- view the contents (cat) of /opt/tomcat/logs/catalina.out
+	    log:tail    -- follow (tail -f) the contents of /opt/tomcat/logs/catalina.out
+	    credentials -- view server credentials (found in $DATA_DIR/credentials.txt)
+	    destroy     -- destroy the server
+
+	    bash-completion -- generate bash tab completion script
 
 	    upload  -f <file> [-d <destination>]
 	    restart -s <service>
@@ -175,27 +231,23 @@ show_usage() {
 
 # find out where this script is located so we can be sure we're running
 # everything from the correct location
-SCRIPT_PATH=$0
+SCRIPT_PATH="$0"
+SCRIPT_NAME="$(basename $SCRIPT_PATH)"
 while [[ -L $SCRIPT_PATH ]] ; do # resolve symlinks
 	SCRIPT_PATH="$(readlink $SCRIPT_PATH)"
 done
 BASE_DIR="$( cd "$( dirname "$SCRIPT_PATH" )" && pwd )"
 
-ENV_FILE="$BASE_DIR/.env"
+DATA_DIR="$HOME/.cods/$SCRIPT_NAME"
+ENV_FILE="$DATA_DIR/env.sh"
 TEMPLATES="$BASE_DIR/templates"
 SCRIPTS="$BASE_DIR/scripts"
-
-if [[ ! -f $ENV_FILE ]]; then
-	echo 'No .env file found!'
-	echo 'Running initial setup...'
-	source $SCRIPTS/setup.sh
-	exit
-fi
+SNIPPETS="$SCRIPTS/snippets"
 
 source $SCRIPTS/util.sh
 source $ENV_FILE
 # sanity check, make sure we have the values we need from the .env file
-if [[ -z $user || -z $ip ]] ; then
+if [[ ! -f $ENV_FILE || -z $user || -z $ip ]] ; then
 	echo "It looks like the .env file ($ENV_FILE) is not setup properly."
 	die 'Are both `user` and `ip` set and not blank?'
 fi
@@ -221,6 +273,29 @@ case $command in
 	log:cat)   ssh -t $user@$ip 'sudo cat /opt/tomcat/logs/catalina.out';;
 	log:tail)  ssh -t $user@$ip 'sudo tail -f /opt/tomcat/logs/catalina.out';;
 	ping)      ping -c5 $ip;;
+	run)       ssh -t $user@$ip "$@";;
+	root)      ssh -t $user@$ip "sudo -s";;
+	destroy) destroy_server;;
+
+	credentials)
+		if [[ -f $DATA_DIR/credentials.txt ]] ; then
+			cat $DATA_DIR/credentials.txt
+		else
+			echo 'No credentials found.'
+		fi;;
+
+	bash-completion)
+		sed -e s/{{scriptname}}/$(basename $0)/g $SCRIPTS/bash_completion.sh
+		;;
+
+	_test)
+		if [[ ! -f $BASE_DIR/test ]] ; then
+			echo "$BASE_DIR/test not found."
+			echo 'This command is meant to be used for development.'
+			exit 1
+		fi
+		source $BASE_DIR/test
+		;;
 
 	*) show_usage;;
 esac

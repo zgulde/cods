@@ -12,8 +12,21 @@
 # You might have to change the url below, the url needs to be updated
 # periodically, the most recent version can be found at
 # https://tomcat.apache.org/download-80.cgi
-TOMCAT_DOWNLOAD_URL=http://supergsego.com/apache/tomcat/tomcat-8/v8.5.27/bin/apache-tomcat-8.5.27.tar.gz
+TOMCAT_DOWNLOAD_URL=http://apache.mirrors.hoobly.com/tomcat/tomcat-8/v8.5.28/bin/apache-tomcat-8.5.28.tar.gz
 TOMCAT_TARGZ="$(echo $TOMCAT_DOWNLOAD_URL | perl -pe 's/.*\///')"
+
+# check for the tomcat install first
+# this step is the most likely to go wrong (the url updates with some
+# frequency), so we'll do it first so we don't have to wait on the rest of the
+# script to fail
+cd /tmp
+wget $TOMCAT_DOWNLOAD_URL
+if [[ ! -f $TOMCAT_TARGZ ]] ; then
+	echo "$TOMCAT_TARGZ not found! You may need to update this url:"
+	echo "$TOMCAT_DOWNLOAD_URL"
+	echo
+	exit 1
+fi
 
 heading(){
 	echo '----------------------------------'
@@ -22,13 +35,6 @@ heading(){
 }
 
 set -e
-
-# setup swap file
-fallocate -l 1G /swapfile
-chmod 600 /swapfile
-mkswap /swapfile
-swapon /swapfile
-echo "/swapfile none swap defaults 0 0" >> /etc/fstab
 
 heading 'updating + upgrading apt'
 
@@ -57,8 +63,6 @@ heading "Installing tomcat..."
 
 # download the tar from apache and extract it to /opt/tomcat
 mkdir -p /opt/tomcat
-cd /tmp
-wget $TOMCAT_DOWNLOAD_URL
 tar xzvf $TOMCAT_TARGZ --strip-components=1 -C /opt/tomcat
 rm $TOMCAT_TARGZ
 
@@ -67,8 +71,7 @@ groupadd tomcat
 useradd -g tomcat -s /bin/false -d /opt/tomcat tomcat
 
 # configure the tomcat install
-chown -R tomcat /opt/tomcat
-chown -R tomcat:tomcat /opt/tomcat/webapps
+chown -R tomcat:tomcat /opt/tomcat
 rm -rf /opt/tomcat/webapps/*
 rm -rf /opt/tomcat/server/webapps/*
 rm -f /opt/tomcat/conf/Catalina/localhost/host-manager.xml
@@ -162,13 +165,24 @@ server {
 	return 444;
 }
 nginx_conf
-mkdir -p /var/www
 rm -rf /var/www/*
 systemctl restart nginx
 
 echo 'Nginx configured and restarted!'
 
-heading 'configuring firewall...'
+heading 'Configuring /srv directory'
+
+# create the git group and directory structure for deployment
+groupadd git
+mkdir -p /srv
+chgrp git /srv
+chmod g+srwx /srv
+# configuration for systemd-tmpfiles
+# see https://github.com/zgulde/tomcat-setup/issues/14
+cp /usr/lib/tmpfiles.d/home.conf /etc/tmpfiles.d/home.conf
+sed -i -e '/\/srv/ { s/0755/2775/g; }' /etc/tmpfiles.d/home.conf
+
+heading 'Configuring Firewall...'
 # firewall setup
 ufw default deny incoming
 ufw default allow outgoing
