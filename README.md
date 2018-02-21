@@ -42,6 +42,7 @@ my-awesome-server site deploy -d myblog.com -f /path/to/myblog-v0.0.1-SNAPSHOT.w
 
 ## Documentation
 
+- [Installation](docs/installation.md)
 - [Usage Guide](docs/usage.md)
 - [Step by Step Deployment Guide For a Spring Boot Application.](docs/deployment-guide.md)
 - [Frequently Asked Questions](docs/faq.md)
