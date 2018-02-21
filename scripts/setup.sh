@@ -99,9 +99,12 @@ echo "DB Password:   $db_password" | tee -a "$DATA_DIR/credentials.txt"
 echo
 echo "These have been saved to $DATA_DIR/credentials.txt."
 echo
-echo '+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Warning ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+'
-echo '| For security purposes, it is advised you delete the credentials.txt  |'
-echo '| file and move these into a password manager                          |'
+echo '+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Read This ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+'
+echo '| You may wish to manage your passwords with a password manager. If    |'
+echo '| this is the case, you should remove the file referenced above. Take  |'
+echo '| care, if this file is lost, the passwords are not recoverable by     |'
+echo '| tool. Note that future generated credentials will be written to this |'
+echo '| file as well.                                                        |'
 echo '+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+'
 echo
 echo 'Next, we will provision the server. Please be patient, as this process'
@@ -120,7 +123,8 @@ echo "$ENV_FILE file created!"
 
 heading 'running provision script'
 
-ssh root@$ip bash < $SCRIPTS/provision.sh
+sed -e "s!{{tomcat_download_url}}!${TOMCAT_DOWNLOAD_URL}!" $SCRIPTS/provision.sh |\
+	ssh root@$ip bash
 
 # make sure provisioning went okay
 if [[ $? -ne 0 ]]; then
@@ -132,7 +136,7 @@ if [[ $? -ne 0 ]]; then
 	echo
 	echo 'To re-provision, you should:'
 	echo '  1. Re-image your server'
-	echo "  2. Remove ~/.cods/$COMMAND_NAME"
+	echo "  2. Remove $BASE_DATA_DIR/$COMMAND_NAME"
 	echo '  3. Edit "~/.ssh/known_hosts" and remove the entry for the servers ip'
 	echo '  4. Run the init script again'
 	echo
@@ -188,7 +192,6 @@ ln -s $BASE_DIR/server /usr/local/bin/$COMMAND_NAME
 heading 'All Done!'
 
 cat <<.
-Next steps:
 
 - For a quick start, run the command to see all the available options:
 

@@ -237,8 +237,9 @@ while [[ -L $SCRIPT_PATH ]] ; do # resolve symlinks
 	SCRIPT_PATH="$(readlink $SCRIPT_PATH)"
 done
 BASE_DIR="$( cd "$( dirname "$SCRIPT_PATH" )" && pwd )"
+BASE_DATA_DIR="$HOME/.config/cods"
 
-DATA_DIR="$HOME/.cods/$SCRIPT_NAME"
+DATA_DIR="$BASE_DATA_DIR/$SCRIPT_NAME"
 ENV_FILE="$DATA_DIR/env.sh"
 TEMPLATES="$BASE_DIR/templates"
 SCRIPTS="$BASE_DIR/scripts"
