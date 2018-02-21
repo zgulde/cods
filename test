@@ -1,17 +1,5 @@
 #!/bin/bash
 
-# find out where this script is located so we can be sure we're running
-# everything from the correct location
-SCRIPT_PATH=$0
-while [[ -L $SCRIPT_PATH ]] ; do # resolve symlinks
-	SCRIPT_PATH="$(readlink $SCRIPT_PATH)"
-done
-BASE_DIR="$( cd "$( dirname "$SCRIPT_PATH" )" && pwd )"
-
-ENV_FILE="$BASE_DIR/.env"
-TEMPLATES="$BASE_DIR/templates"
-SCRIPTS="$BASE_DIR/scripts"
-SNIPPETS="$SCRIPTS/snippets"
 TESTS="$BASE_DIR/tests"
 
 if [[ ! -f $ENV_FILE ]]; then

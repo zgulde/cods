@@ -96,6 +96,7 @@ case $1 in
 		touch $DATA_DIR/credentials.txt
 		echo "All done! '$COMMAND_NAME' ready to go!"
 		;;
+	_server) show_server_path;;
 	*) usage;;
 esac
 

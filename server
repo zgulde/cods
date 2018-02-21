@@ -288,5 +288,14 @@ case $command in
 		sed -e s/{{scriptname}}/$(basename $0)/g $SCRIPTS/bash_completion.sh
 		;;
 
+	_test)
+		if [[ ! -f $BASE_DIR/test ]] ; then
+			echo "$BASE_DIR/test not found."
+			echo 'This command is meant to be used for development.'
+			exit 1
+		fi
+		source $BASE_DIR/test
+		;;
+
 	*) show_usage;;
 esac
