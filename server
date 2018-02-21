@@ -69,7 +69,7 @@ destroy_server() {
 	else
 		echo 'Destroying...'
 		rm -rfv $DATA_DIR
-		rm -v /usr/local/bin/$SCRIPT_NAME
+		rm -v $BIN_PREFIX/$SCRIPT_NAME
 		echo "Removing $ip from ~/.ssh/known_hosts"
 		sed -i -e /^$ip/d $HOME/.ssh/known_hosts
 	fi
