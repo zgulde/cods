@@ -13,3 +13,8 @@ sudo ln -s /etc/nginx/sites-available/${domain} /etc/nginx/sites-enabled/${domai
 
 echo 'Restarting nginx...'
 sudo systemctl restart nginx
+
+# without index file, nginx will display a 403 error when accessing the site.
+# We'll put something there so that we can at least see a page to see if the
+# site was properly setup
+echo 'Hello, World!' > /srv/${domain}/public/index.html

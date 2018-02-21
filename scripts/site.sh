@@ -262,7 +262,7 @@ show_info() {
 	cat <<-.
 		Site: $domain
 
-		public directory:     /srv/$domain/public
+		public directory:      /srv/$domain/public
 		nginx config file:     /etc/nginx/sites-available/$domain
 		deployment git remote: $user@$ip:/srv/$domain/repo.git
 
