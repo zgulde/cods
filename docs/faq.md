@@ -52,12 +52,18 @@ short (assuming the server is already setup and provisioned):
 1. Create the site and database on the server
 
     ```
-    myserver site create -n example.com
+    myserver site create -n example.com --spring-boot
     myserver db create -n example_db -u example_user
     ```
 
-1. Login to the server and create `example.com/application.properties` and edit
-   `example.com/config`
+    *If you aren't deploying a spring boot app, don't add the `--spring-boot`
+    flag.*
+
+1. Login to the server and create `/srv/example.com/application.properties` and edit
+   `/srv/example.com/config`
+
+    *if you used the `--spring-boot` flag in the step above, you just need to
+    edit the `application.properties`, the `config` file should be good to go.*
 
 1. Add the git deployment remote to your project and push
 
@@ -119,6 +125,12 @@ myserver site enablessl -d example.com
 ```
 
 See the `HTTPS` section in the main README for more details
+
+You can also do this when setting up a site:
+
+```
+myserver site create -d example.com --enable-ssl
+```
 
 ## Can I redeploy my project without a `git push`?
 ## I made a typo when setting up the database credentials. What do?
@@ -268,15 +280,16 @@ See also the relevant section in the main README.
     You may also wish to create a database admin account for your teammate at
     this time. See the main README for more details on this step.
 
-1. Have your teammate clone this tool and setup their `.env` file.
-
-    See the main README for details of what this `.env` file should contain
+1. Make sure your teammate has `cods` installed, then have them run:
 
     ```
-    git clone https://github.com/gocodeup/tomcat-setup ~/shared-server
-    nano ~/shared-server/.env
-    ln -s ~/shared-server/server ~/opt/bin/shared-server
+    cods share shared-server
     ```
+
+    You might want to choose a more descriptive name than `shared-server`.
+
+    The script will prompt for the server's ip address, and the user account you
+    created for them.
 
 1. Have your teammate add the appropriate deployment remote to their project.
 
@@ -307,10 +320,11 @@ any command run with the `db` subcommand, these will all need your database
 admin password.
 
 By default, when a server is setup, a file located at
-`~/my-server/credentials.txt` is created. This file has both your user account's
-sudo password, as well as the admin password for the mysql installation on your
-server, and any further generated passwords. The command above simply displays
-the contents of the `credentials.txt` file.
+`~/.config/cods/myserver/credentials.txt` is created (here `myserver` could be a
+different command name depending on what you've chosen). This file has both your
+user account's sudo password, as well as the admin password for the mysql
+installation on your server, and any further generated passwords. The command
+above simply displays the contents of the `credentials.txt` file.
 
 If you deleted/moved this file, or changed your password, and do not remember
 it, (by design) there is nothing you can do to recover it.
