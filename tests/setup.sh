@@ -5,11 +5,6 @@ logfile="$BASE_DIR/testing.log"
 ssh -T $user@$ip sudo bash >/dev/null <<test
 fail() { echo -e "  \\033[01;31m[FAIL]\\033[0m \$@" >&2 ; }
 
-(
-	[[ -f /swapfile ]] &&\
-	grep '/swapfile none swap defaults 0 0' /etc/fstab >/dev/null
-) || fail 'Expected swapfile to be setup'
-
 id -u tomcat >/dev/null || fail 'Expected to find a user account for tomcat'
 [[ \$(getent passwd tomcat | cut -d: -f7) == /bin/false ]] ||\
 	fail 'Expected tomcat users shell to be /bin/false'
