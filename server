@@ -134,7 +134,7 @@ add_user() {
 
 	echo "Password for ${new_user}: $password"
 	echo "[NOTICE]"
-	echo "    credentials for ${new_user} have been added to $BASE_DIR/credentials.txt"
+	echo "    credentials for ${new_user} have been added to $DATA_DIR/credentials.txt"
 	echo "Creating user ${new_user}... (enter *your* sudo password when prompted)"
 
 	ssh -t $user@$ip "
