@@ -270,8 +270,8 @@ case $command in
 	adduser)   add_user $@;;
 	addkey)    add_sshkey $@;;
 	autorenew) auto_renew_certs;;
-	log:cat)   ssh -t $user@$ip 'sudo cat /opt/tomcat/logs/catalina.out';;
-	log:tail)  ssh -t $user@$ip 'sudo tail -f /opt/tomcat/logs/catalina.out';;
+	log:cat)   ssh -t $user@$ip 'cat /opt/tomcat/logs/catalina.out';;
+	log:tail)  ssh -t $user@$ip 'tail -f /opt/tomcat/logs/catalina.out';;
 	ping)      ping -c5 $ip;;
 	run)       ssh -t $user@$ip "$@";;
 	root)      ssh -t $user@$ip "sudo -s";;
