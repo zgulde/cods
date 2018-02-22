@@ -401,7 +401,19 @@ of your project (you should create this file yourself).
 
 If you want to deploy a site that does the routing on the frontend (for example
 react + react router), you will probably want your nginx configuration to
-rewrite missing files to the index.html page.
+rewrite missing files to the index.html page. The nginx config that is setup for
+a static site contains comments and commented out configuration that explain how
+to do this.
+
+Run the `site info` command to find the path to your site's nginx config file,
+then edit the nginx config file (read the comments in the `location /`), and
+finally, restart nginx and you should be good to go.
+
+```
+myserver site info -d example.com
+myserver run sudo nano /etc/nginx/sites-available/example.com
+myserver restart --service=nginx
+```
 
 #### Static Sites with a Build Process
 
