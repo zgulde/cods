@@ -21,23 +21,25 @@ This project is probably **not** for you if:
 Deploy a database backed blog application:
 
 ```bash
-# 0. Create A VPS that you have ssh access to
+# 0. Install
+brew install zgulde/zgulde/cods
 
-# 1. Initialize a server
+# 1. Create A VPS that you have ssh access to
+
+# 2. Provision your server
 cods init my-awesome-server
 
 # you now have a command named 'my-awesome-server' to interact with your server
-# (command name is based on the name of the directory it is cloned in)
 
-# 2. create a database and user for the application
+# 3. create a database and user for the application
 my-awesome-server db create --name=blog_db --user=blog_user
 
-# 3. setup your server to listen for requests for your domain (nginx + tomcat)
+# 4. setup your server to listen for requests for your domain (nginx + tomcat)
 my-awesome-server site create --domain myblog.com
 
-# 4. deploy the war (included here for the quickstart, but you should probably
+# 5. deploy the war (included here for the quickstart, but you should probably
 #    look at git deployment)
-my-awesome-server site deploy -d myblog.com -f /path/to/myblog-v0.0.1-SNAPSHOT.war
+my-awesome-server site deploy -d myblog.com -f /path/to/myblog.war
 ```
 
 ## Documentation

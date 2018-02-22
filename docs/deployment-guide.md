@@ -28,26 +28,32 @@ skip the "First Time Server Setup" section.
     cat ~/.ssh/id_rsa.pub | pbcopy
     ```
 
-1. Clone the deployment tool
+1. Install the deployment tool
 
     ```
-    git clone git@github.com:gocodeup/tomcat-setup.git ~/myserver
+    brew install zgulde/zgulde/cods
     ```
 
 1. Perform the initial setup
 
     ```
-    cd ~/myserver
-    ./server
+    cods init myserver
     ```
 
     The script will prompt you for the server's IP address, so have it ready.
 
     Read the prompts that appear, and provide the necessary information.
 
-After the last step above, a file located at `~/myserver/credentials.txt` will
-be created. This file contains the admin password for your server, as well as
-admin password for the mysql installation on the server.
+After the last step above, you will be able to run the command
+
+```
+myserver
+```
+
+to interact with your server. In addition, a file located at
+`~/.config/cods/myserver/credentials.txt` will be created. This file contains
+the admin password for your server, as well as admin password for the mysql
+installation on the server.
 
 You can access the credentials to your server by running:
 
@@ -87,9 +93,8 @@ Spring boot will also allow us to package our application as a `war`.
     packaged as a `war`. These will be one-time operations, and we will still be
     able to run our application through the `main` method, like before.
 
-    - Change the `<packaging>` in the `pom.xml` from `jar` to `war`
-
-    Edit your class with the `main` method
+    1. Change the `<packaging>` in the `pom.xml` from `jar` to `war`
+    1. Edit your class with the `main` method
 
     ```java
     import org.springframework.boot.SpringApplication;
@@ -233,7 +238,8 @@ Spring boot will also allow us to package our application as a `war`.
     myserver upload --file src/main/resources/application.properties --destination /srv/example.com/
     ```
 
-    Then changing the relevant values
+    Then changing the relevant values. That is, change the database user and
+    password to the ones you created in the last step.
 
     ```
     myserver run nano /srv/example.com/application.properties

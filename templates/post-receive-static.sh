@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SITE_DIR=/srv/{{site}}
-TARGET_LOCATION=/srv/{{site}}/public
+PUBLIC_DIR=/srv/{{site}}/public
 TMP_REPO=$(mktemp -d)
 
 log() {
@@ -38,13 +38,13 @@ fi
 if [[ -f install.sh ]]; then
 	log 'Found "install.sh"! Running...'
 	export SITE_DIR
-	export TARGET_LOCATION
+	export PUBLIC_DIR
 	export TMP_REPO
 	bash install.sh
 else
 	log 'No "install.sh" file found.'
-	log "Replacing all files in $TARGET_LOCATION with this project"
-	mv -v $TMP_REPO/* $TARGET_LOCATION
+	log "Replacing all files in $PUBLIC_DIR with this project"
+	mv -v $TMP_REPO/* $PUBLIC_DIR
 fi
 
 log '--------------------------------------------------'

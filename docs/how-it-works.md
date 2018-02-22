@@ -15,7 +15,62 @@ in general:
 - site creation sets up the virtual host on both tomcat and nginx, or just sets
   up nginx to host static files
 
-## Server
+## This Tool
+
+- the goal is to have virtually zero dependencies, just bash, and a handful of
+  common unix tools that are already installed by default on MacOS and should be
+  on most linux distros (the script will warn you if they aren't). It should
+  also be fast
+- Holds its configuration in `~/.config/cods`
+- Consist of 2 primary scripts
+    - `bin/init.sh`: is used to setup a new server, and will create a command to
+      interact with that server (i.e. a symlink to the `server` script)
+    - `server`: is the entrypoint to interacting with a setup server, e.g. for
+      creating sites and databases
+- When a new server is setup, this tool:
+    - creates a directory in `~/.config/cods` based on the command name that
+      contains the configuration for that server (credentials + ip address,
+      username)
+    - creates a new symlink to the `server` script
+- The `server` script can have multiple symlinks pointing to it for multiple
+  different servers. It will figure out which server configuration to use based
+  on the name of the symlink (which is the same as the name of the directory in
+  `~/.config/cods` that holds the configuration for the server)
+- The `server` script has a handful of functions, and delegates to subcommands
+  by sourcing the appropriate file inside of `scripts` as necessary
+- each script (i.e. subcommand) consists of functions that perform one
+  operation
+- in general each action handles cli args, then sshs into the server and
+  performs one or several operations
+- longer operations are broken up into "snippets" (`scripts/snippets`)
+- See also the readmes in the `snippets` and `templates` directories
+
+### Testing
+
+is a work in progress
+
+In order to run the tests, you'll need to have a server already setup and the
+symlink to the server command should point to a local git checkout of the source
+code (i.e. **not** a homebrew installation).
+
+*If you followed the instructions for installing on Linux, you should already be
+setup for this.*
+
+Assuming you already have a server setup:
+
+1. Clone this repo into `~/opt/cods` (or elsewhere)
+
+1. Run the update subcommand to change all existing server commands to point to
+   your copy of the scripts.
+
+    ```
+    bin/init.sh update
+    ```
+
+1. Run the `_test` subcommand. This subcommand is not shown in the help message,
+   but will provide an interface to the `test` script.
+
+## Server Setup
 
 - Basic Security Hardening
 - SSH logins only with public keys (no passwords)
@@ -23,7 +78,7 @@ in general:
 - no root logins
 - firewall denies traffic for everything but ports 22, 80, and 443
 
-## Nginx
+### Nginx
 
 - all config is "typical"
 - config for each site in `/etc/nginx/sites-available/site-name.tld`
@@ -35,7 +90,7 @@ in general:
 - handles ssl connections when https is setup for a site (as opposed to having
   tomcat do this)
 
-## Tomcat
+### Tomcat
 
 - version 8.5.x
 - Installed in `/opt/tomcat`
@@ -44,7 +99,7 @@ in general:
 - site creation modifies `/opt/tomcat/conf/server.xml` to add an entry for
   virtual hosting for that site
 
-## Git Deployment
+### Git Deployment
 
 - a directory in `/srv` is created for every site, e.g. `/srv/site-name.tld`
 - this directory contains several things
@@ -56,27 +111,3 @@ in general:
     - deploys build artifacts to the right place
     - can also run a custom user defined script
 
-## These Scripts
-
-- the goal is to have virtually zero dependencies, just bash, and a handful of
-  common unix tools that are already installed by default on MacOS and should be
-  on most linux distros (the script will warn you if they aren't). It should
-  also be fast
-- create a `.env` file when initially setup that contains the username and ip
-  address. This file is necessary for all functionality and determines whether
-  or not we need to run the initial setup
-- puts a symlink to the executable entrpoint of this setup in `~/opt/bin` to
-  make interacting with the server easy
-- consist of an entrypoint (`server`) which delegates to subcommands (in
-  `scripts/`) as necessary
-- each script (i.e. subcommand) consists of functions that perform one
-  operation
-- in general each action handles cli args, then sshs into the server and
-  performs one or several operations
-- longer operations are broken up into "snippets" (`scripts/snippets`)
-- See also the readmes in the `snippets` and `templates` directories
-
-### Testing
-
-- is a work in progress
-- Run the `test` script

@@ -9,16 +9,18 @@
 # This script will be run on the server by the setup script.
 ##############################################################################
 
-# You might have to change the url below, the url needs to be updated
-# periodically, the most recent version can be found at
+# The url below is set from the setup.sh script because the url needs to be
+# updated periodically. A url is selected when the cods script is first
+# installed, but you can update to a more recent version by modifying
+# ~/.config/cods/config.sh. The most recent version can be found at
 # https://tomcat.apache.org/download-80.cgi
-TOMCAT_DOWNLOAD_URL=http://apache.mirrors.hoobly.com/tomcat/tomcat-8/v8.5.28/bin/apache-tomcat-8.5.28.tar.gz
-TOMCAT_TARGZ="$(echo $TOMCAT_DOWNLOAD_URL | perl -pe 's/.*\///')"
+TOMCAT_DOWNLOAD_URL={{tomcat_download_url}}
+TOMCAT_TARGZ="${TOMCAT_DOWNLOAD_URL##*/}"
 
-# check for the tomcat install first
-# this step is the most likely to go wrong (the url updates with some
+# Check for the tomcat install first.
+# This step is the most likely to go wrong (the url updates with some
 # frequency), so we'll do it first so we don't have to wait on the rest of the
-# script to fail
+# script to fail.
 cd /tmp
 wget $TOMCAT_DOWNLOAD_URL
 if [[ ! -f $TOMCAT_TARGZ ]] ; then
@@ -166,6 +168,8 @@ server {
 }
 nginx_conf
 rm -rf /var/www/*
+# don't expose OS and version information
+sed -i -e 's/# server_tokens off;/server_tokens off;/' /etc/nginx/nginx.conf
 systemctl restart nginx
 
 echo 'Nginx configured and restarted!'

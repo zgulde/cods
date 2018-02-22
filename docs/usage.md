@@ -1,68 +1,107 @@
 # Usage
 
-The setup script is intended to setup and secure a server with a fresh install
-of Ubuntu 16.04 and only a root account.
-
-## Table of Contents
-
+* [The `cods` command](#the-cods-command)
 * [Commands](#commands)
 * [Site Creation](#site-creation)
-* [Git Deployment](#git-deployment)
+    * [Java Site Creation](#java-site-creation)
+    * [Static Site Creation](#static-site-creation)
 * [HTTPS](#https)
 * [Sharing your server with teammates](#sharing-your-server-with-teammates)
-* [Uploads](#uploads)
-* [Bash Tab Completion](#bash-completion)
+* [Bash Completion](#bash-completion)
 
-**Prerequisites**
+## The `cods` command
 
-1. A java web application packaged as a war that can be served by Tomcat.
+The `cods` command allows you to setup a new server, or create a command to
+manage a server that you have been granted access to.
+
+While it is the first command you will use, you will be interacting with the
+created commands more frequently.
+
+### `init`
+
+When a server is first setup, a command will be created that will be your
+interface to that server.
+
+For example, you could run:
+
+```
+cods init myserver
+```
+
+and this tool will prompt you for information to setup the server, provision it,
+then create a command named `myserver` for you to use to interact with the new
+server.
+
+Before running the `init` command make sure you have
+
 1. A server with a fresh ubuntu 16.04 install
 1. Your ssh key on that server with access to the root account
-1. For any domain (or subdomain) you want to host on your server, you will need
-   to have the DNS records already configured to point to your server's IP.
+1. The server's ip address ready
 
-When the server is first setup, a `.env` file will be created that contains the
-name of the account you created and the server's ip address. All of the other
-commands for managing the server will check for this `.env` file to make sure
-the server is setup before trying to do anything.
+When a server is created, a directory inside of `~/.config/cods` is created that
+is named after the command name. This directory holds the configuration for the
+server, the server credentials, and the default directory for any database
+backups you create.
 
-Broadly speaking, most of the commands will ssh into the server and run a command
-or a series of commands to achieve the goal of the command. This allows us to
-control the server from a local machine, without much need to log in to the
-server itself.
+In the scenario above, these files and direcoty would be created:
 
-Clone this repo once per server you wish to automate. For example, you might
-have the following directory structure
+- `~/.config/cods/myserver/env.sh`: holds the username and ip address of the
+  server
+- `~/.config/cods/myserver/credentials.txt`: holds the sudo and database
+  passwords for the server, and any future generated passwords.
+- `~/.config/cods/myserver/db-backups`: default location for the database
+  backups you create
+
+### A Note on Credentials
+
+Anything this tool does that sets up user accounts will autogenerate passwords
+for the users and store them in the `credentials.txt` file for the server. This
+allows easy access to the generated credentials through the server management
+command.
+
+**Note that these passwords _are_ stored in plain text on your computer.**
+
+If this is not an acceptable security tradeoff for you, you should remove the
+`credentials.txt` file for your server, and update your password storage
+solution whenever a new user or database account is generated.
+
+### `share`
+
+If a teammate of yours granted you access to a shared server, you can use the
+`share` command to create a command to interface with the shared server. See the
+section on server sharing below.
+
+### `update`
+
+If you update these scripts, you should run
 
 ```
-~/
-`---servers/
-    `---personal-server/
-    `---my-awesome-sideproject/
-    `---capstone-project/
+cods update
 ```
 
-Once you have cloned this repo, you will need to setup and provision the server.
-Have the ip address of your server handy, and then run the `server` script. The
-script will detect that we don't have anything setup and run the first time
-setup process.
-
-The script will also provide a command that you can run to interact with your
-server, based on the name of the directory you cloned this project into. For
-example, if you cloned this project into a directory named `myserver`, the setup
-script will create a command named `myserver`.
+to ensure all of your individual server commands are using the most recent
+version of the scripts. (This will make sure all of the symlinks for each server
+command are pointing to the right place.)
 
 ## Commands
 
-The entrypoint for all commands is through the command that the setup script
-creates (really this is just a symlink to the `server` script for convenience).
-It contains various subcommands for performing different activities on the
-server. The first time this script is run it will perform the initial server
-setup and provisioning. Once the server is setup you will be able to run the
-various subcommands.
+The entrypoint for all commands is through the command that the `cods` command
+creates. The created command contains various subcommands for performing
+different activities on the server.
+
+Broadly speaking, most of the subcommands will ssh into the server and run a
+command or a series of commands to achieve the goal of the command. This allows
+us to control the server from a local machine, without much need to log in to
+the server itself.
 
 For the rest of this guide, we'll assume that the command we created is named
-`myserver`.
+`myserver`. That is, assume we have already run:
+
+```
+cods init myserver
+```
+
+and successfully setup the server.
 
 To see all the available subcommands, run the `myserver` command without any
 arguments:
@@ -181,85 +220,51 @@ myserver site create -d example.com
 myserver upload -f ~/Downloads/kittens.png -d /var/www/example.com/uploads
 ```
 
-
 ## Site Creation
 
-This setup will allow you to host multiple different domains on each server. For
-each site you wish to host, you will need to:
+**Prerequisites**
 
-1. Setup the DNS Records for that domain to point to your server
-1. Create the site
-1. (Probably) Create a database and user for the application
-1. Deploy a `war` that contains the application
+1. One of
+    - A java web application packaged as a war that can be served by Tomcat.
+    - A static site (optionally with a build step)
+1. For any domain (or subdomain) you want to host on your server, you will need
+   to have the DNS records already configured to point to your server's IP.
 
-### DNS Records + Site Creation
-
-```bash
-myserver site create example.com
-```
-
-This command will setup virtual hosts with both tomcat and nginx for the domain
-name you have provided.
+This setup will allow you to host multiple different sites on your server,
+possibly a mix of static and java-backed sites, and you can even host different
+domains, or multiple different subdomains. For example, you could setup a java
+api server at `api.example.com`, and a static site that talks to the api at
+`example.com`.
 
 When creating a new site, the `site create` subcommand will check to see if the
 DNS records for the given domain point to your server. You will be given a
 warning if they do not, but you can go ahead and create the site anyway if you
-are still configuring DNS, or waiting for the records to propogate. To test your
-site under these conditions, you can add a record in your `/etc/hosts` file that
-looks like the following:
+are still configuring DNS, or waiting for the records to propogate.
 
-```
-123.123.123.123 test.com
-```
+If the DNS records are setup, you can pass `--enable-ssl` to the `site create`
+command to also enable https for the site after the site is created.
 
-Where `123.123.123.123` is the ip address of your server, and `test.com` is the
-domain name you wish to host. *Note that this will work on your computer, but no
-one else will be able to visit the site until the DNS records are properly
-configured.*
-
-### Create Database + User
-
-While theoretically you might not need to do this, most applications will need
-to talk to a database in some form or fashion.
+### Java Site Creation
 
 ```bash
-myserver db create -d some_db -u some_user
+myserver site create -d example.com
 ```
 
-This command will create a database and a user that has all permissions on that
-database (but not any others).
+This command will setup virtual hosts with both tomcat and nginx for the domain
+name you have provided. Nginx will be setup to serve files out of a public
+directory (located at `/srv/example.com/public`), and if the file is not found,
+to pass the request off to tomcat.
 
-You will be prompted for a password for the new database user.
-
-At this point you may wish to log into the server to do any database setup
-required for your application.
-
-### Deploy The `war`
-
-This will `scp` the file to the appropriate location on your server. Once you
-run this command, you should be able to see your site live!
+If you have a pre-built `war` file, you can use this command to `scp` the file
+to the appropriate location on your server.
 
 ```bash
 myserver site deploy -d example.com -f /path/to/the/war/file.war
 ```
 
-Of course, before you run this you will need to have packaged your application
-as a war. For example, if you are using maven:
-
-```bash
-# from the root directory
-mvn package
-```
-
-or with maven wrapper
-
-```bash
-./mvnw package
-```
-
 Alternatively, you can setup automated deployments with git.
 
-## Git Deployment
+#### Git Deployment
 
 When a site is setup, the server will also be setup for automated builds and
 deployments with git. This is accomplished through a `post-receive` git hook.
@@ -271,23 +276,29 @@ after the site, for example:
 
     /srv/example.com/repo.git
 
-You'll see instructions for adding this as a remote to an existing project in
-the output of the command that sets up the site.
+You can find the exact git remote, as well as a copy-pastable command for adding
+it by running:
+
+```
+myserver site info --domain example.com
+```
 
 When the repo is pushed to, the post-receive git hook will be triggered, which
 will run the build for your project, or run a custom script.
+
+##### `.build_config`
 
 To tell the hook how to build your project, you will need to (at a bare
 minimum), add a file to your project defining how to build your project, and
 where the built `war` file lives. To do this, create a file named
 `.build_config` in the root of your project with the following contents:
 
-`.build_config`
-
 ```bash
 BUILD_COMMAND=command_to_execute_to_build_your_project.sh
 WAR_FILE=relative_path_to_the_artifact.war
 ```
+
+##### `config` file
 
 In addition, often times you will need to include a file in the build that is
 not part of the git repository (e.g. a file with database credentials). To do
@@ -307,17 +318,23 @@ following:
 
 Take a look at the `config` file or template for more information.
 
-### Customizing Deployment
+#### Customizing Deployment
 
 If your deploment needs are more complex than what is described above, you can
 create a file named `install.sh` in the root of your project. This file will be
-executed if a `.build_config` file is not found. This script will be executed
-from your project root, and several environment variables are available to it:
+executed after pushing to the deployment remote if a `.build_config` file is not
+found. This script will be executed after freshly cloning your project, from
+your project root, and several environment variables are available to it:
 
 - `SITE_DIR`: the directory that has the repo for your site, along with any
   config files you have setup there (example value: `/srv/example.com`)
 - `WAR_TARGET_LOCATION`: Where the built war needs to end up so that tomcat can
   find it (example value: `/opt/tomcat/example.com/ROOT.war`)
+- `PUBLIC_DIR`: the directory for static files for your site (example:
+  `/srv/example.com/public`)
+
+The cloned repo that is created will be deleted after the `post-receive` hook
+finishes running.
 
 Example `install.sh`
 
@@ -346,16 +363,104 @@ echo '[install.sh] > ./mvnw package'
 mv target/my-awesome-project.war $WAR_TARGET_LOCATION
 ```
 
-### Manually Triggering A Build
+#### Spring Boot Shortcut
 
-You can also manually trigger a build and deploy without needing to push to the
-git remote on your server.
+You can add `--spring-boot` to the `site create` command:
+
+```
+myserver site create --domain example.com --spring-boot
+```
+
+This will automatically setup the site's `config` file to match the default
+location for the `application.properties` file in a spring boot application.
+
+### Static Site Creation
+
+```
+myserver site create --static --domain example.com
+```
+
+Like creating a java site, you can also pass `--enable-ssl` to activate https
+for the site after creating it.
+
+Like a java site, git deployment is setup when you create the site. You can run
+
+```
+myserver site info --domain example.com
+```
+
+To find the deployment remote.
+
+Deploying a static site is as simple as pushing, when you push, the contents of
+your site will be replaced with the most recent contents of your git repository.
+
+#### 404 Page and Rewrites
+
+If a page is not found, nginx will serve the file named `404.html` from the root
+of your project (you should create this file yourself).
+
+If you want to deploy a site that does the routing on the frontend (for example
+react + react router), you will probably want your nginx configuration to
+rewrite missing files to the index.html page.
+
+#### Static Sites with a Build Process
+
+Of course some static sites have a build process (e.g. webpack or sass). This
+tool is setup to accomodate these as well.
+
+Similarly to java deployment, if there is a file named `install.sh` in the root
+of the project, instead of copying the contents of the repository, the
+`install.sh` script will be run after pushing to the deployment remote.
+
+The script will be run with the current working directory as a fresh clone of
+your project. The clone will be removed when the `install.sh` script finishes
+running, so after you preform any build steps, you should move the built files
+to the public directory for your project (see example below).
+
+When the script is run, several variables will be available to it:
+
+- `SITE_DIR`: the location on the server that holds the site's configuration
+- `PUBLIC_DIR`: the location of files for your site
+
+Example `install.sh`:
+
+```
+# exit script on any error
+set -e
+
+echo '[install.sh] Building...'
+npm install
+npm run build
+
+echo '[install.sh] Build Success, deploying...'
+mv build/* $PUBLIC_DIR
+
+echo '[install.sh] All Done!'
+```
+
+### Manually Triggering A Build for a Site
+
+You can also manually trigger a build and deploy for either a static site or a
+java site without needing to push to the git remote on your server.
 
 ```
 myserver site build -d example.com
 ```
 
 This will run the same script that runs when you push to the remote.
+
+### Database Management
+
+While theoretically you might not need to do this, most applications will need
+to talk to a database in some form or fashion.
+
+```bash
+myserver db create -n some_db -u some_user
+```
+
+This command will create a database and a user that has all permissions on that
+database (but not any others). The new user's password will be automatically
+generated and put into the `credentials.txt` file.
 
 ## HTTPS
 
@@ -384,6 +489,15 @@ myserver autorenew
 
 Note that while you do need to enable https for each site individually, you only
 need to set up automatic certificate renewal once.
+
+You can also enable https when the site is being created:
+
+```
+myserver site create --domain example.com --enable-ssl
+```
+
+This is functionally the same thing as running the `site create` and `site
+enablessl` commands back to back.
 
 ## Sharing your server with teammates
 
@@ -416,89 +530,28 @@ need to set up automatic certificate renewal once.
 
 **For the teamate being added**
 
-1. Clone this repo
-
-    ```bash
-    git clone https://github.com/gocodeup/tomcat-setup ~/shared-server
-    ```
-
-1. Create a `.env` file
-
-    Create a file named `.env` inside the project you just cloned:
-
-    ```
-    nano ~/shared-server/.env
-    ```
-
-    This file should have the following contents:
-
-    ```
-    ip=<the-servers-ip-address>
-    user=<the-user-you-just-created>
-    ```
-
-    Replace the values in `<>`s with their appropriate values. *Note there needs
-    to be **no spaces** around the `=` sign.*
-
-    An example `.env` file might look like this:
-
-    ```
-    ip=123.123.123.123
-    user=sally
-    ```
-
 1. Setup the command
 
     ```
-    ln -s ~/shared-server/server ~/opt/bin/shared-server
+    cods share shared-server
     ```
-
-    Replacing `shared-server` with the name of the directory you cloned this
-    project into
-
-    *If you've run the `./server` before for a different server, then you should
-    be all good to go, you can skip the rest.*
-
-    Make sure `~/opt/bin` in on your `PATH`. You should have a line like this:
-
-    ```
-    export PATH="$PATH:$HOME/opt/bin"
-    ```
-
-    In your `.bashrc` (Linux) or `.bash_profile` (Mac)
 
 ## Uploads
 
-Nginx is set up to intercept any requests to `/uploads` and try to serve them
-out of the uploads directory for your site, which is located at
+Nginx is set up to first try to serve static files out of the public directory
+for a site, before passing the request to the tomcat web server.
+
+One example of putting this to use would be to setup an `uploads` directory
+inside the public directory, as this directory and its contents will persist
+even if you deploy a new `.war` file. For example, you could tell your
+application to write uploaded files to
 
 ```
-/var/www/example.com/uploads
+/srv/example.com/public/uploads
 ```
 
-You can setup your application to interact with this directory, and use the
-`upload` subcommand to manually put files here.
-
-## Development Webserver
-
-There is a subcommand of server, `devserver` that can be used to start up nginx
-locally. This will simulate the nginx setup running in production, but it is up
-to you to start the tomcat server locally on port 8080.
-
-```bash
-myserver devserver my-project.dev
-```
-
-see the built in help
-
-```bash
-myserver devserver
-```
-
-for more details.
-
-*Currently this setup assumes the upstream server is running locally on port
-8080, and this is not configurable.*
+Then any url like `https://example.com/uploads/123abc.png` will be served out of
+the uploads directory.
 
 ## Bash Completion
 

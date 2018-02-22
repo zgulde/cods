@@ -44,28 +44,39 @@ which python >/dev/null && PYTHON=python || PYTHON=python3
 SCRIPT_PATH="$($PYTHON -c "import os; print(os.path.realpath('$SCRIPT_PATH'))")"
 BASE_DIR="$(dirname "$(dirname $SCRIPT_PATH)")"
 SCRIPTS=$BASE_DIR/scripts
+BASE_DATA_DIR="$HOME/.config/cods"
+
+if [[ ! -f $BASE_DATA_DIR/config.sh ]] ; then
+	mkdir -p $BASE_DATA_DIR
+	cat > $BASE_DATA_DIR/config.sh <<-.
+	TOMCAT_DOWNLOAD_URL=http://mirror.stjschools.org/public/apache/tomcat/tomcat-8/v8.5.28/bin/apache-tomcat-8.5.28.tar.gz
+	BIN_PREFIX=/usr/local/bin
+	.
+fi
+
+source $BASE_DATA_DIR/config.sh
 
 source $SCRIPTS/util.sh
 
 case $1 in
 	update)
-		for server_command in $(ls -d ~/.cods/*/) ; do
+		for server_command in $(ls -d $BASE_DATA_DIR/*/) ; do
 			server_command="${server_command%/}"
 			server_command="${server_command##*/}"
-			rm /usr/local/bin/$server_command
-			ln -s "$(show_server_path)" /usr/local/bin/$server_command
+			rm $BIN_PREFIX/$server_command
+			ln -s "$(show_server_path)" $BIN_PREFIX/$server_command
 		done
 		;;
 	init)
 		[[ -z $2 ]] && usage
 		COMMAND_NAME="$2"
-		if [[ -L /usr/local/bin/$COMMAND_NAME ]] ; then
-			echo "$COMMAND_NAME already exists in /usr/local/bin"
+		if [[ -L $BIN_PREFIX/$COMMAND_NAME ]] ; then
+			echo "$COMMAND_NAME already exists in $BIN_PREFIX"
 			echo 'Choose another name, or rename/delete the existing command.'
 			exit 1
 		fi
 
-		DATA_DIR="$HOME/.cods/$COMMAND_NAME"
+		DATA_DIR="$BASE_DATA_DIR/$COMMAND_NAME"
 		ENV_FILE="$DATA_DIR/env.sh"
 		mkdir -p $DATA_DIR/db-backups
 		source $BASE_DIR/scripts/setup.sh
@@ -73,8 +84,8 @@ case $1 in
 	share)
 		[[ -z $2 ]] && usage
 		COMMAND_NAME="$2"
-		if [[ -L /usr/local/bin/$COMMAND_NAME ]] ; then
-			echo "$COMMAND_NAME already exists in /usr/local/bin"
+		if [[ -L $BIN_PREFIX/$COMMAND_NAME ]] ; then
+			echo "$COMMAND_NAME already exists in $BIN_PREFIX"
 			echo 'Choose another name, or rename/delete the existing command.'
 			exit 1
 		fi
@@ -87,8 +98,8 @@ case $1 in
 			echo 'username and ip address.'
 			exit 1
 		fi
-		ln -s $BASE_DIR/server /usr/local/bin/$COMMAND_NAME
-		DATA_DIR="$HOME/.cods/$COMMAND_NAME"
+		ln -s $BASE_DIR/server $BIN_PREFIX/$COMMAND_NAME
+		DATA_DIR="$BASE_DATA_DIR/$COMMAND_NAME"
 		ENV_FILE="$DATA_DIR/env.sh"
 		mkdir -p $DATA_DIR/db-backups
 		echo "ip=$ip" >> $ENV_FILE

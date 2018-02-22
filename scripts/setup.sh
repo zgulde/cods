@@ -1,9 +1,8 @@
 ##############################################################################
 # First time setup script
 #
-# This script will be invoked when the `.env` file is not found, when running
-# the `server` command for the first time. It will perform all the first time
-# setup, as well as run the provision script on the server
+# This script will be invoked from the `cods init` command. It will perform all
+# the first time setup, as well as run the provision script on the server
 ##############################################################################
 
 # check for the utilities we'll need
@@ -99,9 +98,12 @@ echo "DB Password:   $db_password" | tee -a "$DATA_DIR/credentials.txt"
 echo
 echo "These have been saved to $DATA_DIR/credentials.txt."
 echo
-echo '+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Warning ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+'
-echo '| For security purposes, it is advised you delete the credentials.txt  |'
-echo '| file and move these into a password manager                          |'
+echo '+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Read This ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+'
+echo '| You may wish to manage your passwords with a password manager. If    |'
+echo '| this is the case, you should remove the file referenced above. Take  |'
+echo '| care, if this file is lost, the passwords are not recoverable by     |'
+echo '| tool. Note that future generated credentials will be written to this |'
+echo '| file as well.                                                        |'
 echo '+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+'
 echo
 echo 'Next, we will provision the server. Please be patient, as this process'
@@ -109,7 +111,7 @@ echo 'can take a few minutes.'
 echo
 read -p 'Press <Enter> to continue and setup the server'
 
-# create the .env file
+# create the env file
 cat > $ENV_FILE <<EOF
 ip=$ip
 user=$user
@@ -120,7 +122,8 @@ echo "$ENV_FILE file created!"
 
 heading 'running provision script'
 
-ssh root@$ip bash < $SCRIPTS/provision.sh
+sed -e "s!{{tomcat_download_url}}!${TOMCAT_DOWNLOAD_URL}!" $SCRIPTS/provision.sh |\
+	ssh root@$ip bash
 
 # make sure provisioning went okay
 if [[ $? -ne 0 ]]; then
@@ -128,11 +131,12 @@ if [[ $? -ne 0 ]]; then
 	echo 'Uh oh! Looks like something went wrong with the server provisioning!'
 	echo
 	echo 'Check the above output for more details. Is the tomcat download url'
-	echo 'up to date? (Check scripts/provision.sh) and https://tomcat.apache.org/download-80.cgi.'
+	echo 'up to date? Check https://tomcat.apache.org/download-80.cgi for the'
+	echo "most recent url, then edit $BASE_DATA_DIR/config.sh ."
 	echo
 	echo 'To re-provision, you should:'
 	echo '  1. Re-image your server'
-	echo "  2. Remove ~/.cods/$COMMAND_NAME"
+	echo "  2. Remove the $BASE_DATA_DIR/$COMMAND_NAME directory"
 	echo '  3. Edit "~/.ssh/known_hosts" and remove the entry for the servers ip'
 	echo '  4. Run the init script again'
 	echo
@@ -182,13 +186,12 @@ heading 'Finsihed Server Provisioning!'
 
 heading "Setting up '$COMMAND_NAME' command..."
 
-echo "Linking /usr/local/bin/$COMMAND_NAME to $BASE_DIR/server..."
-ln -s $BASE_DIR/server /usr/local/bin/$COMMAND_NAME
+echo "Linking $BIN_PREFIX/$COMMAND_NAME to $BASE_DIR/server..."
+ln -s $BASE_DIR/server $BIN_PREFIX/$COMMAND_NAME
 
 heading 'All Done!'
 
 cat <<.
-Next steps:
 
 - For a quick start, run the command to see all the available options:
 
