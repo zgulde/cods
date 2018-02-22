@@ -16,9 +16,15 @@
 * [What is my git deployment remote?](#what-is-my-git-deployment-remote)
 * [Can I upload a `war` file directly (i.e. without using the git deployment)?](#can-i-upload-a-war-file-directly-ie-without-using-the-git-deployment)
 * [My site's not working.](#my-sites-not-working)
+    * [I haven't yet seen my site live](#i-havent-yet-seen-my-site-live)
+    * [The site was working, but no longer is](#the-site-was-working-but-no-longer-is)
 * [Can I view my site if the DNS records aren't properly configured?](#can-i-view-my-site-if-the-dns-records-arent-properly-configured)
 * [How can I let my teammate push to deploy the project?](#how-can-i-let-my-teammate-push-to-deploy-the-project)
 * [What is my password?](#what-is-my-password)
+* [Can I use tab completion to help me out?](#can-i-use-tab-completion-to-help-me-out)
+* [How can I upload really big files to my server?](#how-can-i-upload-really-big-files-to-my-server)
+* [Do I need to do anything special to use ${fancy_js_framework}?](#do-i-need-to-do-anything-special-to-use-fancy_js_framework)
+* [How can I do client-side routing?](#how-can-i-do-client-side-routing)
 
 All the example command below assume your server management command is named
 `myserver`.
@@ -342,3 +348,49 @@ Where `myserver` is the name of your server command.
 
 Close any open terminals, and when you start a new one, you will be able to use
 tab completion for all subcommands.
+
+## How can I upload really big files to my server?
+
+By default, the nginx configuration for each site allows a maximum upload size
+of 10MB. If your site needs to handle files larger than this, you should edit
+the nginx config for your site, then restart nginx.
+
+```
+# this command will show you the path to the nginx config file on the server
+myserver site info --domain uploads.example.com
+
+myserver login
+...
+# edit the file (you'll need admin access to edit the file)
+sudo nano /etc/nginx/sites-available/uploads.example.com
+# validate nginx config (checks for syntax errors in the config file)
+sudo nginx -t
+# restart nginx to use the new config
+sudo systemctl restart nginx
+```
+
+You'll want to change this line in the config file:
+
+```
+client_max_body_size 10m;
+```
+
+## Do I need to do anything special to use ${fancy_js_framework}?
+## How can I do client-side routing?
+
+If you are working on an application that does client-side url routing (i.e. the
+paths for your app are handled in the client side js), you'll probably want
+nginx to rewrite missing urls to your `index.html` file. The nginx config that
+is setup for a static site contains comments and commented out configuration
+that explain how to do this.
+
+Run the `site info` command to find the path to your site's nginx config file,
+then edit the nginx config file (read the comments in the `location /`), and
+finally, restart nginx and you should be good to go.
+
+```
+myserver site info -d example.com
+myserver run sudo nano /etc/nginx/sites-available/example.com
+myserver restart --service=nginx
+```
+
