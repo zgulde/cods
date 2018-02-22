@@ -168,6 +168,8 @@ server {
 }
 nginx_conf
 rm -rf /var/www/*
+# don't expose OS and version information
+sed -i -e 's/# server_tokens off;/server_tokens off;/' /etc/nginx/nginx.conf
 systemctl restart nginx
 
 echo 'Nginx configured and restarted!'
