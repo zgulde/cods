@@ -63,9 +63,11 @@ case $1 in
 		for server_command in $(ls -d $BASE_DATA_DIR/*/) ; do
 			server_command="${server_command%/}"
 			server_command="${server_command##*/}"
+			echo "linking $BIN_PREFIX/$server_command to $(show_server_path)..."
 			rm $BIN_PREFIX/$server_command
 			ln -s "$(show_server_path)" $BIN_PREFIX/$server_command
 		done
+		echo 'All Done!'
 		;;
 	init)
 		[[ -z $2 ]] && usage
