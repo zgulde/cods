@@ -131,11 +131,12 @@ if [[ $? -ne 0 ]]; then
 	echo 'Uh oh! Looks like something went wrong with the server provisioning!'
 	echo
 	echo 'Check the above output for more details. Is the tomcat download url'
-	echo 'up to date? (Check scripts/provision.sh) and https://tomcat.apache.org/download-80.cgi.'
+	echo 'up to date? Check https://tomcat.apache.org/download-80.cgi for the'
+	echo "most recent url, then edit $BASE_DATA_DIR/config.sh ."
 	echo
 	echo 'To re-provision, you should:'
 	echo '  1. Re-image your server'
-	echo "  2. Remove $BASE_DATA_DIR/$COMMAND_NAME"
+	echo "  2. Remove the $BASE_DATA_DIR/$COMMAND_NAME directory"
 	echo '  3. Edit "~/.ssh/known_hosts" and remove the entry for the servers ip'
 	echo '  4. Run the init script again'
 	echo
