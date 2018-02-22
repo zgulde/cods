@@ -1,15 +1,16 @@
 # Deployment Guide
 
-This document is meant to supplement the [documentation included with the
-deployment tool](https://github.com/gocodeup/tomcat-setup), and to be a mostly
-complete guide to codeup students on deploying their spring boot applications.
+This document is meant to supplement the [usage guide](usage.md), and to be a
+mostly complete guide to codeup students on deploying their spring boot
+applications.
 
-See also the [FAQs](faq.md)
-
-Note that if you are looking to add a site to an existing server, you should
-skip the "First Time Server Setup" section.
+See also the [FAQs](faq.md), and the [usage guide](usage.md) for more in-depth
+documentation.
 
 ## Overview
+
+*Note that if you are looking to add a site to an existing server, you should
+skip the "First Time Server Setup" section.*
 
 1. [First Time Server Setup](#first-time-server-setup)
 1. [Get Your Application Ready For Deployment](#get-your-application-ready-for-deployment)
