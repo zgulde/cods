@@ -3,7 +3,7 @@
 TESTS="$BASE_DIR/tests"
 
 if [[ ! -f $ENV_FILE ]]; then
-	echo 'No .env file found!'
+	echo 'No env file found!'
 	echo 'Currently we can only test everything with an already setup environment.'
 	echo 'exiting...'
 	exit 1

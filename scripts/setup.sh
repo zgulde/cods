@@ -1,9 +1,8 @@
 ##############################################################################
 # First time setup script
 #
-# This script will be invoked when the `.env` file is not found, when running
-# the `server` command for the first time. It will perform all the first time
-# setup, as well as run the provision script on the server
+# This script will be invoked from the `cods init` command. It will perform all
+# the first time setup, as well as run the provision script on the server
 ##############################################################################
 
 # check for the utilities we'll need
@@ -112,7 +111,7 @@ echo 'can take a few minutes.'
 echo
 read -p 'Press <Enter> to continue and setup the server'
 
-# create the .env file
+# create the env file
 cat > $ENV_FILE <<EOF
 ip=$ip
 user=$user
