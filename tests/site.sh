@@ -60,6 +60,20 @@ echo -n '  Cleaning up...'
 remove_site --domain test.com --force >>$logfile 2>&1
 echo ' ok.'
 
+echo -n '[TESTING] Site was removed properly...'
+ssh -T $user@$ip >/dev/null <<.
+fail() { echo -e "  \033[01;31m[FAIL]\033[0m $@" >&2 ; }
+
+[[ -d /srv/test.com ]] && fail 'Expected directory in /srv to be cleaned up'
+[[ -d /opt/tomcat/test.com ]] &&\
+	fail 'Expected directory in /opt/tomcat to be cleaned up'
+[[ -L /etc/nginx/sites-enabled/test.com ]] &&\
+	fail 'expected the symlink in sites-enabled to be removed'
+[[ -f /etc/nginx/sites-available/test.com ]] &&\
+	fail 'expected the nginx config in /etc/nginx/sites-available to be removed'
+.
+echo ' done.'
+
 echo '[TESTING] Static Site Creation'
 echo -n '  Creating site...'
 create_site --domain test.com --static --force >>$logfile 2>&1
