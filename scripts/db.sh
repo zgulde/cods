@@ -41,20 +41,14 @@ create_db() {
 	fi
 
 	db_pass="$(mkpassword)"
-	echo "Db User $dbuser: $db_pass" >> $DATA_DIR/credentials.txt
 
-	cat <<-message
-	creating database:
+	cat <<-.
+	Creating Database:
 	    database: $dbname
 	    user:     $dbuser
 
-	password for $dbuser: $db_pass
-
-	[NOTICE]
-	    credentials for $dbuser have been added to $DATA_DIR/credentials.txt
-
 	When prompted, enter your *database administrator* password to continue
-	message
+	.
 
 	ssh -t $user@$ip "mysql -p <<sql
 	CREATE DATABASE IF NOT EXISTS $dbname;
@@ -62,8 +56,17 @@ create_db() {
 	GRANT ALL ON ${dbname}.* TO '$dbuser'@'localhost';
 	FLUSH PRIVILEGES;
 sql"
-
-	[[ $? -eq 0 ]] && echo 'Database Created!'
+	if [[ $? -eq 0 ]] ; then
+		echo "Db User $dbuser: $db_pass" >> $DATA_DIR/credentials.txt
+		cat <<-.
+		User successfully created!
+		password for $dbuser: $db_pass
+		[NOTICE] credentials for $dbuser have been added to $DATA_DIR/credentials.txt
+		.
+	else
+		echo 'Uh oh, looks like something went wrong. Check the output above and'
+		echo 'try again.'
+	fi
 }
 
 backup_db() {

@@ -130,21 +130,27 @@ add_user() {
 	fi
 
 	password="$(mkpassword)"
-	echo "User ${new_user}: $password" >> $DATA_DIR/credentials.txt
-
-	echo "Password for ${new_user}: $password"
-	echo "[NOTICE]"
-	echo "    credentials for ${new_user} have been added to $DATA_DIR/credentials.txt"
 	echo "Creating user ${new_user}... (enter *your* sudo password when prompted)"
 
 	ssh -t $user@$ip "
+	set -e
 	sudo useradd --create-home --shell /bin/bash --groups sudo,tomcat,git,www-data $new_user
 	echo '$new_user:$password' | sudo chpasswd
 	sudo mkdir -p /home/$new_user/.ssh
 	cat <<< '$(cat $sshkeyfile)' | sudo tee /home/$new_user/.ssh/authorized_keys >/dev/null
 	sudo chown --recursive $new_user:$new_user /home/$new_user
 	"
-	[[ $? -eq 0 ]] && echo "User ${new_user} created!"
+	if [[ $? -eq 0 ]] ; then
+		echo "User ${new_user}: $password" >> $DATA_DIR/credentials.txt
+		cat <<-.
+		User ${new_user} created!
+		Password for ${new_user}: ${password}
+		[NOTICE] credentials for ${new_user} have been added to $DATA_DIR/credentials.txt
+		.
+	else
+		echo 'Uh oh, something went wrong! Check the output above and try again'
+	fi
+
 }
 
 add_sshkey() {
