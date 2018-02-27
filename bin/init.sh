@@ -4,6 +4,7 @@ usage() {
 	cat <<-.
 	$(basename $0) -- This command is for creating new server commands, *not*
 	                  for interacting with a server directly
+	Version: $(head -n1 $BASE_DIR/CHANGELOG.md)
 
 	Commands:
 
