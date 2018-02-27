@@ -10,6 +10,7 @@ brew install zgulde/zgulde/cods
 
 ```
 brew upgrade cods
+cods update
 ```
 
 ## Linux / Other
@@ -42,5 +43,13 @@ and change `BIN_PREFIX` to whatever you would prefer
 
 ```
 cd ~/opt/cods # or wherever you cloned this
-git pull origin master
+git fetch origin
+
+# get the latest
+git reset --hard origin/master
+
+# or a specific version
+git checkout v0.2.3
 ```
+
+
