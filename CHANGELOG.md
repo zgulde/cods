@@ -1,3 +1,7 @@
+0.3.0 BETA
+
+- enhancement: use tomcat 9.0
+
 0.2.3
 
 - enhancement: add version information to `cods` command

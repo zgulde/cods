@@ -131,7 +131,7 @@ if [[ $? -ne 0 ]]; then
 	echo 'Uh oh! Looks like something went wrong with the server provisioning!'
 	echo
 	echo 'Check the above output for more details. Is the tomcat download url'
-	echo 'up to date? Check https://tomcat.apache.org/download-80.cgi for the'
+	echo 'up to date? Check https://tomcat.apache.org/download-90.cgi for the'
 	echo "most recent url, then edit $BASE_DATA_DIR/config.sh ."
 	echo
 	echo 'To re-provision, you should:'
