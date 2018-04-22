@@ -22,8 +22,9 @@ skip the "First Time Server Setup" section.*
 
 1. Create a droplet on digitalocean.com
 
-    Choose the $5/month, 1GB RAM droplet. Make sure to add your ssh key to the
-    droplet! The command below will copy your public key to your clipboard.
+    Choose Ubuntu 16.04x64 as the operating system. The $5/month, 1GB RAM for
+    the size of the server. Make sure to add your ssh key to the droplet! The
+    command below will copy your public key to your clipboard.
 
     ```
     cat ~/.ssh/id_rsa.pub | pbcopy
@@ -35,11 +36,20 @@ skip the "First Time Server Setup" section.*
     brew install zgulde/zgulde/cods
     ```
 
+    This will [tap](https://github.com/Homebrew/brew/blob/master/docs/Taps.md)
+    [this repository](https://github.com/zgulde/homebrew-zgulde), which contains
+    a description of how to install this tool and install this tool in one step.
+
 1. Perform the initial setup
 
     ```
     cods init myserver
     ```
+
+    The `myserver` part of the command above specifies the name of the command
+    that will be created that you will use to interact with your server. You can
+    choose something different here (e.g. `my-awesome-server`), but this guide
+    will assume you have chosen `myserver`.
 
     The script will prompt you for the server's IP address, so have it ready.
 
