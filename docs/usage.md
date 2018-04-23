@@ -217,7 +217,7 @@ myserver site create -d example.com
 #### Upload a file to a site's uploads directory
 
 ```bash
-myserver upload -f ~/Downloads/kittens.png -d /var/www/example.com/uploads
+myserver upload -f ~/Downloads/kittens.png -d /srv/example.com/public/uploads
 ```
 
 ## Site Creation

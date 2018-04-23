@@ -80,13 +80,12 @@ Assuming you already have a server setup:
 
 ### Nginx
 
-- all config is "typical"
 - config for each site in `/etc/nginx/sites-available/site-name.tld`
 - symlinks in `sites-enabled`
-- static content served out of `/var/www/site-name.tld`
-- For java sites, will intercept any requests to `/uploads` and serve static
-  files from `/var/www/site-name.tld/uploads`, otherwise will pass requests off
-  to `localhost:8080`, where tomcat is listening
+- static content served out of `/srv/site-name.tld/public`
+- Will attempt to serve static content first, if not found
+    - the request will be passed to tomcat for a java site
+    - `404.html` in the webroot will be served
 - handles ssl connections when https is setup for a site (as opposed to having
   tomcat do this)
 
@@ -110,4 +109,3 @@ Assuming you already have a server setup:
     - looks for build configuration and uses it to build the project
     - deploys build artifacts to the right place
     - can also run a custom user defined script
-

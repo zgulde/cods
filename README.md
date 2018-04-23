@@ -12,7 +12,7 @@ tomcat, or if you want to host several Java projects on the same server.
 
 This project is probably **not** for you if:
 
-- You need to deploy anything that is not a `war`
+- You need to deploy anything that is not a `war` or a static site
 - You want to use a database that is not MySQL
 - You want to use a webserver other than tomcat behind nginx
 

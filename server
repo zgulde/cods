@@ -35,7 +35,7 @@ upload_file() {
 		                                  the server
 
 		Examples:
-		    $(basename $0) upload -f ~/Downloads/mycat.png -d /var/www/example.com/uploads/mycat.png
+		    $(basename $0) upload -f ~/Downloads/mycat.png -d /srv/example.com/public/uploads/mycat.png
 		    $(basename $0) upload --file=migration.sql
 		    $(basename $0) upload --file ~/IdeaProjects/blog/seeder.sql
 		.
