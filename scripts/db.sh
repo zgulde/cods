@@ -34,8 +34,8 @@ create_db() {
 		-u|--user <dbuser> -- name of the database user to create
 
 		Examples:
-		    $(basename $0) db create -n example_db -u example_user
-		    $(basename $0) db create --name=test_db --user=test_user
+		    $(basename "$0") db create -n example_db -u example_user
+		    $(basename "$0") db create --name=test_db --user=test_user
 		.
 		die
 	fi
@@ -57,7 +57,7 @@ create_db() {
 	FLUSH PRIVILEGES;
 sql"
 	if [[ $? -eq 0 ]] ; then
-		echo "Db User $dbuser: $db_pass" >> $DATA_DIR/credentials.txt
+		echo "Db User $dbuser: $db_pass" >> "$DATA_DIR/credentials.txt"
 		cat <<-.
 		User successfully created!
 		password for $dbuser: $db_pass
@@ -75,8 +75,8 @@ backup_db() {
 	    case $arg in
 	        -n|--name) database=$1 ; shift;;
 	        --name=*) database=${arg#*=};;
-			-o|--outfile) outputfile=$1 ; shift;;
-			--outfile=*) outputfile=${arg#*=} ; outputfile="${outputfile/#\~/$HOME}";;
+			-o|--outfile) outputfile="$1" ; shift;;
+			--outfile=*) outputfile="${arg#*=}" ; outputfile="${outputfile/#\~/$HOME}";;
 	        *) echo "Unknown argument: $arg" ; exit 1;;
 	    esac
 	done
@@ -90,19 +90,19 @@ backup_db() {
 		-o|--outfile <outputfile> -- (optional) where to save the sql dump
 
 		Examples:
-		    $(basename $0) db backup -n example_db
-		    $(basename $0) db backup -n example_db -o ~/my-db-dump.sql
-		    $(basename $0) db backup --name=blog_db --outfile=./src/main/sql/blog-backup.sql
+		    $(basename "$0") db backup -n example_db
+		    $(basename "$0") db backup -n example_db -o ~/my-db-dump.sql
+		    $(basename "$0") db backup --name=blog_db --outfile=./src/main/sql/blog-backup.sql
 		.
 		die
 	fi
-	if [[ -z $outputfile ]]; then
+	if [[ -z "$outputfile" ]]; then
 		outputfile="$DATA_DIR/db-backups/$(date +%Y-%m-%d_%H:%M:%S)-${database}-backup.sql"
 	fi
 
 	read -sp 'Database Password: ' db_pass
 	echo -e "\nbacking up...."
-	ssh -t $user@$ip "mysqldump -p${db_pass} ${database} 2>/dev/null" > $outputfile
+	ssh -t $user@$ip "mysqldump -p${db_pass} ${database} 2>/dev/null" > "$outputfile"
 	echo
 	echo "$outputfile created!"
 }
@@ -126,8 +126,8 @@ remove_db() {
 		-u|--user <dbuser> -- name of the user to remove
 
 		Examples:
-		    $(basename $0) db remove -n example_db -u example_user
-		    $(basename $0) db remove --name test_db --user test_user
+		    $(basename "$0") db remove -n example_db -u example_user
+		    $(basename "$0") db remove --name test_db --user test_user
 		.
 		die
 	fi
@@ -146,7 +146,7 @@ show_usage() {
 	db -- command for interacting with databases on your server
 	usage
 
-	    $(basename $0) db <command> [options]
+	    $(basename "$0") db <command> [options]
 
 	where <command> is one of the following:
 
@@ -163,9 +163,9 @@ command=$1
 shift
 
 case $command in
-	create)    create_db $@;;
-	backup)    backup_db $@;;
-	remove|rm) remove_db $@;;
+	create)    create_db "$@";;
+	backup)    backup_db "$@";;
+	remove|rm) remove_db "$@";;
 	list|ls)   list_databases;;
 	login)     login;;
 	*)         show_usage;;

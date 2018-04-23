@@ -14,7 +14,7 @@ cleanup() {
 }
 
 domain=$1
-webroot=$2
+webroot="$2"
 
 if [[ -z $domain ]]; then
 	cat 1>&2 <<'help'
@@ -46,8 +46,8 @@ help
 fi
 
 if [[ -z $webroot ]]; then
-	webroot=/Users/$USER/tmp
-	mkdir -p $webroot/uploads
+	webroot="/Users/$USER/tmp"
+	mkdir -p "$webroot/uploads"
 fi
 
 if [[ -f $nginx_config_file ]]; then
@@ -57,7 +57,7 @@ if [[ -f $nginx_config_file ]]; then
 fi
 
 perl -pe "s/DOMAIN/${domain}/g; s!WEBROOT!${webroot}!g"\
-	$TEMPLATES/nginx-dev.conf\
+	"$TEMPLATES/nginx-dev.conf"\
 	> $nginx_config_file
 
 echo "Starting development webserver!"

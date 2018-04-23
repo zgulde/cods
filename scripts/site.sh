@@ -39,9 +39,9 @@ create_site() {
 		--static             -- (optional) setup a static site
 
 		Examples:
-		    $(basename $0) site create -d example.com
-		    $(basename $0) site create --domain=example.com --enable-ssl --spring-boot
-		    $(basename $0) site create --domain example.com --static
+		    $(basename "$0") site create -d example.com
+		    $(basename "$0") site create --domain=example.com --enable-ssl --spring-boot
+		    $(basename "$0") site create --domain example.com --static
 		.
 		die
 	fi
@@ -70,8 +70,8 @@ create_site() {
 	ssh -t $user@$ip "
 	set -e
 	domain=${domain}
-	$(< $site_create_snippet)
-	$(< $SNIPPETS/enable-git-deployment.sh)
+	$(< "$site_create_snippet")
+	$(< "$SNIPPETS/enable-git-deployment.sh")
 	"
 
 	[[ $? -eq 0 ]] && echo "${domain} created!"
@@ -103,7 +103,7 @@ enable_ssl() {
 		-d|--domain <domain> -- domain name of the site to enable https for
 
 		Example:
-		    $(basename $0) site enablessl -d example.com
+		    $(basename "$0") site enablessl -d example.com
 		.
 		die
 	fi
@@ -112,7 +112,7 @@ enable_ssl() {
 	set -e
 	domain=${domain}
 	email=${email}
-	$(< $SNIPPETS/enable-ssl.sh)
+	$(< "$SNIPPETS/enable-ssl.sh")
 	"
 	[[ $? -eq 0 ]] && echo "https enabled for ${domain}!"
 }
@@ -134,7 +134,7 @@ remove_site() {
 		-d|--domain <domain> -- name of the site to remove
 
 		Example:
-		    $(basename $0) site remove -d example.com
+		    $(basename "$0") site remove -d example.com
 		.
 		die
 	fi
@@ -174,8 +174,8 @@ build_site() {
 		-d|--domain <domain> -- name of the site to build and deploy
 
 		Examples:
-		    $(basename $0) site build -d example.com
-		    $(basename $0) site build --domain=example.com
+		    $(basename "$0") site build -d example.com
+		    $(basename "$0") site build --domain=example.com
 		.
 		die
 	fi
@@ -195,8 +195,8 @@ deploy_site() {
 	while [[ $# -gt 0 ]] ; do
 	    arg=$1 ; shift
 	    case $arg in
-	        -f|--filepath) war_filepath=$1 ; shift;;
-	        --filepath=*) war_filepath=${arg#*=} ; war_filepath="${war_filepath/#\~/$HOME}";;
+	        -f|--filepath) war_filepath="$1" ; shift;;
+	        --filepath=*) war_filepath="${arg#*=}" ; war_filepath="${war_filepath/#\~/$HOME}";;
 			-d|--domain) domain=$1 ; shift;;
 			--domain=*) domain=${arg#*=};;
 	        *) echo "Unknown argument: $arg" ; exit 1;;
@@ -214,13 +214,13 @@ deploy_site() {
 		-f|--filepath <filepath> -- path to the war file
 
 		Example:
-		    $(basename $0) site deploy -d example.com -f ~/example-project.war
+		    $(basename "$0") site deploy -d example.com -f ~/example-project.war
 		.
 		die
 	fi
 
 	# ensure file exists and is a war (or at least has the extension)
-	if [[ ! -f $war_filepath ]]; then
+	if [[ ! -f "$war_filepath" ]]; then
 		echo 'It looks like that file does not exist!'
 		exit 1
 	fi
@@ -230,7 +230,7 @@ deploy_site() {
 	fi
 
 	# ensure site exists
-	list_sites | grep "^$domain$" >/dev/null || die "It looks like $site does not exist. Aborting..."
+	list_sites | grep "^$domain$" >/dev/null || die "It looks like $domain does not exist. Aborting..."
 
 	scp "$war_filepath" $user@$ip:/opt/tomcat/${domain}/ROOT.war
 }
@@ -251,7 +251,7 @@ show_info() {
 		-d|--domain <domain> -- name of the site to show information about
 
 		Example:
-		    $(basename $0) site info -d example.com
+		    $(basename "$0") site info -d example.com
 		.
 		die
 	fi
@@ -278,7 +278,7 @@ show_help() {
 	site -- command for managing sites setup on your server
 	usage
 
-	    $(basename $0) site <command> [options]
+	    $(basename "$0") site <command> [options]
 
 	where <command> is one of the following:
 
@@ -299,11 +299,11 @@ shift
 
 case $command in
 	list|ls)       list_sites;;
-	create)        create_site $@;;
-	remove|rm)     remove_site $@;;
-	build)	       build_site $@;;
-	enablessl)     enable_ssl $@;;
-	info)          show_info $@;;
-	deploy)	       deploy_site $@;;
+	create)        create_site "$@";;
+	remove|rm)     remove_site "$@";;
+	build)	       build_site "$@";;
+	enablessl)     enable_ssl "$@";;
+	info)          show_info "$@";;
+	deploy)	       deploy_site "$@";;
 	*)             show_help;;
 esac

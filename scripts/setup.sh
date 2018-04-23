@@ -22,7 +22,7 @@ heading(){
 	echo '----------------------------------'
 }
 
-if [[ -e $ENV_FILE ]]; then
+if [[ -e "$ENV_FILE" ]]; then
 	echo 'It looks like things are already setup, aborting...'
 	echo 'To redo the setup process, try running the "destroy" subcommand.'
 	echo "Alternatively, remove $ENV_FILE"
@@ -55,6 +55,7 @@ echo
 echo 'A username should start with a lowercase letter, and only consist of'
 echo 'lowercase letters, numbers, or the "_" character. It should also'
 echo 'be no longer than 30 characters.'
+echo 'Specifically: /^[a-z][a-z0-9_]{0,29}$/'
 echo
 echo 'Usually it is fine (and easier) to use the same username as the one on'
 echo 'your local machine, but if your local username does not match the given'
@@ -112,7 +113,7 @@ echo
 read -p 'Press <Enter> to continue and setup the server'
 
 # create the env file
-cat > $ENV_FILE <<EOF
+cat > "$ENV_FILE" <<EOF
 ip=$ip
 user=$user
 email=$email
@@ -122,7 +123,7 @@ echo "$ENV_FILE file created!"
 
 heading 'running provision script'
 
-sed -e "s!{{tomcat_download_url}}!${TOMCAT_DOWNLOAD_URL}!" $SCRIPTS/provision.sh |\
+sed -e "s!{{tomcat_download_url}}!${TOMCAT_DOWNLOAD_URL}!" "$SCRIPTS/provision.sh" |\
 	ssh root@$ip bash
 
 # make sure provisioning went okay
@@ -145,7 +146,7 @@ fi
 
 heading 'Copying over templates'
 
-scp -r $BASE_DIR/templates root@$ip:/srv/.templates
+scp -r "$BASE_DIR/templates" root@$ip:/srv/.templates
 
 heading 'securing mysql installation...'
 
@@ -187,7 +188,7 @@ heading 'Finsihed Server Provisioning!'
 heading "Setting up '$COMMAND_NAME' command..."
 
 echo "Linking $BIN_PREFIX/$COMMAND_NAME to $BASE_DIR/server..."
-ln -s $BASE_DIR/server $BIN_PREFIX/$COMMAND_NAME
+ln -s "$BASE_DIR/server" "$BIN_PREFIX/$COMMAND_NAME"
 
 heading 'All Done!'
 
