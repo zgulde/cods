@@ -43,14 +43,14 @@ SCRIPT_PATH="$0"
 # The inline python code does work on both python2 and python3
 which python >/dev/null && PYTHON=python || PYTHON=python3
 SCRIPT_PATH="$($PYTHON -c "import os; print(os.path.realpath('$SCRIPT_PATH'))")"
-BASE_DIR="$(dirname "$(dirname $SCRIPT_PATH)")"
+BASE_DIR="$(dirname "$(dirname "$SCRIPT_PATH")")"
 SCRIPTS=$BASE_DIR/scripts
 BASE_DATA_DIR="$HOME/.config/cods"
 
 if [[ ! -f "$BASE_DATA_DIR/config.sh" ]] ; then
 	mkdir -p "$BASE_DATA_DIR"
 	cat > "$BASE_DATA_DIR/config.sh" <<-.
-	TOMCAT_DOWNLOAD_URL=http://mirror.stjschools.org/public/apache/tomcat/tomcat-8/v8.5.28/bin/apache-tomcat-8.5.28.tar.gz
+	TOMCAT_DOWNLOAD_URL=http://apache.osuosl.org/tomcat/tomcat-8/v8.5.30/bin/apache-tomcat-8.5.30.tar.gz
 	BIN_PREFIX=/usr/local/bin
 	.
 fi
