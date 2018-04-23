@@ -1,3 +1,10 @@
+1.0.0
+
+- docs: more of them
+
+There isn't really much new here, but the api is stable enough to commit to and
+create a v1.
+
 0.2.3
 
 - enhancement: add version information to `cods` command
