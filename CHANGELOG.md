@@ -1,3 +1,7 @@
+1.1.0
+
+- feature: add server command for enabling a swapfile
+
 1.0.0
 
 - docs: more of them
