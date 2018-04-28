@@ -128,6 +128,7 @@ sed -e "s!{{tomcat_download_url}}!${TOMCAT_DOWNLOAD_URL}!" "$SCRIPTS/provision.s
 
 # make sure provisioning went okay
 if [[ $? -ne 0 ]]; then
+	rm -rf "$DATA_DIR"
 	echo
 	echo 'Uh oh! Looks like something went wrong with the server provisioning!'
 	echo
