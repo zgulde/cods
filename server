@@ -230,6 +230,8 @@ show_info() {
 	cat <<-info
 		Information about your server:
 
+		Cods Version: $(head -n1 "$BASE_DIR/CHANGELOG.md")
+
 		ip address: $ip
 		login:      $user
 
