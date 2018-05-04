@@ -132,7 +132,7 @@ add_user() {
 
 		Can be used by either specifying a username and public key file, or a
 		github username and the public keys will be extracted from github
-		(https://github.com/$USERNAME.keys)
+		(https://github.com/\$USERNAME.keys)
 
 		-f|--sshkeyfile <sshkeyfile>  -- path to the new user's public key
 		-u|--user <username>          -- username for the new user

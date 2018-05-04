@@ -1,3 +1,7 @@
+1.2.2
+
+- bugfix: fix typo in `adduser` help message
+
 1.2.1
 
 - minor enhancement: add version information to `info` subcommand
