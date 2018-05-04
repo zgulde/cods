@@ -3,7 +3,8 @@
 * [How do I deploy changes to my site?](#how-do-i-deploy-changes-to-my-site)
 * [Do I need to create a new server (droplet) for every site I want to host?](#do-i-need-to-create-a-new-server-droplet-for-every-site-i-want-to-host)
 * [How do I setup a new site?](#how-do-i-setup-a-new-site)
-* [Can I use a subdomain?](#can-i-use-a-subdomain)
+* [How do I create a static site?](#how-do-i-create-a-static-site)
+* [Can I use a subdomain for my site?](#can-i-use-a-subdomain-for-my-site)
 * [How do I login to my server?](#how-do-i-login-to-my-server)
 * [How do I login to my database?](#how-do-i-login-to-my-database)
 * [How can I run a database migration on my production database?](#how-can-i-run-a-database-migration-on-my-production-database)
@@ -16,13 +17,11 @@
 * [What is my git deployment remote?](#what-is-my-git-deployment-remote)
 * [Can I upload a `war` file directly (i.e. without using the git deployment)?](#can-i-upload-a-war-file-directly-ie-without-using-the-git-deployment)
 * [My site's not working.](#my-sites-not-working)
-    * [I haven't yet seen my site live](#i-havent-yet-seen-my-site-live)
-    * [The site was working, but no longer is](#the-site-was-working-but-no-longer-is)
 * [Can I view my site if the DNS records aren't properly configured?](#can-i-view-my-site-if-the-dns-records-arent-properly-configured)
 * [How can I let my teammate push to deploy the project?](#how-can-i-let-my-teammate-push-to-deploy-the-project)
 * [What is my password?](#what-is-my-password)
 * [Can I use tab completion to help me out?](#can-i-use-tab-completion-to-help-me-out)
-* [How can I upload really big files to my server?](#how-can-i-upload-really-big-files-to-my-server)
+* [How can I upload really big files to my site?](#how-can-i-upload-really-big-files-to-my-site)
 * [Do I need to do anything special to use ${fancy_js_framework}?](#do-i-need-to-do-anything-special-to-use-fancy_js_framework)
 * [How can I do client-side routing?](#how-can-i-do-client-side-routing)
 
@@ -49,7 +48,8 @@ commands.
 ## How do I setup a new site?
 
 See the README or the deployment guide for more detailed instructions, but in
-short (assuming the server is already setup and provisioned):
+short (assuming the server is already setup and provisioned) (this assumes the
+new site you want to deploy is a spring boot application):
 
 1. Do any necessary DNS record configuration
 
@@ -58,12 +58,9 @@ short (assuming the server is already setup and provisioned):
 1. Create the site and database on the server
 
     ```
-    myserver site create -n example.com --spring-boot
-    myserver db create -n example_db -u example_user
+    myserver site create --domain example.com --spring-boot
+    myserver db create --name example_db --user example_user
     ```
-
-    *If you aren't deploying a spring boot app, don't add the `--spring-boot`
-    flag.*
 
 1. Login to the server and create `/srv/example.com/application.properties` and edit
    `/srv/example.com/config`
@@ -73,7 +70,28 @@ short (assuming the server is already setup and provisioned):
 
 1. Add the git deployment remote to your project and push
 
-## Can I use a subdomain?
+## How do I create a static site?
+
+See the usage guide for more info, but in short:
+
+1. Setup the site
+
+    ```
+    myserver site create --domain my-static-site.com --static
+    ```
+
+1. Add the git deployment remote to your project and push
+
+    ```
+    myserver site info --domain my-static-site.com
+    ```
+
+    will show you the git deployment remote
+
+By default, the contents of the repository will be served. If you have a build
+step for your static site, checkout the usage guide to get it setup.
+
+## Can I use a subdomain for my site?
 
 Yes! Assuming the DNS records are setup properly, you could host different
 applications at `example.com`, `blog.example.com`, or even
@@ -182,11 +200,10 @@ Replacing `example.com` with the site you setup.
 Yes, build the war, then run:
 
 ```
-from ~/my-server
 myserver site deploy -d example.com -f /path/to/the/file.war
 ```
 
-Replacing `example` with the relevant values for your project.
+Replacing `example.com` with your domain that is already setup.
 
 ## My site's not working.
 
@@ -195,7 +212,7 @@ how far along in the process you are.
 
 ### I haven't yet seen my site live
 
-Did you:
+If you are deploying a spring boot application, did you:
 
 - Change your class with the `main` method and commit it?
 - Change the `packaging` in your `pom.xml`? Change it from `jar` to `war` and
@@ -225,7 +242,14 @@ Will dump out the tomcat log file located on your server at
 `/opt/tomcat/logs/catalina.out`. You will see any exceptions that happen in
 production and their stack traces here.
 
-*Note you will need your server admin password for this operation.*
+Also,
+
+```
+myserver log:tail
+```
+
+will let you watch the log file in real time from your terminal (press Ctrl-C to
+exit).
 
 ## Can I view my site if the DNS records aren't properly configured?
 
@@ -349,7 +373,7 @@ Where `myserver` is the name of your server command.
 Close any open terminals, and when you start a new one, you will be able to use
 tab completion for all subcommands.
 
-## How can I upload really big files to my server?
+## How can I upload really big files to my site?
 
 By default, the nginx configuration for each site allows a maximum upload size
 of 10MB. If your site needs to handle files larger than this, you should edit
@@ -393,4 +417,3 @@ myserver site info -d example.com
 myserver run sudo nano /etc/nginx/sites-available/example.com
 myserver restart --service=nginx
 ```
-
