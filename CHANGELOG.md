@@ -1,3 +1,8 @@
+1.2.1
+
+- minor enhancement: add version information to `info` subcommand
+- bugfix: quote variables that should be quoted
+
 1.2.0
 
 - feature: enhance the `adduser` subcommand; add users to the server with a
