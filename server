@@ -168,8 +168,9 @@ add_user() {
 		echo 'Downloaded public ssh key(s)!'
 	fi
 
-	if [[ ! -f "$sshkeyfile" ]]; then
+	if [[ ! -f "$sshkeyfile" && ! -r "$sshkeyfile" ]]; then
 		echo 'Please enter a valid ssh key file.'
+		echo "$sshkeyfile does not exist or is not readable."
 		exit 1
 	fi
 
@@ -218,8 +219,10 @@ add_sshkey() {
 		.
 		die
     fi
-	if [[ ! -f $sshkeyfile ]] ; then
-		die "It looks like $sshkeyfile does not exist!"
+	if [[ ! -f "$sshkeyfile" && ! -r "$sshkeyfile" ]] ; then
+		echo 'Please enter a valid ssh key file.'
+		echo "$sshkeyfile does not exist or is not readable."
+		exit 1
 	fi
 
 	cat "$sshkeyfile" | ssh $user@$ip 'cat >> .ssh/authorized_keys'
