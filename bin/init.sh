@@ -2,9 +2,9 @@
 
 usage() {
 	cat <<-.
-	$(basename $0) -- This command is for creating new server commands, *not*
+	$(basename "$0") -- This command is for creating new server commands, *not*
 	                  for interacting with a server directly
-	Version: $(head -n1 $BASE_DIR/CHANGELOG.md)
+	Version: $(head -n1 "$BASE_DIR/CHANGELOG.md")
 
 	Commands:
 
@@ -19,13 +19,13 @@ usage() {
 	update -- Update all the existing already setup server commands
 
 	Examples:
-	    $(basename $0) init myserver
-	    $(basename $0) init my-awesome-server
+	    $(basename "$0") init myserver
+	    $(basename "$0") init my-awesome-server
 
-	    $(basename $0) share shared-server
-	    $(basename $0) share some-project-server
+	    $(basename "$0") share shared-server
+	    $(basename "$0") share some-project-server
 
-	    $(basename $0) update
+	    $(basename "$0") update
 	.
 	exit 1
 }
