@@ -15,6 +15,7 @@ This project is probably **not** for you if:
 - You need to deploy anything that is not a `war` or a static site
 - You want to use a database that is not MySQL
 - You want to use a webserver other than tomcat behind nginx
+- You want to use an operating system that is not Ubuntu on your server
 
 ## Quick Start
 
@@ -28,18 +29,28 @@ brew install zgulde/zgulde/cods
 
 # 2. Provision your server
 cods init my-awesome-server
+# 2a. Provide the server's ip address, and the server will be provisioned
 
-# you now have a command named 'my-awesome-server' to interact with your server
+# 2b. Go get a cup of coffee while everything is setup...
 
-# 3. create a database and user for the application
+# You now have a command named 'my-awesome-server' to interact with your server
+
+# 3. Create a database and user for the application
 my-awesome-server db create --name=blog_db --user=blog_user
 
-# 4. setup your server to listen for requests for your domain (nginx + tomcat)
+# 4. Setup your server to listen for requests for your domain (nginx + tomcat)
 my-awesome-server site create --domain myblog.com
 
-# 5. deploy the war (included here for the quickstart, but you should probably
+# 5. Deploy the war (included here for the quickstart, but you should probably
 #    look at git deployment)
 my-awesome-server site deploy -d myblog.com -f /path/to/myblog.war
+
+# 6. (Optional) Turn on https for your site
+my-awesome-server site enablessl -d myblog.com
+
+# 7. (Optional) Deploy another site! You can host many sites on the same server
+myserver site create --domain staging.myblog.com
+myserver site create --domain myotherblog.org
 ```
 
 ## Documentation
