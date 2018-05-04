@@ -1,3 +1,9 @@
+1.2.0
+
+- feature: enhance the `adduser` subcommand; add users to the server with a
+  github username
+- bugfix: Don't create the data directory for a command if the server setup fails
+
 1.1.0
 
 - feature: add server command for enabling a swapfile
