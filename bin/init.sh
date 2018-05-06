@@ -8,6 +8,8 @@ usage() {
 
 	Commands:
 
+	help: Open the interactive help
+
 	init:  Initialize a new server. -- You must provide a name for the new
 	                                   server, this name will be the name of
 	                                   the command that is created.
@@ -26,6 +28,8 @@ usage() {
 	    $(basename "$0") share some-project-server
 
 	    $(basename "$0") update
+
+	    $(basename "$0") help
 	.
 	exit 1
 }
@@ -61,6 +65,7 @@ source "$BASE_DATA_DIR/config.sh"
 source "$SCRIPTS/util.sh"
 
 case $1 in
+	help) shift ; source "$SCRIPTS/walkthrough.sh";;
 	update)
 		for server_command in $(ls -d "$BASE_DATA_DIR"/*/) ; do
 			server_command="${server_command%/}"
