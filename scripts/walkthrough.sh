@@ -5,9 +5,43 @@ wait_to_continue() {
 
 initial_server_setup() {
 	cat <<-.
-	To setup and provision a server, you'll need to have the server's ip address
-	ready, and choose a command name. The command name you choose will be the
-	name of the command that is created to interact with your server.
+	[0/0]
+	Initial Server Setup -- Creating A VPS and a command to interact with it
+
+	Prerequisites
+
+	- An account with a VPS provider (e.g. Digital Ocean)
+	- cods installed (this should already be taken care of if you are seeing
+	  this message)
+
+	.
+	wait_to_continue
+
+	cat <<-.
+	[1/2]
+	Create a Server (Digital Ocean calls these "droplets") with the following
+	specifications:
+
+	- Ubuntu 16.04x64
+	- At least 1GB of Memory (RAM)
+
+	Add your public ssh key to the server. This command will copy the contents
+	of your public key to your clipboard so that you can paste it:
+
+	    cat ~/.ssh/id_rsa.pub | pbcopy
+
+	(If you are on Linux, you'll probably need to do something a bit different
+	here, but we trust your ability to do so)
+
+	.
+	wait_to_continue
+
+	cat <<-.
+	[2/2]
+
+	Now we'll setup the command to interact with your server. You'll now need to
+	choose a command name. The command name you choose will be the name of the
+	command that is created to interact with your server.
 
 	You might wish to choose something like 'myserver', or 'blog-server'.
 
@@ -19,6 +53,7 @@ initial_server_setup() {
 
 	    cods init $command_name
 
+	To provision the server and setup the command
 	.
 }
 
@@ -192,7 +227,11 @@ site_setup() {
 	when you ran 'cods init'
 
 	.
-	while [[ -z $server ]] ; do read -p 'Server command: ' server ; done
+	PS3='Please enter a number: '
+	select server in $(find "$BASE_DATA_DIR" -type d -depth 1 | perl -pe 's!^.*/(.*)$!\1!g') ; do
+		break
+	done
+
 	cat <<-.
 
 	Next we'll need the name of the site you are setting up. You should enter
@@ -200,7 +239,7 @@ site_setup() {
 	'example.com'
 
 	.
-	while [[ -z $site ]] ; do read -p 'Site name: ' site ; done
+	read -p 'Site name: ' site
 
 	cat <<-.
 
@@ -395,7 +434,6 @@ topics=(
 	'initial server setup'
 	'application prep'
 	'site setup'
-	'debugging'
 	'exit'
 )
 
@@ -405,8 +443,7 @@ if [[ $# -eq 1 ]] ; then
 		1) initial_server_setup;;
 		2) application_prep;;
 		3) site_setup;;
-		4) debugging;;
-		5) exit;;
+		4) exit;;
 		*) echo "Invalid Selection, $1";;
 	esac
 else
@@ -417,8 +454,7 @@ else
 			1) initial_server_setup;;
 			2) application_prep;;
 			3) site_setup;;
-			4) debugging;;
-			5) exit;;
+			4) exit;;
 			*) echo "Invalid Selection, $REPLY";;
 		esac
 		break
