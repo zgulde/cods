@@ -49,8 +49,8 @@ my-awesome-server site deploy -d myblog.com -f /path/to/myblog.war
 my-awesome-server site enablessl -d myblog.com
 
 # 7. (Optional) Deploy another site! You can host many sites on the same server
-myserver site create --domain staging.myblog.com
-myserver site create --domain myotherblog.org
+my-awesome-server site create --domain staging.myblog.com --enable-ssl --spring-boot
+my-awesome-server site create --static --domain myotherblog.org
 ```
 
 ## Documentation
