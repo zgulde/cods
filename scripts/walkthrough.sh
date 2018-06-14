@@ -5,7 +5,7 @@ wait_to_continue() {
 
 initial_server_setup() {
 	cat <<-.
-	[0/0]
+	[0/2]
 	Initial Server Setup -- Creating A VPS and a command to interact with it
 
 	Prerequisites
