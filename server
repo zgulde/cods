@@ -14,6 +14,10 @@ auto_renew_certs() {
     [[ $? -eq 0 ]] && echo 'Autorenewal enabled!'
 }
 
+show_ports() {
+	ssh -t $user@$ip "grep -oR '[0-9]\{4,\}' /etc/nginx/sites-available/ | awk -F: '{split(\$1, a, \"/\"); print \$2,a[5]}' | sort -nk1"
+}
+
 enable_swap() {
 	ssh -t $user@$ip "
 	set -e
@@ -264,6 +268,7 @@ show_usage() {
 
 	    login       -- login to the server
 	    info        -- display information about the server
+		ports       -- show the ports that are being reverse proxied to
 	    ping        -- ping the server
 	    swapon      -- create and enable a swapfile (requires sudo password)
 	    autorenew   -- setup ssl certs to be automatically renewed
@@ -333,7 +338,8 @@ case $command in
 	ping)      ping -c5 $ip;;
 	run)       ssh -t $user@$ip "$@";;
 	root)      ssh -t $user@$ip "sudo -s";;
-	destroy) destroy_server;;
+	ports)     show_ports;;
+	destroy)   destroy_server;;
 
 	credentials)
 		if [[ -f "$DATA_DIR/credentials.txt" ]] ; then

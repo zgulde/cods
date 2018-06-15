@@ -4,7 +4,11 @@ echo "Setting up git deployment for $domain..."
 
 # figure out what type of site we have to determine which template to use
 if grep proxy_pass /etc/nginx/sites-available/$domain >/dev/null ; then
-	template=post-receive.sh
+	if grep 8080 /etc/nginx/sites-available/$domain >/dev/null ; then
+		template=post-receive.sh
+	else
+		template=post-receive-node.sh
+	fi
 else
 	template=post-receive-static.sh
 fi

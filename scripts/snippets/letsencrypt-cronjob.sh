@@ -19,5 +19,5 @@ else
 		exit 1
 	fi
 	echo "$(sudo crontab -l)
-@daily sleep \$((\${RANDOM} % 60))m; /usr/bin/letsencrypt renew && systemctl restart nginx"
+@daily sleep \$((\${RANDOM} % 60))m && /usr/bin/letsencrypt renew && systemctl restart nginx"
 fi

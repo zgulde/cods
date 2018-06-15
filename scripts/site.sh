@@ -21,6 +21,10 @@ create_site() {
 			--sb|--spring-boot) springboot=yes;;
 			--static) static_site=yes;;
 			--force) force_creation=yes;;
+			--node=*) node_port=${arg#*=};;
+			--node) node_site=yes;;
+			-p|--port) port=$1 ; shift;;
+			--port=*) port=${arg#*=};;
 			*) echo "Unknown argument: $arg" ; exit 1;;
 		esac
 	done
@@ -29,17 +33,20 @@ create_site() {
 		Setup up the server to host a new site. Optionally also enable ssl or
 		setup the site as a spring boot site (this just enables some common
 		configuration).
-		You should only enable ssl if you know your DNS records are properly
-		configured, otherwise you can do this with the separate 'enablessl'
-		site subcommand.
+		By default a java site served by tomcat is created
 
-		-d|--domain <domain> -- domain name of the site to create
-		--enable-ssl         -- (optional) enable ssl after setting up the site
-		--spring-boot        -- (optional) designate that this is a spring boot site
-		--static             -- (optional) setup a static site
+		-d|--domain <domain>   -- (required) domain name of the site to create
+		--enable-ssl           -- (optional) enable ssl after setting up the site
+		                          (see the enablessl subcommand)
+		--spring-boot          -- (optional) designate that this is a spring boot site
+		--static               -- setup a static site
+		--node                 -- setup a node site. The port number that the application
+		                          runs on must be provided through --port
+		-p|--port              -- port number that the application will run on
 
 		Examples:
 		    $(basename "$0") site create -d example.com
+		    $(basename "$0") site create --domain=example.com --node --port=3000
 		    $(basename "$0") site create --domain=example.com --enable-ssl --spring-boot
 		    $(basename "$0") site create --domain example.com --static
 		.
@@ -62,6 +69,12 @@ create_site() {
 
 	if [[ $static_site == yes ]] ; then
 		site_create_snippet="$SNIPPETS/create-static-site.sh"
+	elif [[ $node_site == yes ]] ; then
+		if [[ -z $port ]] ; then
+			echo 'Missing port number (--port)'
+			exit 1
+		fi
+		site_create_snippet="$SNIPPETS/create-node-site.sh"
 	else
 		site_create_snippet="$SNIPPETS/create-java-site.sh"
 	fi
@@ -70,6 +83,7 @@ create_site() {
 	ssh -t $user@$ip "
 	set -e
 	domain=${domain}
+	port=${port}
 	$(< "$site_create_snippet")
 	$(< "$SNIPPETS/enable-git-deployment.sh")
 	"
@@ -153,6 +167,12 @@ remove_site() {
 	sudo rm -rf /opt/tomcat/${domain}
 	sudo rm -rf /opt/tomcat/conf/Catalina/${domain}
 	sudo rm -rf /srv/${domain}
+	sudo systemctl stop ${domain} 2>/dev/null
+	sudo systemctl disable ${domain}.service 2>/dev/null
+	sudo rm -f /etc/systemd/system/${domain}.service
+	sudo rm -f /etc/sudoers.d/${domain}
+	sudo systemctl daemon-reload
+	sudo systemctl reset-failed
 	"
 
 	[[ $? -eq 0 ]] && echo 'site removed!'

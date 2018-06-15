@@ -1,0 +1,19 @@
+[Unit]
+Description=Service for {{domain}}
+
+[Service]
+WorkingDirectory=/srv/{{domain}}
+ExecStart=/usr/bin/npm start
+Restart=always
+# Restart service after 10 seconds if it crashes
+RestartSec=10
+# Output to syslog
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier={{domain}}
+#User=<alternate user>
+#Group=<alternate group>
+# Environment=NODE_ENV=production PORT=1337
+
+[Install]
+WantedBy=multi-user.target
