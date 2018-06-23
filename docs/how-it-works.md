@@ -9,11 +9,12 @@ this tool, you should look at the other guides.
 in general:
 
 - automation of sshing into the server and running commands
-- Virtual Hosting with both nginx and tomcat
-- nginx as a reverse proxy to the tomcat server
-- ssl through nginx
-- site creation sets up the virtual host on both tomcat and nginx, or just sets
-  up nginx to host static files
+- Virtual Hosting with nginx
+- nginx as a reverse proxy to various application servers
+- static content served w/ nginx
+- a systemd service unit is created for each site to handle starting/stopping
+  and logging for each site
+- ssl through nginx + letsencrypt
 
 ## This Tool
 
@@ -89,15 +90,6 @@ Assuming you already have a server setup:
 - handles ssl connections when https is setup for a site (as opposed to having
   tomcat do this)
 
-### Tomcat
-
-- version 8.5.x
-- Installed in `/opt/tomcat`
-- All default webapps removed
-- a directory for each site at `/opt/tomcat/site-name.tld`
-- site creation modifies `/opt/tomcat/conf/server.xml` to add an entry for
-  virtual hosting for that site
-
 ### Git Deployment
 
 - a directory in `/srv` is created for every site, e.g. `/srv/site-name.tld`
@@ -105,7 +97,11 @@ Assuming you already have a server setup:
     - `repo.git`: a bare remote to serve as a deploy remote
     - `config`: a file used by the post-receive hook
 - in addition each repo has a post-receive hook that:
-    - clones the project
-    - looks for build configuration and uses it to build the project
-    - deploys build artifacts to the right place
+    - for a java project:
+        - clones the project
+        - looks for build configuration and uses it to build the project
+        - deploys build artifacts to the right place
+    - for a static site/node project:
+        - checks out the most recent version of the code
+    - restarts the application server
     - can also run a custom user defined script
