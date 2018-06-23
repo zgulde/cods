@@ -211,48 +211,30 @@ build_site() {
 	"
 }
 
-deploy_site() {
+show_logs() {
 	while [[ $# -gt 0 ]] ; do
 	    arg=$1 ; shift
 	    case $arg in
-	        -f|--filepath) war_filepath="$1" ; shift;;
-	        --filepath=*) war_filepath="${arg#*=}" ; war_filepath="${war_filepath/#\~/$HOME}";;
-			-d|--domain) domain=$1 ; shift;;
-			--domain=*) domain=${arg#*=};;
+	        -d|--domain) domain=$1 ; shift;;
+	        --domain=*) domain=${arg#*=};;
+			-f|--follow) follow=yes;;
 	        *) echo "Unknown argument: $arg" ; exit 1;;
 	    esac
 	done
-	if [[ -z $domain ]] || [[ -z $war_filepath ]] ; then
+	if [[ -z $domain ]] ; then
 		cat <<-.
-		Deploy a pre-built war file.
+		View server logs for a given site
 
-		You should probably only do this if you really know what youre doing,
-		for most use cases, git deployment is recommended. See also the 'build'
-		subcommand.
-
-		-d|--domain <domain>     -- name of the site to deploy
-		-f|--filepath <filepath> -- path to the war file
-
-		Example:
-		    $(basename "$0") site deploy -d example.com -f ~/example-project.war
+		-d|--domain <domain> -- Name of the domain to check logs for
+		-f|--follow          -- Watch the log file in real-time (press C-c to quit)
 		.
 		die
 	fi
-
-	# ensure file exists and is a war (or at least has the extension)
-	if [[ ! -f "$war_filepath" ]]; then
-		echo 'It looks like that file does not exist!'
-		exit 1
+	if [[ $follow == yes ]] ; then
+		ssh $user@$ip sudo journalctl -o short-iso -f -u ${domain}
+	else
+		ssh $user@$ip sudo journalctl --no-pager -o short-iso -u ${domain}
 	fi
-	if [[ "$war_filepath" != *.war ]] ; then
-		echo 'It looks like that file is not a valid war file (it does not have the)' >&2
-		die '".war" file extension. Aborting...'
-	fi
-
-	# ensure site exists
-	list_sites | grep "^$domain$" >/dev/null || die "It looks like $domain does not exist. Aborting..."
-
-	scp "$war_filepath" $user@$ip:/opt/tomcat/${domain}/ROOT.war
 }
 
 show_info() {
@@ -304,12 +286,12 @@ show_help() {
 
 	    list -- list the sites setup on your server
 
-	    create        -d <domain> [--static] [--enable-ssl] [--spring-boot]
-	    remove        -d <domain>
-	    build         -d <domain>
-	    enablessl     -d <domain>
-	    info          -d <domain>
-	    deploy        -d <domain> -f <warfile>
+	    create    -d <domain> {--static|--java|--node} [--enable-ssl] [--spring-boot] [-p <port>]
+	    remove    -d <domain> [--force]
+	    build     -d <domain>
+	    enablessl -d <domain>
+	    info      -d <domain>
+	    logs      -d <domain> [-f]
 
 	help
 }
@@ -318,12 +300,13 @@ command=$1
 shift
 
 case $command in
-	list|ls)       list_sites;;
-	create)        create_site "$@";;
-	remove|rm)     remove_site "$@";;
-	build)	       build_site "$@";;
-	enablessl)     enable_ssl "$@";;
-	info)          show_info "$@";;
-	deploy)	       deploy_site "$@";;
-	*)             show_help;;
+	list|ls)   list_sites;;
+	create)    create_site "$@";;
+	remove|rm) remove_site "$@";;
+	build)	   build_site "$@";;
+	enablessl) enable_ssl "$@";;
+	info)      show_info "$@";;
+	logs)      show_logs "$@";;
+	deploy)	   deploy_site "$@";;
+	*)         show_help;;
 esac

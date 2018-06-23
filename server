@@ -268,14 +268,12 @@ show_usage() {
 
 	    login       -- login to the server
 	    info        -- display information about the server
-		ports       -- show the ports that are being reverse proxied to
+	    ports       -- show the ports that are being reverse proxied to
 	    ping        -- ping the server
 	    swapon      -- create and enable a swapfile (requires sudo password)
 	    autorenew   -- setup ssl certs to be automatically renewed
 	    reboot      -- reboot the server
 	    run         -- run arbitrary commands
-	    log:cat     -- view the contents (cat) of /opt/tomcat/logs/catalina.out
-	    log:tail    -- follow (tail -f) the contents of /opt/tomcat/logs/catalina.out
 	    credentials -- view server credentials (found in $DATA_DIR/credentials.txt)
 	    destroy     -- destroy the server
 
@@ -333,8 +331,6 @@ case $command in
 	adduser)   add_user "$@";;
 	addkey)    add_sshkey "$@";;
 	autorenew) auto_renew_certs;;
-	log:cat)   ssh -t $user@$ip 'cat /opt/tomcat/logs/catalina.out';;
-	log:tail)  ssh -t $user@$ip 'tail -f /opt/tomcat/logs/catalina.out';;
 	ping)      ping -c5 $ip;;
 	run)       ssh -t $user@$ip "$@";;
 	root)      ssh -t $user@$ip "sudo -s";;
