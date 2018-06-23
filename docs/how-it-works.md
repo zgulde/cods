@@ -15,6 +15,7 @@ in general:
 - a systemd service unit is created for each site to handle starting/stopping
   and logging for each site
 - ssl through nginx + letsencrypt
+- each application/site runs as it's own user/group
 
 ## This Tool
 
@@ -85,10 +86,9 @@ Assuming you already have a server setup:
 - symlinks in `sites-enabled`
 - static content served out of `/srv/site-name.tld/public`
 - Will attempt to serve static content first, if not found
-    - the request will be passed to tomcat for a java site
+    - the request will be passed to the application server
     - `404.html` in the webroot will be served
-- handles ssl connections when https is setup for a site (as opposed to having
-  tomcat do this)
+- handles ssl connections when https is setup for a site
 
 ### Git Deployment
 
@@ -105,3 +105,23 @@ Assuming you already have a server setup:
         - checks out the most recent version of the code
     - restarts the application server
     - can also run a custom user defined script
+
+### Systemd
+
+- A service unit file is created for each domain/application on the server
+- commands used to start the application (ExecStart):
+    - node: `npm start`
+    - java: `java -jar app.jar` (this jar file is built by the post-recieve hook
+      and put in the right place)
+- stdout and stderr of each application server is logged
+- allows us to use `systemctl` to start/stop/restart the application, or start
+  it again when it fails (e.g. `systemctl status example.com` or `systemctl
+  restart example.com`)
+- allows us to hook into systemd's handling of log files so we don't have to
+  worry about curation, timestamps, or rotaion
+    - `journalctl -u example.com` to view a site/application's logs with
+      timestamps
+    - the `site logs` server subcommand is a shortcut to this
+- each service is run by a user + group that is specific to that site
+- sudo permissions are setup so that admins can manage (i.e. start/stop/restart
+  and view log files) the service w/o a password

@@ -94,6 +94,12 @@ Deploying a database backed blog application:
     my-awesome-server site create --static --domain myotherblog.org --enable-ssl
     ```
 
+## Interactive Help
+
+```
+cods help
+```
+
 ## Documentation
 
 - [Installation](docs/installation.md)

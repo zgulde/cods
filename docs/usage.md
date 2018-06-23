@@ -147,8 +147,7 @@ you will need to enter the database administrator password.
 - `autorenew`: setup letsencrypt certificates to automatically be renewed
 - `addkey`: add an authorized ssh key to the server for your account
 - `adduser`: add an admin user account to the server
-- `log:cat`: view the contents of the tomcat log file, `/opt/tomcat/logs/catalina.out`
-- `log:tail`: watch the contents of the tomcat log file in real-time (`tail -f`)
+- `ports`: view the ports that are being reverse-proxied to by nginx
 - `bash-completion`: generate the bash completion script for the command
 - `credentials`: view the auto-generated credentials for your server
 
@@ -159,11 +158,11 @@ you will need to enter the database administrator password.
 - `list`: view the sites that are currently setup on the server
 - `create`: create a new site
 - `build`: trigger a build and deployment of an existing site
+- `logs`: view the log files for a site
 - `remove`: remove a site. Will remove the nginx config for the site, as well as
   any previously deployed `war`s
 - `enablessl`: enable https for a site
 - `info`: show general information for a site
-- `deploy`: deploy a `war` file for an individual site
 
 `db`
 
@@ -225,16 +224,18 @@ myserver upload -f ~/Downloads/kittens.png -d /srv/example.com/public/uploads
 **Prerequisites**
 
 1. One of
-    - A java web application packaged as a war that can be served by Tomcat.
+    - A java web application with an embedded webserver (e.g. embedded tomcat)
+      packaged as a jar
+    - a node application
     - A static site (optionally with a build step)
 1. For any domain (or subdomain) you want to host on your server, you will need
    to have the DNS records already configured to point to your server's IP.
 
 This setup will allow you to host multiple different sites on your server,
-possibly a mix of static and java-backed sites, and you can even host different
-domains, or multiple different subdomains. For example, you could setup a java
-api server at `api.example.com`, and a static site that talks to the api at
-`example.com`.
+possibly a mix of static and java or node-backed sites, and you can even host
+different domains, or multiple different subdomains. For example, you could
+setup a java api server at `api.example.com`, and a static site that talks to
+the api at `example.com`.
 
 When creating a new site, the `site create` subcommand will check to see if the
 DNS records for the given domain point to your server. You will be given a
@@ -244,29 +245,30 @@ are still configuring DNS, or waiting for the records to propogate.
 If the DNS records are setup, you can pass `--enable-ssl` to the `site create`
 command to also enable https for the site after the site is created.
 
+### Reverse Proxy Sites
+
+For both Java and Node sites, you will need to choose a port for the application
+to use on the server. Two applications _cannot_ use the same port, and this tool
+will prevent you from configuring two separate sites to point to the same
+upstream proxy.
+
+The port will need to be chosen when you create the site, and you can view all
+the ports that are currently referenced by running:
+
+```
+myserver ports
+```
+
 ### Java Site Creation
 
 ```bash
-myserver site create -d example.com
+myserver site create -d example.com --java -p 8080
 ```
 
-This command will setup virtual hosts with both tomcat and nginx for the domain
-name you have provided. Nginx will be setup to serve files out of a public
-directory (located at `/srv/example.com/public`), and if the file is not found,
-to pass the request off to tomcat.
+The port specified will be passed as a command line argument to your application
+(in this example, `--server.port=8080`)
 
-If you have a pre-built `war` file, you can use this command to `scp` the file
-to the appropriate location on your server.
-
-```bash
-myserver site deploy -d example.com -f /path/to/the/war/file.war
-```
-
-Alternatively, you can setup automated deployments with git.
-
-#### Git Deployment
-
-When a site is setup, the server will also be setup for automated builds and
+When a site is setup, the server will be setup for automated builds and
 deployments with git. This is accomplished through a `post-receive` git hook.
 This functionality is two-fold: there is a simple setup, and the ability to do
 somethings more advanced (see the customizing deployment section below).
@@ -286,26 +288,33 @@ myserver site info --domain example.com
 When the repo is pushed to, the post-receive git hook will be triggered, which
 will run the build for your project, or run a custom script.
 
-##### `.build_config`
+##### `.cods`
 
 To tell the hook how to build your project, you will need to (at a bare
 minimum), add a file to your project defining how to build your project, and
-where the built `war` file lives. To do this, create a file named
-`.build_config` in the root of your project with the following contents:
+where the built `jar` file is output. To do this, create a file named `.cods` in
+the root of your project with the following contents:
 
 ```bash
 BUILD_COMMAND=command_to_execute_to_build_your_project.sh
-WAR_FILE=relative_path_to_the_artifact.war
+JAR_FILE=relative/path/to/the_artifact.jar
+```
+
+For a spring boot application, the file might look like this:
+
+```bash
+BUILD_COMMAND='./mvnw package'
+JAR_FILE=target/myblog-0.2.1-SNAPSHOT.jar
 ```
 
 ##### `config` file
 
-In addition, often times you will need to include a file in the build that is
-not part of the git repository (e.g. a file with database credentials). To do
-that, we can create that file on the server, and tell the git hook how to find
-this file. To do this, create the file you want to be included in the build
-inside of the directory named after your site inside of `/srv`, and edit the
-`config` file found in the same place.
+In addition to the build configuration, often times you will need to include a
+file in the build that is not part of the git repository (e.g. a file with
+database credentials). To do that, we can create that file on the server, and
+tell the git hook how to find this file. To do this, create the file you want to
+be included in the build inside of the directory named after your site inside of
+`/srv`, and edit the `config` file found in the same place.
 
 For example, if you needed an `application.properties` file included in the
 build for `example.com`, but this file is ignored by git, you would do the
@@ -328,8 +337,8 @@ your project root, and several environment variables are available to it:
 
 - `SITE_DIR`: the directory that has the repo for your site, along with any
   config files you have setup there (example value: `/srv/example.com`)
-- `WAR_TARGET_LOCATION`: Where the built war needs to end up so that tomcat can
-  find it (example value: `/opt/tomcat/example.com/ROOT.war`)
+- `JAR_TARGET_LOCATION`: Where the built jar needs to end up (example value:
+  `/srv/example.com/app.jar`)
 - `PUBLIC_DIR`: the directory for static files for your site (example:
   `/srv/example.com/public`)
 
@@ -341,6 +350,8 @@ Example `install.sh`
 ```bash
 # exit the script on any errors
 set -e
+# error on the use of any undefined variables
+set -u
 
 # 1. copy over any env specific files you setup on the server
 cp $SITE_DIR/application.properties src/main/resources/application.properties
@@ -360,7 +371,10 @@ npm run build
 echo '[install.sh] Building war file...'
 echo '[install.sh] > ./mvnw package'
 ./mvnw package
-mv target/my-awesome-project.war $WAR_TARGET_LOCATION
+mv target/my-awesome-project.war $JAR_TARGET_LOCATION
+
+# restart the service in order to run the new version of the application
+sudo systemctl restart example.com
 ```
 
 #### Spring Boot Shortcut
@@ -373,6 +387,30 @@ myserver site create --domain example.com --spring-boot
 
 This will automatically setup the site's `config` file to match the default
 location for the `application.properties` file in a spring boot application.
+
+### Node Site Creation
+
+```
+myserver site create --node --port 3000
+```
+
+This tool relies on a `npm start` command being defined on your project that
+starts the web server.
+
+It is up to you to ensure that the port that your application runs on is the
+same as the port that you pass when you run the above command to create the node
+site.
+
+A git remote will be created for you, and a `post-receive` hook will be setup so
+that when you push to the site:
+
+- the new version of the code is checked out, replacing the old version (if you
+  logged in to the server and edited any files by hand, they will be overridden)
+- if a file named `install.sh` exists at the root of the project, it will be
+  run, and a variable named `SITE_DIR` will be available to it that contains the
+  location of the directory for your site (and the source code).
+- if no `install.sh` is found, a `npm install` will be run and the service will
+  be restarted
 
 ### Static Site Creation
 
@@ -452,14 +490,14 @@ echo '[install.sh] All Done!'
 
 ### Manually Triggering A Build for a Site
 
-You can also manually trigger a build and deploy for either a static site or a
-java site without needing to push to the git remote on your server.
+You can also manually trigger a build and deploy for a site without needing to
+push to the git remote on your server.
 
 ```
 myserver site build -d example.com
 ```
 
-This will run the same script that runs when you push to the remote.
+This will run the same commands that run when you push to the remote.
 
 ### Database Management
 
@@ -551,12 +589,12 @@ enablessl` commands back to back.
 ## Uploads
 
 Nginx is set up to first try to serve static files out of the public directory
-for a site, before passing the request to the tomcat web server.
+for a site, before passing the request to the upstream proxy.
 
 One example of putting this to use would be to setup an `uploads` directory
 inside the public directory, as this directory and its contents will persist
-even if you deploy a new `.war` file. For example, you could tell your
-application to write uploaded files to
+even if you deploy a new version of your application. For example, you could
+tell your application to write uploaded files to
 
 ```
 /srv/example.com/public/uploads
