@@ -1,0 +1,2 @@
+BUILD_COMMAND='./mvnw package'
+JAR_FILE=target/helloworld-0.0.1-SNAPSHOT.jar
