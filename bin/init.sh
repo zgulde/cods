@@ -65,7 +65,7 @@ source "$BASE_DATA_DIR/config.sh"
 source "$SCRIPTS/util.sh"
 
 case $1 in
-	help) shift ; source "$SCRIPTS/walkthrough.sh";;
+	help) shift ; source "$SCRIPTS/interactive-help.sh";;
 	update)
 		for server_command in $(ls -d "$BASE_DATA_DIR"/*/) ; do
 			server_command="${server_command%/}"
