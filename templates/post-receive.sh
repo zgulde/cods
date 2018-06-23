@@ -49,17 +49,17 @@ else
 	log "No configuration file ($SITE_DIR/config) found. Continuing..."
 fi
 
-if [[ -f .build_config ]]; then
-	log 'Found ".build_config" file! Building based on this file...'
-	source .build_config
+if [[ -f .cods ]]; then
+	log 'Found ".cods" file! Building based on this file...'
+	source .cods
 
 	if [[ -z $BUILD_COMMAND ]]; then
-		log '$BUILD_COMMAND not set! (Check the .build_config file)'
+		log '$BUILD_COMMAND not set! (Check the .cods file)'
 		log 'Aborting...'
 		exit 1
 	fi
 	if [[ -z $JAR_FILE ]]; then
-		log '$JAR_FILE not set! (Check the .build_config file)'
+		log '$JAR_FILE not set! (Check the .cods file)'
 		log 'Aborting...'
 		exit 1
 	fi
@@ -99,7 +99,7 @@ elif [[ -f install.sh ]]; then
 	export TMP_REPO
 	bash install.sh
 else
-	log 'No ".build_config" file or "install.sh" file found.'
+	log 'No ".cods" file or "install.sh" file found.'
 fi
 
 log '--------------------------------------------------'

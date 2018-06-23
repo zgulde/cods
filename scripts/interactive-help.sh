@@ -127,11 +127,11 @@ sb_application_prep() {
 
 	cat <<-.
 	[4/6]
-	Next we'll setup the .build_config file. This file will be used to build our
-	project on the server.
+	Next we'll setup the .cods file. This file will be used to build our project
+	on the server.
 
-	Create a plain text file named '.build_config' in the root of your
-	project. Copy the two lines below into it:
+	Create a plain text file named '.cods' in the root of your project. Copy the
+	two lines below into it:
 
 	BUILD_COMMAND='./mvnw package'
 	JAR_FILE=
@@ -141,10 +141,10 @@ sb_application_prep() {
 	    find target -name \*.jar
 
 	it should output the path to the built jar file, something like
-	'target/my-project.jar'. Copy the output and paste into the .build_config
-	file after 'JAR_FILE=' *without any spaces*.
+	'target/my-project.jar'. Copy the output and paste into the .cods file after
+	'JAR_FILE=' *without any spaces*.
 
-	Your .build_config file should end up looking something like this:
+	Your .cods file should end up looking something like this:
 
 	BUILD_COMMAND='./mvnw package'
 	JAR_FILE=target/blog-0.0.1-SNAPSHOT.jar
@@ -154,11 +154,11 @@ sb_application_prep() {
 
 	cat <<-.
 	[5/6]
-	Now let's verify that the .build_config file was setup properly.
+	Now let's verify that the .cods file was setup properly.
 
 	First, run this command:
 
-	    source .build_config
+	    source .cods
 
 	You should see no output.
 
@@ -183,7 +183,7 @@ sb_application_prep() {
 	[6/6]
 	Lastly, make sure to add and commit all the changes you've made.
 
-	You should make sure the .build_config file and the changes you've made to
+	You should make sure the .cods file and the changes you've made to
 	yor application are committed *on your master branch*. (This is the branch
 	that will be used for deployment)
 
