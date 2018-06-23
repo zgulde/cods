@@ -160,7 +160,7 @@ you will need to enter the database administrator password.
 - `build`: trigger a build and deployment of an existing site
 - `logs`: view the log files for a site
 - `remove`: remove a site. Will remove the nginx config for the site, as well as
-  any previously deployed `war`s
+  any previously deployed `jar`s
 - `enablessl`: enable https for a site
 - `info`: show general information for a site
 
@@ -331,9 +331,9 @@ Take a look at the `config` file or template for more information.
 
 If your deploment needs are more complex than what is described above, you can
 create a file named `install.sh` in the root of your project. This file will be
-executed after pushing to the deployment remote if a `.build_config` file is not
-found. This script will be executed after freshly cloning your project, from
-your project root, and several environment variables are available to it:
+executed after pushing to the deployment remote if a `.cods` file is not found.
+This script will be executed after freshly cloning your project, from your
+project root, and several environment variables are available to it:
 
 - `SITE_DIR`: the directory that has the repo for your site, along with any
   config files you have setup there (example value: `/srv/example.com`)
@@ -367,11 +367,11 @@ echo '[install.sh] Building JS...'
 echo '[install.sh] > npm run build'
 npm run build
 
-# 3. Build the war file and put it in the right place
+# 3. Build the jar file and put it in the right place
 echo '[install.sh] Building war file...'
 echo '[install.sh] > ./mvnw package'
 ./mvnw package
-mv target/my-awesome-project.war $JAR_TARGET_LOCATION
+mv target/my-awesome-project.jar $JAR_TARGET_LOCATION
 
 # restart the service in order to run the new version of the application
 sudo systemctl restart example.com

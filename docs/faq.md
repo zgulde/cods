@@ -15,7 +15,6 @@
 * [I made a typo when setting up the database credentials. What do?](#i-made-a-typo-when-setting-up-the-database-credentials-what-do)
 * [How can I find my server's ip address?](#how-can-i-find-my-servers-ip-address)
 * [What is my git deployment remote?](#what-is-my-git-deployment-remote)
-* [Can I upload a `war` file directly (i.e. without using the git deployment)?](#can-i-upload-a-war-file-directly-ie-without-using-the-git-deployment)
 * [My site's not working.](#my-sites-not-working)
 * [Can I view my site if the DNS records aren't properly configured?](#can-i-view-my-site-if-the-dns-records-arent-properly-configured)
 * [How can I let my teammate push to deploy the project?](#how-can-i-let-my-teammate-push-to-deploy-the-project)
@@ -53,7 +52,7 @@ new site you want to deploy is a spring boot application):
 
 1. Do any necessary DNS record configuration
 
-1. Make sure your project builds as a `war` and has a `.build_config` file
+1. Make sure your project builds as a `jar` and has a `.cods` file
 
 1. Create the site and database on the server
 
@@ -195,16 +194,6 @@ myserver site info -d example.com
 
 Replacing `example.com` with the site you setup.
 
-## Can I upload a `war` file directly (i.e. without using the git deployment)?
-
-Yes, build the war, then run:
-
-```
-myserver site deploy -d example.com -f /path/to/the/file.war
-```
-
-Replacing `example.com` with your domain that is already setup.
-
 ## My site's not working.
 
 That's not really a question, but the answer to the implied question depends on
@@ -214,10 +203,7 @@ how far along in the process you are.
 
 If you are deploying a spring boot application, did you:
 
-- Change your class with the `main` method and commit it?
-- Change the `packaging` in your `pom.xml`? Change it from `jar` to `war` and
-  make sure to commit the change.
-- Add the `.build_config` file and commit it?
+- Add the `.cods` file and commit it?
 - Setup the site on the server? I.e. run `myserver site create`
 - Setup a database on the server? I.e. run `myserver db create`
 - Setup the production `application.properties` file on your server?
@@ -235,20 +221,20 @@ of your application.
 **Check the logs!**
 
 ```
-myserver log:cat
+myserver site logs --domain example.com
 ```
 
-Will dump out the tomcat log file located on your server at
-`/opt/tomcat/logs/catalina.out`. You will see any exceptions that happen in
-production and their stack traces here.
+Will dump out the logs on your server for the site. You will see any exceptions
+that happen in production and their stack traces here, along with timestamps
+that indicate when this happened.
 
 Also,
 
 ```
-myserver log:tail
+myserver site logs --domain example.com --follow
 ```
 
-will let you watch the log file in real time from your terminal (press Ctrl-C to
+will let you watch the logs in real time from your terminal (press Ctrl-C to
 exit).
 
 ## Can I view my site if the DNS records aren't properly configured?
