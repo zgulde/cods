@@ -30,10 +30,15 @@ done
 git --work-tree=${SITE_DIR} --git-dir=${SITE_DIR}/repo.git checkout -f master
 
 cd $SITE_DIR
-npm install
 
-log 'Restarting {{site}} service...'
-sudo systemctl restart {{site}}
+if [[ -f install.sh ]] ; then
+	export SITE_DIR
+	bash install.sh
+else
+	npm install
+	log 'Restarting {{site}} service...'
+	sudo systemctl restart {{site}}
+fi
 
 log '--------------------------------------------------'
 log '> All done!'
