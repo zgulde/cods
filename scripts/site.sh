@@ -12,87 +12,114 @@ list_sites() {
 }
 
 create_site() {
-	while [[ $# -gt 0 ]] ; do
-		arg=$1 ; shift
-		case $arg in
-			-d|--domain) domain=$1 ; shift;;
-			--domain=*) domain=${arg#*=};;
-			--enable-ssl) ssl=yes;;
-			--sb|--spring-boot) springboot=yes;;
-			--static) static_site=yes;;
-			--force) force_creation=yes;;
-			--node=*) node_port=${arg#*=};;
-			--node) node_site=yes;;
-			-p|--port) port=$1 ; shift;;
-			--port=*) port=${arg#*=};;
-			*) echo "Unknown argument: $arg" ; exit 1;;
-		esac
-	done
-	if [[ -z $domain ]] ; then
+	usage() {
 		cat <<-.
-		Setup up the server to host a new site. Optionally also enable ssl or
-		setup the site as a spring boot site (this just enables some common
-		configuration).
-		By default a java site served by tomcat is created
+		Setup up the server to host a new site. The domain name and one of
+		{--static --java --node} must be provided.
 
-		-d|--domain <domain>   -- (required) domain name of the site to create
-		--enable-ssl           -- (optional) enable ssl after setting up the site
-		                          (see the enablessl subcommand)
-		--spring-boot          -- (optional) designate that this is a spring boot site
-		--static               -- setup a static site
-		--node                 -- setup a node site. The port number that the application
-		                          runs on must be provided through --port
-		-p|--port              -- port number that the application will run on
+		-d|--domain <domain> -- (required) domain name of the site to create
+		--static             -- setup a static site
+		--java               -- setup a java site
+		--node               -- setup a node site
+		-p|--port            -- port number that the application will run on
+		                        (required for --node and --java)
+		--spring-boot        -- (optional) designate that this is a spring boot site
+		--enable-ssl         -- (optional) enable ssl after setting up the site
+		                        (see the enablessl subcommand)
 
 		Examples:
 		    $(basename "$0") site create -d example.com
 		    $(basename "$0") site create --domain=example.com --node --port=3000
-		    $(basename "$0") site create --domain=example.com --enable-ssl --spring-boot
+		    $(basename "$0") site create --domain=example.com --java -p 8080 --enable-ssl --spring-boot
 		    $(basename "$0") site create --domain example.com --static
 		.
-		die
+	}
+	if [[ $# -eq 0 || $1 == *help || $1 = -h ]] ; then
+		usage ; die
+	fi
+	local domain enablessl force springboot sitetype port arg
+	while [[ $# -gt 0 ]] ; do
+	    arg=$1 ; shift
+	    case $arg in
+			-d|--domain) domain=$1 ; shift;;
+			--domain=*) domain=${arg#*=};;
+			--enable-ssl) enablessl=yes;;
+			-f|--force) force=yes;;
+			--spring-boot) springboot=yes;;
+			-s|--static) [[ -n $sitetype ]] && die 'type already specified' || sitetype=static ;;
+			-j|--java) [[ -n $sitetype ]] && die 'type already specified' || sitetype=java ;;
+			-n|--node) [[ -n $sitetype ]] && die 'type already specified' || sitetype=node ;;
+			-p|--port) port=$1 ; shift;;
+			--port=*) port=${arg#*=};;
+	        *) echo "Unknown argument: $arg" ; exit 1;;
+	    esac
+	done
+
+	[[ -z $domain ]] && die 'The domain name is required'
+	[[ -z $sitetype ]] && die 'Please specify a site type'
+	if [[ $sitetype == java || $sitetype == node ]] && [[ -z $port ]] ; then
+		die 'Please specify the port number'
 	fi
 
+	echo "Making sure $domain isn't already setup..."
 	if list_sites | grep "^$domain$" > /dev/null ; then
 		echo 'It looks like that site is already setup. Doing nothing.'
 		echo 'If you wish to re-create the site, first remove the site, then'
 		echo 'create it.'
-		exit 1
+		die
+	else echo 'ok'
 	fi
-
-	# verify dns records
-	if [[ "$(dig +short ${domain} | tail -n 1)" != $ip && -z $force_creation ]]; then
+	if [[ $sitetype == java || $sitetype == node ]] ; then
+		if [[ $port -gt 65535 || $port -lt 1024 ]] ; then
+			die "Invalid port number: ${port}, must be in the range (1024 - 65535)"
+		fi
+		echo "Checking to make sure port $port is free..."
+		existing_port="$(show_ports 2>/dev/null | grep $port)"
+		if [[ -n $existing_port ]] ; then
+			die "Port $port already in use by $(cut -d\  -f2 <<< $existing_port)"
+		else echo ok
+		fi
+	fi
+	echo "Checking DNS records for ${domain}..."
+	if [[ "$(dig +short ${domain} | tail -n 1)" != $ip && -z $force ]]; then
 		echo 'It looks like the dns records for that domain are not setup to'
 		echo 'point to your server.'
 		confirm "Are you sure you want to setup ${domain}?" || die 'Aborting...'
+	else echo 'ok'
 	fi
 
-	if [[ $static_site == yes ]] ; then
+	if [[ $sitetype == static ]] ; then
 		site_create_snippet="$SNIPPETS/create-static-site.sh"
-	elif [[ $node_site == yes ]] ; then
-		if [[ -z $port ]] ; then
-			echo 'Missing port number (--port)'
-			exit 1
-		fi
-		site_create_snippet="$SNIPPETS/create-node-site.sh"
+		template=post-receive-static.sh
 	else
-		site_create_snippet="$SNIPPETS/create-java-site.sh"
+		site_create_snippet="$SNIPPETS/create-reverse-proxy-site.sh"
+		if [[ $sitetype == java ]] ; then
+			execstart="/usr/bin/java -jar app.jar --server.port=${port}"
+			template=post-receive.sh
+		else
+			execstart="/usr/bin/npm start"
+			template=post-receive-node.sh
+		fi
 	fi
 
 	echo "Setting up ${domain}..."
+
 	ssh -t $user@$ip "
 	set -e
 	domain=${domain}
 	port=${port}
+	execstart='${execstart}'
+	template=${template}
 	$(< "$site_create_snippet")
 	$(< "$SNIPPETS/enable-git-deployment.sh")
 	"
 
-	[[ $? -eq 0 ]] && echo "${domain} created!"
-
 	if [[ $springboot == yes ]] ; then
 		ssh $user@$ip "domain=${domain} $(< $SNIPPETS/springboot-extra-config.sh)"
 	fi
+
+	[[ $? -eq 0 ]] && echo "${domain} created!"
+
 	if [[ $ssl == yes ]] ; then
 		echo "Enabling SSL for $domain..."
 		enable_ssl --domain $domain
@@ -137,7 +164,7 @@ remove_site() {
 	    case $arg in
 	        -d|--domain) domain=$1 ; shift;;
 	        --domain=*) domain=${arg#*=};;
-			--force) force=yes;;
+			-f|--force) force=yes;;
 	        *) echo "Unknown argument: $arg" ; exit 1;;
 	    esac
 	done
@@ -153,7 +180,7 @@ remove_site() {
 		die
 	fi
 
-	list_sites | grep "^$domain$" >/dev/null || die "It looks like $domain does not exist. Aborting..."
+	# list_sites | grep "^$domain$" >/dev/null || die "It looks like $domain does not exist. Aborting..."
 	# confirm deletion
 	if [[ -z $force ]] ; then
 		confirm "Are you sure you want to remove ${domain}?" || die 'domain not removed.'
@@ -171,6 +198,12 @@ remove_site() {
 	sudo systemctl disable ${domain}.service 2>/dev/null
 	sudo rm -f /etc/systemd/system/${domain}.service
 	sudo rm -f /etc/sudoers.d/${domain}
+	# remove all users from the group
+	for user in \$(ls /home) ; do
+		sudo gpasswd -d \$user $domain >/dev/null
+	done
+	sudo gpasswd -d www-data $domain >/dev/null
+	sudo userdel ${domain}
 	sudo systemctl daemon-reload
 	sudo systemctl reset-failed
 	"
@@ -207,7 +240,7 @@ build_site() {
 
 	ssh -t $user@$ip "
 	cd /srv/${domain}/repo.git
-	hooks/post-receive
+	echo '_ _ master' | hooks/post-receive
 	"
 }
 

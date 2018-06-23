@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SITE_DIR=/srv/{{site}}
-WAR_TARGET_LOCATION=/opt/tomcat/{{site}}/ROOT.war
+JAR_TARGET_LOCATION=/srv/{{site}}/app.jar
 
 TMP_REPO=$(mktemp -d)
 
@@ -42,7 +42,7 @@ if [[ -f $SITE_DIR/config ]]; then
 		log "Copying $source file to $destination..."
 		cp $SITE_DIR/$source $TMP_REPO/$destination
 	else
-		log "Configuration file found '${SITE_DIR}/config', but $source and $destination are not set."
+		log "Configuration file found '${SITE_DIR}/config', but \$source and \$destination are not set."
 		log 'Nothing copied. Continuing...'
 	fi
 else
@@ -58,8 +58,8 @@ if [[ -f .build_config ]]; then
 		log 'Aborting...'
 		exit 1
 	fi
-	if [[ -z $WAR_FILE ]]; then
-		log '$WAR_FILE not set! (Check the .build_config file)'
+	if [[ -z $JAR_FILE ]]; then
+		log '$JAR_FILE not set! (Check the .build_config file)'
 		log 'Aborting...'
 		exit 1
 	fi
@@ -78,22 +78,24 @@ if [[ -f .build_config ]]; then
 		log 'Aborting...'
 		exit 1
 	fi
-	if [[ ! -f $WAR_FILE ]]; then
-		log "Build was successful, but war file: '$WAR_FILE' was not found!"
+	if [[ ! -f $JAR_FILE ]]; then
+		log "Build was successful, but jar file: '$JAR_FILE' was not found!"
 		log 'Aborting...'
 		exit 1
 	fi
 
-	log "Build success! Deploying $WAR_FILE to $WAR_TARGET_LOCATION..."
-	rm -f $WAR_TARGET_LOCATION
-	mv $WAR_FILE $WAR_TARGET_LOCATION
+	log "Build success! Deploying $JAR_FILE to $JAR_TARGET_LOCATION..."
+	rm -f $JAR_TARGET_LOCATION
+	mv $JAR_FILE $JAR_TARGET_LOCATION
+
+	sudo service {{site}} restart
 
 	log '{{site}} deployed!'
 
 elif [[ -f install.sh ]]; then
 	log 'Found "install.sh"! Running...'
 	export SITE_DIR
-	export WAR_TARGET_LOCATION
+	export JAR_TARGET_LOCATION
 	export TMP_REPO
 	bash install.sh
 else
