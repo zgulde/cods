@@ -108,7 +108,7 @@ restart_service() {
 
 		Examples:
 		    $(basename "$0") restart -s nginx
-		    $(basename "$0") restart --service tomcat
+		    $(basename "$0") restart --service example.com
 		.
 		die
 	fi
@@ -183,7 +183,7 @@ add_user() {
 
 	ssh -t $user@$ip "
 	set -e
-	sudo useradd --create-home --shell /bin/bash --groups sudo,tomcat,git,www-data $new_user
+	sudo useradd --create-home --shell /bin/bash --groups sudo,web $new_user
 	echo '$new_user:$password' | sudo chpasswd
 	sudo mkdir -p /home/$new_user/.ssh
 	cat <<< '$(cat "$sshkeyfile")' | sudo tee /home/$new_user/.ssh/authorized_keys >/dev/null

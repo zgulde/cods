@@ -1,34 +1,13 @@
 ##############################################################################
 # Server provisioning script
 #
-# Contains most of the common server setup, most notably the tomcat and nginx
-# config. Anything that is required for the first time server setup and requires
-# root access, but does *not* require external information (e.g. the ip address
-# or the user's username) lives here.
+# Contains most of the common server setup, most notably the nginx config.
+# Anything that is required for the first time server setup and requires root
+# access, but does *not* require external information (e.g. the server's ip
+# address or the user's username) lives here.
 #
 # This script will be run on the server by the setup script.
 ##############################################################################
-
-# The url below is set from the setup.sh script because the url needs to be
-# updated periodically. A url is selected when the cods script is first
-# installed, but you can update to a more recent version by modifying
-# ~/.config/cods/config.sh. The most recent version can be found at
-# https://tomcat.apache.org/download-80.cgi
-TOMCAT_DOWNLOAD_URL={{tomcat_download_url}}
-TOMCAT_TARGZ="${TOMCAT_DOWNLOAD_URL##*/}"
-
-# Check for the tomcat install first.
-# This step is the most likely to go wrong (the url updates with some
-# frequency), so we'll do it first so we don't have to wait on the rest of the
-# script to fail.
-cd /tmp
-wget $TOMCAT_DOWNLOAD_URL
-if [[ ! -f $TOMCAT_TARGZ ]] ; then
-	echo "$TOMCAT_TARGZ not found! You may need to update this url:"
-	echo "$TOMCAT_DOWNLOAD_URL"
-	echo
-	exit 1
-fi
 
 heading(){
 	echo '----------------------------------'
@@ -61,102 +40,13 @@ apt-get install -y\
 	letsencrypt\
 	nodejs
 
-heading "Installing tomcat..."
-
-# download the tar from apache and extract it to /opt/tomcat
-mkdir -p /opt/tomcat
-tar xzvf $TOMCAT_TARGZ --strip-components=1 -C /opt/tomcat
-rm $TOMCAT_TARGZ
-
-# create a tomcat user
-groupadd tomcat
-useradd -g tomcat -s /bin/false -d /opt/tomcat tomcat
-
-# configure the tomcat install
-chown -R tomcat:tomcat /opt/tomcat
-rm -rf /opt/tomcat/webapps/*
-rm -rf /opt/tomcat/server/webapps/*
-rm -f /opt/tomcat/conf/Catalina/localhost/host-manager.xml
-rm -f /opt/tomcat/conf/Catalina/localhost/manager.xml
-chmod -R g+w /opt/tomcat/webapps/
-
-# replace default server config
-cat > /opt/tomcat/conf/server.xml <<'server.xml'
-<?xml version="1.0" encoding="UTF-8"?>
-<Server port="8005" shutdown="SHUTDOWN">
-  <Listener className="org.apache.catalina.startup.VersionLoggerListener" />
-  <Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />
-  <Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener" />
-  <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener" />
-  <Listener className="org.apache.catalina.core.ThreadLocalLeakPreventionListener" />
-  <GlobalNamingResources>
-	<Resource name="UserDatabase" auth="Container"
-			  type="org.apache.catalina.UserDatabase"
-			  description="User database that can be updated and saved"
-			  factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
-			  pathname="conf/tomcat-users.xml" />
-  </GlobalNamingResources>
-  <Service name="Catalina">
-	<Connector port="8009" protocol="AJP/1.3" redirectPort="8443" />
-	<Connector port="8080"
-		proxyPort="80"
-		protocol="HTTP/1.1"
-		connectionTimeout="20000"
-		redirectPort="8443" />
-	<Engine name="Catalina" defaultHost="localhost">
-	  <Realm className="org.apache.catalina.realm.LockOutRealm">
-		<Realm className="org.apache.catalina.realm.UserDatabaseRealm"
-			   resourceName="UserDatabase"/>
-	  </Realm>
-	  <!--## Virtual Hosts ##-->
-	  <Host name="localhost" appBase="webapps" deployOnStartup="false" />
-	</Engine>
-  </Service>
-</Server>
-server.xml
-
-# find the java installation path
-java_home=$(update-java-alternatives -l | awk '{print $3}')/jre
-# create the tomcat service
-cat > /etc/systemd/system/tomcat.service <<tomcat.service
-[Unit]
-Description=Apache Tomcat Web Application Container
-After=network.target
-
-[Service]
-Type=forking
-
-Environment=JAVA_HOME=${java_home}
-Environment=CATALINA_PID=/opt/tomcat/temp/tomcat.pid
-Environment=CATALINA_HOME=/opt/tomcat
-Environment=CATALINA_BASE=/opt/tomcat
-Environment='JAVA_OPTS=-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom'
-
-ExecStart=/opt/tomcat/bin/startup.sh
-ExecStop=/opt/tomcat/bin/shutdown.sh
-
-User=tomcat
-Group=tomcat
-UMask=0007
-RestartSec=10
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-tomcat.service
-
-systemctl daemon-reload
-
-# start tomcat now, and have it start automatically on boot
-systemctl enable tomcat
-systemctl start tomcat
-
 heading 'configuring nginx...'
 
-# when files are written to the uploads directory for a specific site, they are
-# created by the tomcat user, so in order for nginx to serve them, we'll add
-# the www-data user to the tomcat group
-usermod -a -G tomcat www-data
+# group we'll use use for all of our web-admin needs
+groupadd web
+
+# add the user that nginx runs as to the web group
+usermod -a -G web www-data
 
 # remove the default nginx config
 rm /etc/nginx/sites-available/default
@@ -176,10 +66,8 @@ echo 'Nginx configured and restarted!'
 
 heading 'Configuring /srv directory'
 
-# create the git group and directory structure for deployment
-groupadd git
 mkdir -p /srv
-chgrp git /srv
+chgrp web /srv
 chmod g+srwx /srv
 # configuration for systemd-tmpfiles
 # see https://github.com/zgulde/tomcat-setup/issues/14

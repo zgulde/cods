@@ -54,7 +54,6 @@ BASE_DATA_DIR="$HOME/.config/cods"
 if [[ ! -f "$BASE_DATA_DIR/config.sh" ]] ; then
 	mkdir -p "$BASE_DATA_DIR"
 	cat > "$BASE_DATA_DIR/config.sh" <<-.
-	TOMCAT_DOWNLOAD_URL=http://apache.osuosl.org/tomcat/tomcat-8/v8.5.30/bin/apache-tomcat-8.5.30.tar.gz
 	BIN_PREFIX=/usr/local/bin
 	.
 fi

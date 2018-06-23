@@ -3,8 +3,9 @@
 #
 # This script contains functions for site management, and will run the
 # appropriate function based on the arguments passed to it. Most of the
-# functionality here is for setting up nginx and tomcat to host sites, as well
-# as enabling https for sites.
+# functionality here is for setting up nginx to host sites either statically, or
+# as a reverse proxy to an application server, as well as enabling https for
+# sites.
 ##############################################################################
 
 list_sites() {
@@ -127,6 +128,7 @@ create_site() {
 }
 
 enable_ssl() {
+	local domain
 	while [[ $# -gt 0 ]] ; do
 	    arg=$1 ; shift
 	    case $arg in
@@ -149,16 +151,22 @@ enable_ssl() {
 		die
 	fi
 
+	echo "Finding port number for ${domain}..."
+	port="$(show_ports | grep ${domain} | egrep -o '\d{4,5}')"
+	echo "Found port no: ${port}"
+
 	ssh -t $user@$ip "
 	set -e
 	domain=${domain}
 	email=${email}
+	port=${port}
 	$(< "$SNIPPETS/enable-ssl.sh")
 	"
 	[[ $? -eq 0 ]] && echo "https enabled for ${domain}!"
 }
 
 remove_site() {
+	local domain force
 	while [[ $# -gt 0 ]] ; do
 	    arg=$1 ; shift
 	    case $arg in
@@ -180,38 +188,40 @@ remove_site() {
 		die
 	fi
 
-	# list_sites | grep "^$domain$" >/dev/null || die "It looks like $domain does not exist. Aborting..."
+	list_sites | grep "^$domain$" >/dev/null || die "It looks like $domain does not exist. Aborting..."
 	# confirm deletion
 	if [[ -z $force ]] ; then
 		confirm "Are you sure you want to remove ${domain}?" || die 'domain not removed.'
 	fi
 
 	ssh -t $user@$ip "
-	sudo sed -i -e '/${domain}/d' /opt/tomcat/conf/server.xml
+	# clean up application server configuration if its a reverse-proxy site
+	if grep proxy_pass /etc/nginx/sites-available/${domain} >/dev/null ; then
+		sudo systemctl stop ${domain}
+		sudo systemctl disable ${domain}.service
+		sudo rm -f /etc/systemd/system/${domain}.service
+		sudo rm -f /etc/sudoers.d/${domain}
+		sudo systemctl daemon-reload
+		sudo systemctl reset-failed
+	fi
 
 	sudo rm -f /etc/nginx/sites-available/${domain}
 	sudo rm -f /etc/nginx/sites-enabled/${domain}
-	sudo rm -rf /opt/tomcat/${domain}
-	sudo rm -rf /opt/tomcat/conf/Catalina/${domain}
 	sudo rm -rf /srv/${domain}
-	sudo systemctl stop ${domain} 2>/dev/null
-	sudo systemctl disable ${domain}.service 2>/dev/null
-	sudo rm -f /etc/systemd/system/${domain}.service
-	sudo rm -f /etc/sudoers.d/${domain}
+
 	# remove all users from the group
 	for user in \$(ls /home) ; do
 		sudo gpasswd -d \$user $domain >/dev/null
 	done
 	sudo gpasswd -d www-data $domain >/dev/null
 	sudo userdel ${domain}
-	sudo systemctl daemon-reload
-	sudo systemctl reset-failed
 	"
 
 	[[ $? -eq 0 ]] && echo 'site removed!'
 }
 
 build_site() {
+	local domain
 	while [[ $# -gt 0 ]] ; do
 	    arg=$1 ; shift
 	    case $arg in
@@ -238,6 +248,12 @@ build_site() {
 
 	echo "Running post-receive hook for $domain..."
 
+	# The post-receive hook will ensure that the branch being pushed is the
+	# master branch before deploying. Normally this is the behaviour we want,
+	# but here we aren't actually pushing, we just want to do the deployment, so
+	# we'll need to "fake" the fact that we're pushing the master branch. We'll
+	# do so with the echo command below, as git hooks normally recieve the name
+	# of the branch being pushed via stdin
 	ssh -t $user@$ip "
 	cd /srv/${domain}/repo.git
 	echo '_ _ master' | hooks/post-receive
@@ -245,6 +261,7 @@ build_site() {
 }
 
 show_logs() {
+	local domain follow
 	while [[ $# -gt 0 ]] ; do
 	    arg=$1 ; shift
 	    case $arg in
@@ -271,6 +288,7 @@ show_logs() {
 }
 
 show_info() {
+	local domain
 	while [[ $# -gt 0 ]] ; do
 	    arg=$1 ; shift
 	    case $arg in

@@ -1,4 +1,4 @@
-# variables: $domain, $email
+# variables: $domain, $email, $port
 
 if egrep 'ssl\s*on;' /etc/nginx/sites-available/$domain >/dev/null ; then
 	echo "It looks like SSL is already setup for $domain"

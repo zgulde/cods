@@ -123,8 +123,7 @@ echo "$ENV_FILE file created!"
 
 heading 'running provision script'
 
-sed -e "s!{{tomcat_download_url}}!${TOMCAT_DOWNLOAD_URL}!" "$SCRIPTS/provision.sh" |\
-	ssh root@$ip bash
+ssh root@$ip bash < "$SCRIPTS/provision.sh"
 
 # make sure provisioning went okay
 if [[ $? -ne 0 ]]; then
@@ -132,9 +131,7 @@ if [[ $? -ne 0 ]]; then
 	echo
 	echo 'Uh oh! Looks like something went wrong with the server provisioning!'
 	echo
-	echo 'Check the above output for more details. Is the tomcat download url'
-	echo 'up to date? Check https://tomcat.apache.org/download-80.cgi for the'
-	echo "most recent url, then edit $BASE_DATA_DIR/config.sh ."
+	echo 'Check the above output for more details.'
 	echo
 	echo 'To re-provision, you should:'
 	echo '  1. Re-image your server'
@@ -168,7 +165,7 @@ heading 'creating user'
 
 ssh root@$ip bash <<setup_user
 # create a user and add the ssh key
-useradd --create-home --shell /bin/bash --groups sudo,tomcat,git,www-data $user
+useradd --create-home --shell /bin/bash --groups sudo,web $user
 echo '$user:$password' | chpasswd
 # copy over ssh key config for the new user
 mkdir -p /home/$user/.ssh
