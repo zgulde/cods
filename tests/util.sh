@@ -75,3 +75,11 @@ rc=$?
 
 [[ $number_failures -eq 0 ]] && success '[PASSED] die'
 
+echo -n '[TESTING] repeat...'
+number_failures=0
+
+if [[ "$(repeat 1 3)" != 111 ]] ; then
+	fail 'Expected $(repeat 1 3) === 111'
+fi
+
+[[ $number_failures -eq 0 ]] && success '[PASSED] repeat'

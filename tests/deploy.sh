@@ -22,9 +22,10 @@ case $test_type in
 
 		echo '[test] We have to wait a bit for the java application to start up...'
 		echo '[test] 20 seconds is usually more than enough...'
-		for n in {1..20} ; do
-			sleep 1
-			echo -ne "\r[test] $n"
+		# fancy progress bar
+		for i in {1..40} ; do
+			echo -ne "\r[test] $((i / 2))/20 [$(repeat = $i)$(repeat ' ' $((40 - i)))]"
+			sleep 0.5
 		done
 		echo
 
