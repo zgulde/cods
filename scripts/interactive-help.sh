@@ -406,11 +406,11 @@ sb_site_setup() {
 
 	There are two ways to view the log files on your server, the simplest is:
 
-	    $server site logs --domain $domain
+	    $server site logs --domain $site
 
 	You can also watch the logs for your site on your server in real time, run
 
-	    $server site logs --domain $domain --follow
+	    $server site logs --domain $site --follow
 
 	Press Ctrl-C to stop watching the logs.
 
