@@ -12,11 +12,11 @@ eval "$(< $SCRIPTS/site.sh)" >/dev/null
 	fail 'It should exit with a non-zero status when port is not specified for a java site'
 ( create_site --domain test.com --node > /dev/null ) &&\
 	fail 'It should exit with a non-zero status when port is not specified for a node site'
-( create_site --domain --static --java --port 8080 > /dev/null ) &&\
+( create_site --domain test.com --static --java --port 8080 > /dev/null ) &&\
 	fail 'It should exit with a non-zero status when multiple types are specified'
-( create_site --domain --static --java --port 1023 > /dev/null ) &&\
+( create_site --domain test.com --static --java --port 1023 > /dev/null ) &&\
 	fail 'It should exit with a non-zero status when a port number too low (< 1024) is specified'
-( create_site --domain --static --java --port 65536 > /dev/null ) &&\
+( create_site --domain test.com --static --java --port 65536 > /dev/null ) &&\
 	fail 'It should exit with a non-zero status when a port number too high (> 65535) is specified'
 
 echo '[TESTING] Java Site Creation'
@@ -79,7 +79,7 @@ systemctl list-unit-files | grep enabled | grep test.com >/dev/null ||\
 systemctl | grep running | grep -F test.com.service >/dev/null &&\
 	fail 'Expected the test.com service *not* to be running'
 
-test -f /etc/sudoers.d/test.com ||\
+test -f /etc/sudoers.d/test-com ||\
 	fail 'Expected to find configuration in /etc/sudoers.d/'
 test
 echo ' done.'

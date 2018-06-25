@@ -39,9 +39,16 @@ echo 'Reloading systemd...'
 sudo systemctl daemon-reload
 echo 'Enabling service...'
 sudo systemctl enable ${domain}.service
+
 echo 'Allow service to be restarted by non-root users...'
+# We'll create a separate file with the permissions for manipulating the service
+# for this site so that it is easier to clean up. The name of this file must not
+# contain '.'s though, so we'll generate a file named after the domain with '-'s
+# instead of '.'s
+# see /etc/sudoers.d/README and man 5 sudoers
+filename=${domain//./-}
 {
-	echo "%webadmin ALL=NOPASSWD: /bin/systemctl restart ${domain}"
-	echo "%webadmin ALL=NOPASSWD: /bin/journalctl --no-pager -o short-iso -u ${domain}"
-	echo "%webadmin ALL=NOPASSWD: /bin/journalctl -o short-iso -f -u ${domain}"
-} | sudo EDITOR='tee' visudo -f /etc/sudoers.d/${domain} >/dev/null
+	echo "%web ALL=NOPASSWD: /bin/systemctl restart ${domain}"
+	echo "%web ALL=NOPASSWD: /bin/journalctl --no-pager -o short-iso -u ${domain}"
+	echo "%web ALL=NOPASSWD: /bin/journalctl -o short-iso -f -u ${domain}"
+} | sudo EDITOR='tee' visudo -f /etc/sudoers.d/${filename} >/dev/null
