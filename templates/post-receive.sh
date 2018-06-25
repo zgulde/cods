@@ -88,7 +88,8 @@ if [[ -f .cods ]]; then
 	rm -f $JAR_TARGET_LOCATION
 	mv $JAR_FILE $JAR_TARGET_LOCATION
 
-	sudo service {{site}} restart
+	log 'Restarting {{site}}...'
+	sudo systemctl restart {{site}}
 
 	log '{{site}} deployed!'
 

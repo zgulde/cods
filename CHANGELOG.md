@@ -1,3 +1,7 @@
+2.0.1
+
+- bugfix: fix site restart in post-receive hook
+
 2.0.0
 
 - added: Interactive help (`cods help`). Interactive walkthroughs for various
