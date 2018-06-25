@@ -25,5 +25,8 @@ else
 fi
 
 sudo cp /srv/.templates/$template /etc/nginx/sites-available/${domain}
-sudo sed -i -e s/{{domain}}/${domain}/g /etc/nginx/sites-available/${domain}
+sudo sed -i\
+	-e s/{{domain}}/${domain}/g\
+	-e s/{{port}}/${port}/g\
+	/etc/nginx/sites-available/${domain}
 sudo systemctl restart nginx
