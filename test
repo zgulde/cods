@@ -18,6 +18,7 @@ case $command in
 	util)  source $TESTS/util.sh;;
 	site)  source $TESTS/site.sh;;
 	setup) source $TESTS/setup.sh;;
+	deploy) source $TESTS/deploy.sh;;
 	_sudo)
 		# Enable passwordless sudo
 		# Intentionally undocumented, as we probably don't want end users doing
@@ -27,5 +28,5 @@ case $command in
 		ssh -t $user@$ip "echo '$user ALL=(ALL) NOPASSWD: ALL' | sudo EDITOR='tee -a' visudo"
 		;;
 
-	* ) echo 'util | site | setup';;
+	* ) echo 'util | site | setup | deploy';;
 esac

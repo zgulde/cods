@@ -2,6 +2,14 @@
 # A handful of helper functions #
 #################################
 
+repeat() {
+	local string=$1
+	local n=$2
+	local fmt="%-${n}s"
+	local s="$(printf $fmt $string)"
+	echo -n "${s// /$string}"
+}
+
 heading(){
     echo '---------------------------------------------------------------------'
     echo "> $@"

@@ -14,6 +14,10 @@ auto_renew_certs() {
     [[ $? -eq 0 ]] && echo 'Autorenewal enabled!'
 }
 
+show_ports() {
+	ssh -t $user@$ip "grep -oR '[0-9]\{4,\}' /etc/nginx/sites-available/ | awk -F: '{split(\$1, a, \"/\"); print \$2,a[5]}' | sort -nk1"
+}
+
 enable_swap() {
 	ssh -t $user@$ip "
 	set -e
@@ -104,7 +108,7 @@ restart_service() {
 
 		Examples:
 		    $(basename "$0") restart -s nginx
-		    $(basename "$0") restart --service tomcat
+		    $(basename "$0") restart --service example.com
 		.
 		die
 	fi
@@ -179,7 +183,7 @@ add_user() {
 
 	ssh -t $user@$ip "
 	set -e
-	sudo useradd --create-home --shell /bin/bash --groups sudo,tomcat,git,www-data $new_user
+	sudo useradd --create-home --shell /bin/bash --groups sudo,web $new_user
 	echo '$new_user:$password' | sudo chpasswd
 	sudo mkdir -p /home/$new_user/.ssh
 	cat <<< '$(cat "$sshkeyfile")' | sudo tee /home/$new_user/.ssh/authorized_keys >/dev/null
@@ -264,13 +268,12 @@ show_usage() {
 
 	    login       -- login to the server
 	    info        -- display information about the server
+	    ports       -- show the ports that are being reverse proxied to
 	    ping        -- ping the server
 	    swapon      -- create and enable a swapfile (requires sudo password)
 	    autorenew   -- setup ssl certs to be automatically renewed
 	    reboot      -- reboot the server
 	    run         -- run arbitrary commands
-	    log:cat     -- view the contents (cat) of /opt/tomcat/logs/catalina.out
-	    log:tail    -- follow (tail -f) the contents of /opt/tomcat/logs/catalina.out
 	    credentials -- view server credentials (found in $DATA_DIR/credentials.txt)
 	    destroy     -- destroy the server
 
@@ -328,12 +331,11 @@ case $command in
 	adduser)   add_user "$@";;
 	addkey)    add_sshkey "$@";;
 	autorenew) auto_renew_certs;;
-	log:cat)   ssh -t $user@$ip 'cat /opt/tomcat/logs/catalina.out';;
-	log:tail)  ssh -t $user@$ip 'tail -f /opt/tomcat/logs/catalina.out';;
 	ping)      ping -c5 $ip;;
 	run)       ssh -t $user@$ip "$@";;
 	root)      ssh -t $user@$ip "sudo -s";;
-	destroy) destroy_server;;
+	ports)     show_ports;;
+	destroy)   destroy_server;;
 
 	credentials)
 		if [[ -f "$DATA_DIR/credentials.txt" ]] ; then

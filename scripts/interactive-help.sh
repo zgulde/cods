@@ -5,7 +5,7 @@ wait_to_continue() {
 
 initial_server_setup() {
 	cat <<-.
-	[0/0]
+	[0/2]
 	Initial Server Setup -- Creating A VPS and a command to interact with it
 
 	Prerequisites
@@ -57,9 +57,9 @@ initial_server_setup() {
 	.
 }
 
-application_prep() {
+sb_application_prep() {
 	cat <<-.
-	[0/7]
+	[0/6]
 	Let's get your spring boot application ready for deployment!
 
 	We'll walk through the changes you'll need to make to your application in
@@ -69,7 +69,7 @@ application_prep() {
 	wait_to_continue
 
 	cat <<-.
-	[1/7]
+	[1/6]
 	First, navigate to your project's directory, for example
 
 	    cd ~/IdeaProjects/my-project
@@ -81,15 +81,40 @@ application_prep() {
 	wait_to_continue
 
 	cat <<-.
-	[2/7]
-	Okay, let's make sure your application runs from the command line. Go ahead
-	and run this command:
+	[2/6]
+	First we'll make sure that your application is able to be packaged as a jar
+	successfully. Go ahead and run this command:
 
-	    ./mvnw spring-boot:run
+	    ./mvnw package
 
-	If this command fails, inspect the output and fix the errors, otherwise it
-	should start up your application locally just as if you were running the
-	main method.
+	Which will produce a .jar file inside the "target" directory.
+
+	If the command fails, inspect the output and fix the errors before
+	continuing, then try and package it again.
+
+	Now run
+
+	    ls target/*.jar
+
+	Which will output something like "your-project-0.0.1-SNAPSHOT.jar". Make a
+	note of the name of your jar file, as we will reference it several times
+	throughout this process.
+
+	.
+
+	wait_to_continue
+
+	cat <<-.
+	[3/6]
+	Next we'll run the jar that was produced.
+
+		java -jar target/YOUR_JAR_FILE
+
+	Replacing "YOUR_JAR_FILE" with the actual name of the file that was
+	produced.
+
+	This will start up your application locally just as if you were running the
+	main method from your IDE.
 
 	Once this starts up, you should open your browser and make sure everything
 	works the way you want it to.
@@ -101,72 +126,39 @@ application_prep() {
 	wait_to_continue
 
 	cat <<-.
-	[3/7]
-	If you haven't already, you'll need to make a few modifications to your
-	application code. Specifically,
+	[4/6]
+	Next we'll setup the .cods file. This file will be used to build our project
+	on the server.
 
-	- change the packaging type in the pom.xml
-	- extend the class that has your main method
-
-	See https://github.com/zgulde/cods/blob/master/docs/deployment-guide.md#get-your-application-ready-for-deployment
-
-	.
-
-	wait_to_continue
-
-	cat <<-.
-	[4/7]
-	Next, let's make sure that a war file can be built from your application
-	successfully. Run this command to package your application as a .war file:
-
-	    ./mvnw package
-
-	If any errors occur, inspect the output and fix the errors, then try again.
-
-	You can verify that everything worked correctly by running this command:
-
-	    ls target/*.war
-
-	You should see the something like 'your-project.war'.
-
-	.
-
-	wait_to_continue
-
-	cat <<-.
-	[5/7]
-	Next we'll setup the .build_config file. This file will be used to build our
-	project on the server.
-
-	Create a plain text file named '.build_config' in the root of your
-	project. Copy the two lines below into it:
+	Create a plain text file named '.cods' in the root of your project. Copy the
+	two lines below into it:
 
 	BUILD_COMMAND='./mvnw package'
-	WAR_FILE=
+	JAR_FILE=
 
 	Now run this command in your terminal:
 
-	    find target -name \*.war
+	    find target -name \*.jar
 
-	it should output the path to the built war file, something like
-	'target/my-project.war'. Copy the output and paste into the .build_config
-	file after 'WAR_FILE=' *without any spaces*.
+	it should output the path to the built jar file, something like
+	'target/my-project.jar'. Copy the output and paste into the .cods file after
+	'JAR_FILE=' *without any spaces*.
 
-	Your .build_config file should end up looking something like this:
+	Your .cods file should end up looking something like this:
 
 	BUILD_COMMAND='./mvnw package'
-	WAR_FILE=target/blog-0.0.1-SNAPSHOT.war
+	JAR_FILE=target/blog-0.0.1-SNAPSHOT.jar
 
 	.
 	wait_to_continue
 
 	cat <<-.
-	[6/7]
-	Now let's verify that the .build_config file was setup properly.
+	[5/6]
+	Now let's verify that the .cods file was setup properly.
 
 	First, run this command:
 
-	    source .build_config
+	    source .cods
 
 	You should see no output.
 
@@ -178,9 +170,9 @@ application_prep() {
 
 	Now run this:
 
-	    [[ -f \$WAR_FILE ]] && echo 'Good to Go!' || echo 'WAR_FILE not found!'
+	    [[ -f \$JAR_FILE ]] && echo 'Good to Go!' || echo 'JAR_FILE not found!'
 
-	And you should see "Good to Go!" output. If not, double check the WAR_FILE
+	And you should see "Good to Go!" output. If not, double check the JAR_FILE
 	value from the previous step and try again.
 
 	.
@@ -188,10 +180,10 @@ application_prep() {
 	wait_to_continue
 
 	cat <<-.
-	[7/7]
+	[6/6]
 	Lastly, make sure to add and commit all the changes you've made.
 
-	You should make sure the .build_config file and the changes you've made to
+	You should make sure the .cods file and the changes you've made to
 	yor application are committed *on your master branch*. (This is the branch
 	that will be used for deployment)
 
@@ -203,10 +195,10 @@ application_prep() {
 
 }
 
-site_setup() {
+sb_site_setup() {
 	local server site
 	cat <<-.
-	[0/7]
+	[0/8]
 	Let's walk through the process of setting up a site on your server.
 
 	Prerequisites:
@@ -219,7 +211,7 @@ site_setup() {
 	.
 	wait_to_continue
 	cat <<-.
-	[1/7]
+	[1/8]
 	First a couple questions
 
 	In order to better help, we will need the name of the command you use to
@@ -254,7 +246,7 @@ site_setup() {
 	wait_to_continue
 
 	cat <<-.
-	[2/7]
+	[2/8]
 
 	Let's make a database for your application (you can skip this step if your
 	application doesn't use a database).
@@ -280,30 +272,59 @@ site_setup() {
 
 	    $server credentials
 
+	either in a new terminal, or before you run the db command above.
+
 	.
 	wait_to_continue
 
 	cat <<-.
-	[3/7]
+	[3/8]
+	Now let's find a free port for your application. Run this command to view
+	the ports that are in use on your server:
+
+	    $server ports
+
+	(You might not see anything if you don't have any sites setup yet). Choose a
+	port number for your application. Anything between 1024 and 65535 is valid,
+	but it is common to choose a number such as 8080, 8000, 8888, 3000, or 5000
+
+	.
+
+	read -p 'What port number will you use? ' port
+
+	cat <<-.
+
+	Got it, we'll host the site on port $port.
+
+	.
+
+	wait_to_continue
+
+	cat <<-.
+	[4/8]
 	Next we will tell your server that it is going to host $site
 
 	Run this command:
 
-	    $server site create --domain $site --spring-boot
+	    $server site create --domain $site --java --spring-boot --port $port
 
 	You'll be prompted for your sudo password, the server admin password. You
 	can also find this by running:
 
 	    $server credentials
 
+	In a separate terminal, or running it before you run the site create
+	command.
+
 	.
+
 	wait_to_continue
 
 	cat <<-.
-	[4/7]
+	[5/8]
 	We will now need to setup the production application.properties file. An
-	easy way to do this is transferring your local application.properties to the
-	server, then modifying it there.
+	easy way to do this is to start by transferring your local
+	application.properties to the server, then modifying it there.
 
 	Navigate to your project directory (if you aren't there already):
 
@@ -322,7 +343,7 @@ site_setup() {
 	wait_to_continue
 
 	cat <<-.
-	[5/7]
+	[6/8]
 	Now we'll edit the application.properties file on the server
 
 	    $server run nano /srv/$site/application.properties
@@ -334,8 +355,8 @@ site_setup() {
 	In this file, make sure that the database name and database user match the
 	values you setup earlier,
 
-	    name: $db_name
-	    user: $db_user
+	    db name: $db_name
+	    db user: $db_user
 
 	And make sure the password matches the autogenerated password that was
 	created. You can find this password by running:
@@ -352,7 +373,7 @@ site_setup() {
 	wait_to_continue
 
 	cat <<-.
-	[6/7]
+	[7/8]
 	Lastly, we'll add the deployment remote to our project and push.
 
 	Run this command:
@@ -377,7 +398,7 @@ site_setup() {
 	wait_to_continue
 
 	cat <<-.
-	[7/7]
+	[8/8]
 	Log files
 
 	One of the first places to look when you are troubleshooting a site that is
@@ -385,15 +406,13 @@ site_setup() {
 
 	There are two ways to view the log files on your server, the simplest is:
 
-	    $server log:cat
+	    $server site logs --domain $site
 
-	This will dump the entire contents of the log file out to your terminal
+	You can also watch the logs for your site on your server in real time, run
 
-	To watch the log file for tomcat on your server in real time, run
+	    $server site logs --domain $site --follow
 
-	    $server log:tail
-
-	You can press Ctrl-C to stop watching the log file.
+	Press Ctrl-C to stop watching the logs.
 
 	The above command is useful when run immediately after pushing, as you can
 	watch your application as it starts up.
@@ -404,19 +423,13 @@ site_setup() {
 	echo 'All done!'
 }
 
-debugging() {
-	echo TODO
-}
-
-# TODO: DNS Records, VPS provisioning (specs + ssh keys), troubleshooting
+# TODO: node sites, static sites, DNS Records, troubleshooting?
 
 cat <<-.
 Welcome to the interactive deployment guide!
 
-This is a rough translation of the deployment guide https://github.com/zgulde/cods/blob/master/docs/deployment-guide.md
-to an interactive cli format.
-
-This guide is tailored for deploying a spring boot application.
+This is a rough translation of the documentation included in this repo to an
+interactive cli format.
 
 This will ask you some questions, and provide you with information and, in some
 cases, copy and pastable commands. It is recommended that you have this help
@@ -425,6 +438,8 @@ open in one terminal, and a separate terminal open to run commands in.
 This help will *not* run any commands for you, it will only display information
 and commands that you can use.
 
+You can exit at any time by pressing Ctrl-C
+
 What do you need help with?
 
 .
@@ -432,31 +447,20 @@ What do you need help with?
 
 topics=(
 	'initial server setup'
-	'application prep'
-	'site setup'
+	'spring boot application prep'
+	'spring boot application site setup'
 	'exit'
 )
 
-if [[ $# -eq 1 ]] ; then
+PS3='Please enter a number: '
+select _ in "${topics[@]}" ; do
 	clear
-	case $1 in
+	case $REPLY in
 		1) initial_server_setup;;
-		2) application_prep;;
-		3) site_setup;;
+		2) sb_application_prep;;
+		3) sb_site_setup;;
 		4) exit;;
-		*) echo "Invalid Selection, $1";;
+		*) echo "Invalid Selection, $REPLY";;
 	esac
-else
-	PS3='Please enter a number: '
-	select _ in "${topics[@]}" ; do
-		clear
-		case $REPLY in
-			1) initial_server_setup;;
-			2) application_prep;;
-			3) site_setup;;
-			4) exit;;
-			*) echo "Invalid Selection, $REPLY";;
-		esac
-		break
-	done
-fi
+	break
+done
