@@ -280,6 +280,7 @@ show_logs() {
 		.
 		die
 	fi
+	list_sites | grep "^$domain$" >/dev/null || die "It looks like $domain does not exist. Aborting..."
 	if [[ $follow == yes ]] ; then
 		ssh $user@$ip sudo journalctl -o short-iso -f -u ${domain}
 	else
