@@ -1,6 +1,19 @@
-DOMAIN=testing.zach.lol
+usage() {
+	echo 'Please provide a domain name and site type to use for testing deployment. E.g.'
+	echo
+	echo '    myserver _test deploy java testing.example.com'
+	echo '    myserver _test deploy static testing.example.com'
+	echo
+	echo 'Where site type is one of {java,static}'
+	echo
+}
 
 test_type=$1 ; shift
+DOMAIN=$1 ; shift
+
+if [[ -z $DOMAIN ]] || [[ -z $test_type ]] ; then
+	usage ; exit 1
+fi
 
 eval "$(< $SCRIPTS/site.sh)" >/dev/null
 
@@ -83,5 +96,5 @@ case $test_type in
 
 		rm -rf $BASE_DIR/tests/sample-sites/static/.git
 		;;
-	*) echo 'static | java';;
+	*) usage ; exit 1;;
 esac
