@@ -154,7 +154,7 @@ as a `jar` and run it.
     ```
     source .cods
     eval "$BUILD_COMMAND"
-    [[ -f $WAR_FILE ]] && echo 'Good to Go!' || echo 'WAR_FILE not found!'
+    [[ -f $JAR_FILE ]] && echo 'Good to Go!' || echo 'JAR_FILE not found!'
     ```
 
     You should see no output from the first command, your project should build
