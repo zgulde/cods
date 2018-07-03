@@ -87,6 +87,25 @@ as a `jar` and run it.
 0. Make sure you have committed all changes and your application is free from
    errors.
 
+1. If your application is using spring boot v1.x and you have multiple versions
+   of Java installed on your machine, [see the FAQ
+   here](faq.md#do-i-need-to-do-anything-differently-if-i-have-multiple-java-installations)
+
+1. Skip Tests
+
+    Unless you've built out testing for your application, you'll want to add the
+    `skipTests` element below to your `pom.xml`:
+
+    ```xml
+    ...
+	<properties>
+        ...
+        <skipTests>true</skipTests>
+        ...
+	</properties>
+    ...
+    ```
+
 1. Package the application as a jar
 
     From the root of your project, run the following command:
@@ -115,8 +134,10 @@ as a `jar` and run it.
     production, we'll run it from the command line and ensure everything is
     working the right way.
 
+    The command below will run the jar file that was produced in the last step:
+
     ```
-    java -jar YOU_JAR_FILE
+    java -jar YOUR_JAR_FILE
     ```
 
     Replacing `YOUR_JAR_FILE` with the filepath you found in the previous step.

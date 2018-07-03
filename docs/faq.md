@@ -16,6 +16,8 @@
 * [How can I find my server's ip address?](#how-can-i-find-my-servers-ip-address)
 * [What is my git deployment remote?](#what-is-my-git-deployment-remote)
 * [My site's not working.](#my-sites-not-working)
+    * [I haven't yet seen my site live](#i-havent-yet-seen-my-site-live)
+    * [The site was working, but no longer is](#the-site-was-working-but-no-longer-is)
 * [Can I view my site if the DNS records aren't properly configured?](#can-i-view-my-site-if-the-dns-records-arent-properly-configured)
 * [How can I let my teammate push to deploy the project?](#how-can-i-let-my-teammate-push-to-deploy-the-project)
 * [What is my password?](#what-is-my-password)
@@ -23,6 +25,7 @@
 * [How can I upload really big files to my site?](#how-can-i-upload-really-big-files-to-my-site)
 * [Do I need to do anything special to use ${fancy_js_framework}?](#do-i-need-to-do-anything-special-to-use-fancy_js_framework)
 * [How can I do client-side routing?](#how-can-i-do-client-side-routing)
+* [Do I need to do anything differently if I have multiple Java installations?](#do-i-need-to-do-anything-differently-if-i-have-multiple-java-installations)
 
 All the example command below assume your server management command is named
 `myserver`.
@@ -403,3 +406,38 @@ myserver site info -d example.com
 myserver run sudo nano /etc/nginx/sites-available/example.com
 myserver restart --service=nginx
 ```
+
+## Do I need to do anything differently if I have multiple Java installations?
+
+If you have multiple versions of java installed and you are deploying a spring
+boot v1.x application, you'll want to specify that you are using Java 8 when you
+run your application from the command line.
+
+This consists of two steps:
+
+- Configuring Maven
+
+    ```
+    echo "JAVA_HOME=$(/usr/libexec/java_home -v 1.8)" > ~/.mavenrc
+    ```
+
+    This command will create a file named `~/.mavenrc` in your home directory
+    that will specify that maven should use Java 8 when running from the command
+    line
+
+- Configuration for the `java` command
+
+    We'll want to specify that we want to use java 8 when we run the `java`
+    command.
+
+    ```
+    export JAVA_HOME="$(/usr/libexec/java_home -v 1.8)"
+    ```
+
+    This will make the `java` command use java 8 **for the current terminal
+    session**. If you open a new terminal, you'll need to run the command again.
+
+    Alternatively, if you want to always use java 8 when running the `java`
+    command, you could add the line above to your `.bashrc` (linux) or
+    `.bash_profile` (MacOS)
+
