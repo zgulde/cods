@@ -1,3 +1,11 @@
+2.1.0
+
+- feature: better bash completion, all options are now completed, and
+  completions aren't offered when it doesn't make sense to
+- bugfix: static sites -- creation and post-receive hook
+- docs: fix inaccuracies, more docs for java 1.8 + sb 1.x
+- tests: add full deploy tests for a node site
+
 2.0.1
 
 - bugfix: fix site restart in post-receive hook
