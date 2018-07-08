@@ -41,7 +41,7 @@ if [[ -f $SITE_DIR/config ]]; then
 		log "Copying $source file to $destination..."
 		cp $SITE_DIR/$source $TMP_REPO/$destination
 	else
-		log "Configuration file found '${SITE_DIR}/config', but $source and $destination are not set."
+		log "Configuration file found '${SITE_DIR}/config', but \$source and \$destination are not set."
 		log 'Nothing copied. Continuing...'
 	fi
 else
