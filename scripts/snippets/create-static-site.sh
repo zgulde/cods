@@ -25,4 +25,5 @@ sudo systemctl restart nginx
 # We'll put something there so that we can at least see a page to see if the
 # site was properly setup
 echo "<h1>$domain ready to go!</h1>" | sudo tee /srv/${domain}/public/index.html > /dev/null
-
+chown ${domain}:${domain} /srv/${domain}/public/index.html
+chmod g+rw /srv/${domain}/public/index.html
