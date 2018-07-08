@@ -1,28 +1,82 @@
-SERVER_SUBCOMMANDS='site db devserver login upload restart reboot info adduser addkey autorenew ping credentials bash-completion destroy ports'
-DB_SUBCOMMANDS='create backup run remove rm list ls login'
-SITE_SUBCOMMANDS='list ls create remove rm build enablessl info logs'
+# provide completions based on the passed arguments
+_cods_complete() {
+	local cur="${COMP_WORDS[COMP_CWORD]}"
+	COMPREPLY=( $(compgen -W "$*" -- $cur) )
+}
+
+# used to indicate no further completions are available
+_cods_dont_complete() {
+	COMPREPLY=()
+}
+
+# do filename completion
+_cods_complete_files() {
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+	COMPREPLY=( $(compgen -X '' -f "${cur}") )
+}
 
 _{{scriptname}}() {
-	local cur prev opts
+	local cur prev subcommand subsubcommand server_subcommands db_subcommands site_subcommands
+
+	server_subcommands='site db devserver login upload restart reboot info adduser addkey autorenew ping credentials bash-completion destroy ports'
+	db_subcommands='create backup run remove rm list ls login'
+	site_subcommands='list ls create remove rm build enablessl info logs'
 
 	COMPREPLY=()
 
-	cur="${COMP_WORDS[COMP_CWORD]}"
-	prev="${COMP_WORDS[COMP_CWORD-1]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+	subcommand=${COMP_WORDS[1]}
 
-	case $prev in
-		{{scriptname}})
-			COMPREPLY=( $(compgen -W "$SERVER_SUBCOMMANDS" -- $cur) )
+	case $subcommand in
+		# no further completions for any of these
+		devserver|login|info|ports|ping|swapon|autorenew|reboot|run|credentials|destroy|bash-completion)
+			_cods_dont_complete;;
+		upload)
+			case $prev in
+				-f|--file) _cods_complete_files;;
+				-d|--destination) _cods_dont_complete;;
+				*) _cods_complete -f -d --file --destination ;;
+			esac ;;
+		restart) _cods_complete -s --service;;
+		addkey)
+			case $prev in
+				-f|--sshkeyfile) _cods_complete_files;;
+				*) _cods_complete -f --sshkeyfile ;;
+			esac ;;
+		adduser)
+			case $prev in
+				-f|--sshkeyfile) _cods_complete_files;;
+				*) _cods_complete -u --username -f --sshkeyfile --github-username;;
+			esac ;;
+		site)
+			# if [[ $prev == --domain || $prev == -d ]] ; then
+			# 	_cods_complete zach.lol static.zach.lol handouts.zach.lol nestor.zach.lol notes.zach.lol
+			# 	return
+			# fi
+			subsubcommand=${COMP_WORDS[2]}
+			case $subsubcommand in
+				create) _cods_complete --static --node --java --enable-ssl --spring-boot -p --port --domain -d ;;
+				build|enablessl|info) _cods_complete -d --domain;;
+				list|ls) _cods_dont_complete ;;
+				remove|rm) _cods_complete --force -f --domain -d;;
+				logs) _cods_complete -d --domain -f --follow;;
+				*) _cods_complete $site_subcommands ;;
+			esac
 			;;
 		db)
-			COMPREPLY=( $(compgen -W "$DB_SUBCOMMANDS" -- $cur) )
+			subsubcommand=${COMP_WORDS[2]}
+			case $subsubcommand in
+				create|remove|rm) _cods_complete --name -n --user -u ;;
+				login|list|ls) _cods_dont_complete ;;
+				backup)
+					case $prev in
+						-o|--outfile) _cods_complete_files;;
+						*) _cods_complete --name -n -o --outfile ;;
+					esac ;;
+				*) _cods_complete $db_subcommands
+			esac
 			;;
-		site)
-			COMPREPLY=( $(compgen -W "$SITE_SUBCOMMANDS" -- $cur) )
-			;;
-		*)
-			COMPREPLY=( $(compgen -X '' -f "${cur}") )
-			;;
+		*) _cods_complete $server_subcommands ;;
 	esac
 }
 
