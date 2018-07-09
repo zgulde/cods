@@ -16,9 +16,13 @@ _cods_complete_files() {
 }
 
 _{{scriptname}}() {
-	local cur prev subcommand subsubcommand server_subcommands db_subcommands site_subcommands
+	local cur prev subcommand subsubcommand server_subcommands
+	local db_subcommands site_subcommands
 
-	server_subcommands='site db devserver login upload restart reboot info adduser addkey autorenew ping credentials bash-completion destroy ports'
+	server_subcommands='site db devserver login upload restart reboot info'
+	server_subcommands+=' adduser addkey autorenew ping credentials'
+	server_subcommands+=' bash-completion destroy ports _test'
+
 	db_subcommands='create backup run remove rm list ls login'
 	site_subcommands='list ls create remove rm build enablessl info logs'
 
@@ -65,6 +69,15 @@ _{{scriptname}}() {
 				logs) _cods_complete -d --domain -f --follow;;
 				*) _cods_complete $site_subcommands ;;
 			esac
+			;;
+		_test)
+			if [[ ${COMP_WORDS[2]} == deploy ]] ; then
+				_cods_complete java static node
+			elif [[ $prev == _test ]] ; then
+				_cods_complete util site setup deploy
+			else
+				_cods_dont_complete
+			fi
 			;;
 		db)
 			subsubcommand=${COMP_WORDS[2]}
