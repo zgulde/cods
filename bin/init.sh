@@ -69,11 +69,12 @@ case $1 in
 		for server_command in $(ls -d "$BASE_DATA_DIR"/*/) ; do
 			server_command="${server_command%/}"
 			server_command="${server_command##*/}"
-			echo "linking $BIN_PREFIX/$server_command to $(show_server_path)..."
+			echo '- Updating $server_command'
+			echo "  Linking $BIN_PREFIX/$server_command To $(show_server_path)..."
 			rm "$BIN_PREFIX/$server_command"
 			ln -s "$(show_server_path)" "$BIN_PREFIX/$server_command"
 		done
-		echo 'All Done!'
+		echo '- All Done!'
 		;;
 	init)
 		[[ -z $2 ]] && usage
@@ -98,8 +99,8 @@ case $1 in
 			exit 1
 		fi
 
-		read -p "Enter the server's ip address: " ip
-		read -p "Enter your username: " user
+		read -p "- Enter the server's ip address: " ip
+		read -p "- Enter your username: " user
 		if ! ssh $user@$ip true ; then
 			echo "Unable to login! Command: ssh $user@$ip true"
 			echo 'Make sure you have access to the server and have the correct'
@@ -113,7 +114,8 @@ case $1 in
 		echo "ip=$ip" >> "$ENV_FILE"
 		echo "user=$user" >> "$ENV_FILE"
 		touch "$DATA_DIR/credentials.txt"
-		echo "All done! '$COMMAND_NAME' ready to go!"
+		echo "- All done!"
+		echo "  '$COMMAND_NAME' ready to go!"
 		;;
 	_server) show_server_path;;
 	*) usage;;

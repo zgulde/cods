@@ -43,11 +43,12 @@ create_db() {
 	db_pass="$(mkpassword)"
 
 	cat <<-.
-	Creating Database:
+	- Creating Database:
+
 	    database: $dbname
 	    user:     $dbuser
 
-	When prompted, enter your *database administrator* password to continue
+	  When prompted, enter your *database administrator* password to continue
 	.
 
 	ssh -t $user@$ip "mysql -p <<sql
@@ -59,9 +60,10 @@ sql"
 	if [[ $? -eq 0 ]] ; then
 		echo "Db User $dbuser: $db_pass" >> "$DATA_DIR/credentials.txt"
 		cat <<-.
-		User successfully created!
-		password for $dbuser: $db_pass
-		[NOTICE] credentials for $dbuser have been added to $DATA_DIR/credentials.txt
+		- User Successfully Created!
+		  password for $dbuser: $db_pass
+		  [NOTICE] credentials for $dbuser have been added to the credentials file
+		           $DATA_DIR/credentials.txt
 		.
 	else
 		echo 'Uh oh, looks like something went wrong. Check the output above and'

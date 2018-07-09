@@ -29,16 +29,16 @@ if [[ -e "$ENV_FILE" ]]; then
 	exit 1
 fi
 
-read -p 'Enter the servers ip address: ' ip
+read -p '- Enter the servers ip address: ' ip
 echo
-echo 'Since this will be the first time we will have connected to your server,'
-echo 'you will be prompted whether or not you trust the server. Type yes when'
-echo 'prompted.'
+echo '  Since this will be the first time we will have connected to your server,'
+echo '  you will be prompted whether or not you trust the server. Type yes when'
+echo '  prompted.'
 echo
 # make sure we can access that server
 ssh root@$ip ls > /dev/null
 if [[ $? -ne 0 ]]; then
-	echo "Cannot login to $ip!"
+	echo "Error: Cannot login to $ip!"
 	echo 'Make sure:'
 	echo '  - The ip address is correct'
 	echo '  - Your public key is on the server'
@@ -48,20 +48,22 @@ if [[ $? -ne 0 ]]; then
 fi
 
 echo
-echo 'You will need to now choose a username for the server. This is the user'
-echo 'you will log in as, as well as the database administrator user that'
-echo 'will be setup.'
+echo '- Choose A Username'
 echo
-echo 'A username should start with a lowercase letter, and only consist of'
-echo 'lowercase letters, numbers, or the "_" character. It should also'
-echo 'be no longer than 30 characters.'
-echo 'Specifically: /^[a-z][a-z0-9_]{0,29}$/'
+echo '  You will need to now choose a username for the server. This is the user'
+echo '  you will log in as, as well as the database administrator user that'
+echo '  will be setup.'
 echo
-echo 'Usually it is fine (and easier) to use the same username as the one on'
-echo 'your local machine, but if your local username does not match the given'
-echo 'rules, you should choose something different.'
+echo '  A username should start with a lowercase letter, and only consist of'
+echo '  lowercase letters, numbers, or the "_" character. It should also'
+echo '  be no longer than 30 characters.'
+echo '  Specifically: /^[a-z][a-z0-9_]{0,29}$/'
 echo
-read -p "Enter a username (default $USER): " user
+echo '  Usually it is fine (and easier) to use the same username as the one on'
+echo '  your local machine, but if your local username does not match the given'
+echo '  rules, you should choose something different.'
+echo
+read -p "  Enter a username (default $USER): " user
 if [[ -z "$user" ]]; then
 	user=$USER
 fi
@@ -82,22 +84,25 @@ if [[ $? -ne 0 ]]; then
 fi
 
 echo
-echo 'We will need an email address for obtaining a ssl certificate, while this'
-echo 'is optional, it is recommended so that you can be contacted if anything'
-echo 'goes wrong with your site.'
+echo '- Enter Email Address'
+echo
+echo '  We will need an email address for obtaining a ssl certificate, while this'
+echo '  is optional, it is recommended so that you can be contacted if anything'
+echo '  goes wrong with your site.'
 echo
 read -p 'email: ' email
 echo
 
+echo '- Autogenerate Passwords'
 password="$(mkpassword)"
 db_password="$(mkpassword)"
 
-echo "Here are your auto-generated passwords for the server:"
+echo "  Here are your auto-generated passwords for the server:"
 echo
 echo "Sudo Password: $password" | tee -a "$DATA_DIR/credentials.txt"
 echo "DB Password:   $db_password" | tee -a "$DATA_DIR/credentials.txt"
 echo
-echo "These have been saved to $DATA_DIR/credentials.txt."
+echo "  These have been saved to $DATA_DIR/credentials.txt."
 echo
 echo '+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Read This ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+'
 echo '| You may wish to manage your passwords with a password manager. If    |'
@@ -107,8 +112,8 @@ echo '| tool. Note that future generated credentials will be written to this |'
 echo '| file as well.                                                        |'
 echo '+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+'
 echo
-echo 'Next, we will provision the server. Please be patient, as this process'
-echo 'can take a few minutes.'
+echo '  Next, we will provision the server. Please be patient, as this process'
+echo '  can take a few minutes.'
 echo
 read -p 'Press <Enter> to continue and setup the server'
 
