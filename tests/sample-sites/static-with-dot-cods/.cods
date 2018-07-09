@@ -1,0 +1,2 @@
+BUILD_COMMAND='mkdir out && echo "static with .cods is working" > out/index.html'
+OUTPUT_DIR=out
