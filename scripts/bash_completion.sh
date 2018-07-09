@@ -49,10 +49,13 @@ _{{scriptname}}() {
 				*) _cods_complete -u --username -f --sshkeyfile --github-username;;
 			esac ;;
 		site)
-			# if [[ $prev == --domain || $prev == -d ]] ; then
-			# 	_cods_complete zach.lol static.zach.lol handouts.zach.lol nestor.zach.lol notes.zach.lol
-			# 	return
-			# fi
+			if [[ $prev == --domain || $prev == -d ]] ; then
+				# it would be really cool if we could complete existing domain
+				# names setup on the server...
+				# _cods_complete zach.lol static.zach.lol handouts.zach.lol nestor.zach.lol notes.zach.lol
+				_cods_dont_complete
+				return
+			fi
 			subsubcommand=${COMP_WORDS[2]}
 			case $subsubcommand in
 				create) _cods_complete --static --node --java --enable-ssl --spring-boot -p --port --domain -d ;;

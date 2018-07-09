@@ -1,19 +1,19 @@
 # variables $domain, $port
 
-echo "Creating user + group for ${domain}..."
+echo "- Creating User and Group For ${domain}"
 sudo useradd --no-create-home ${domain} --shell /bin/false
 # add admin users to new group
 for user in $(ls /home) ; do sudo usermod -a -G ${domain} ${user} ; done
 # and ngnix
 sudo usermod -a -G ${domain} www-data
 
-echo "Creating site directory (/srv/${domain})"
+echo "- Creating Site Directory -- /srv/${domain}"
 sudo mkdir -p /srv/${domain}/public
 sudo chown -R ${domain}:${domain} /srv/${domain}
 sudo chmod g+srw /srv/${domain}
 sudo chmod g+srw /srv/${domain}/public
 
-echo 'Configuring nginx...'
+echo '- Creating Nginx Config'
 sudo cp /srv/.templates/site.nginx.conf /etc/nginx/sites-available/${domain}
 sudo sed -i\
 	-e s/{{domain}}/${domain}/g\
@@ -22,11 +22,11 @@ sudo sed -i\
 
 sudo ln -s /etc/nginx/sites-available/${domain} /etc/nginx/sites-enabled/${domain}
 
-echo 'Restarting nginx...'
+echo '- Restarting Nginx'
 sudo systemctl restart nginx
 
 # create the service
-echo 'Creating service file...'
+echo '- Creating Systemd Service File'
 sudo cp /srv/.templates/service-unit /etc/systemd/system/${domain}.service
 sudo sed -i\
 	-e s/{{user}}/${domain}/g\
@@ -35,12 +35,11 @@ sudo sed -i\
 	-e "s!{{execstart}}!${execstart}!g"\
 	/etc/systemd/system/${domain}.service
 
-echo 'Reloading systemd...'
+echo '- Enabling Service'
 sudo systemctl daemon-reload
-echo 'Enabling service...'
 sudo systemctl enable ${domain}.service
 
-echo 'Allow service to be restarted by non-root users...'
+echo '- Allow Service To Be Restarted Without A Password'
 # We'll create a separate file with the permissions for manipulating the service
 # for this site so that it is easier to clean up. The name of this file must not
 # contain '.'s though, so we'll generate a file named after the domain with '-'s

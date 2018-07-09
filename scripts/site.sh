@@ -56,37 +56,37 @@ create_site() {
 	    esac
 	done
 
-	[[ -z $domain ]] && die 'The domain name is required'
-	[[ -z $sitetype ]] && die 'Please specify a site type'
+	[[ -z $domain ]] && die 'Error: No domain name specified'
+	[[ -z $sitetype ]] && die 'Error: No site type specified, provide one of {--java,--node,--static}'
 	if [[ $sitetype == java || $sitetype == node ]] && [[ -z $port ]] ; then
-		die 'Please specify the port number'
+		die 'Error: No port number specified'
 	fi
 
-	echo "Making sure $domain isn't already setup..."
+	echo "- Making Sure $domain Isn't Already Setup..."
 	if list_sites | grep "^$domain$" > /dev/null ; then
 		echo 'It looks like that site is already setup. Doing nothing.'
 		echo 'If you wish to re-create the site, first remove the site, then'
 		echo 'create it.'
 		die
-	else echo 'ok'
+	else echo '  ok'
 	fi
 	if [[ $sitetype == java || $sitetype == node ]] ; then
 		if [[ $port -gt 65535 || $port -lt 1024 ]] ; then
 			die "Invalid port number: ${port}, must be in the range (1024 - 65535)"
 		fi
-		echo "Checking to make sure port $port is free..."
+		echo "- Checking To Make Sure Port $port Is Free..."
 		existing_port="$(show_ports 2>/dev/null | grep $port)"
 		if [[ -n $existing_port ]] ; then
-			die "Port $port already in use by $(cut -d\  -f2 <<< $existing_port)"
-		else echo ok
+			die "Error: Port $port already in use by $(cut -d\  -f2 <<< $existing_port)"
+		else echo '  ok'
 		fi
 	fi
-	echo "Checking DNS records for ${domain}..."
+	echo "- Checking DNS Records For ${domain}..."
 	if [[ "$(dig +short ${domain} | tail -n 1)" != $ip && -z $force ]]; then
 		echo 'It looks like the dns records for that domain are not setup to'
 		echo 'point to your server.'
 		confirm "Are you sure you want to setup ${domain}?" || die 'Aborting...'
-	else echo 'ok'
+	else echo '  ok'
 	fi
 
 	if [[ $sitetype == static ]] ; then
@@ -103,7 +103,7 @@ create_site() {
 		fi
 	fi
 
-	echo "Setting up ${domain}..."
+	echo "- Logging In To Create ${domain}... (sudo password will be required)"
 
 	ssh -t $user@$ip "
 	set -e
@@ -116,13 +116,14 @@ create_site() {
 	"
 
 	if [[ $springboot == yes ]] ; then
+		echo '- Performing Extra Spring Boot Configuration'
 		ssh $user@$ip "domain=${domain} $(< $SNIPPETS/springboot-extra-config.sh)"
 	fi
 
-	[[ $? -eq 0 ]] && echo "${domain} created!"
+	[[ $? -eq 0 ]] && echo "- Finished Setting Up ${domain}"
 
 	if [[ $ssl == yes ]] ; then
-		echo "Enabling SSL for $domain..."
+		echo "- Enabling Https For $domain..."
 		enable_ssl --domain $domain
 	fi
 }
@@ -151,9 +152,13 @@ enable_ssl() {
 		die
 	fi
 
-	echo "Finding port number for ${domain}..."
+	echo "- Finding Port Number For ${domain}..."
 	port="$(show_ports | grep ${domain} | egrep -o '\d{4,5}')"
-	echo "Found port no: ${port}"
+	if [[ -n $port ]] ; then
+		echo "  Found Port No: ${port}"
+	else
+		echo '  No Port Found, Setting Up A Static Site'
+	fi
 
 	ssh -t $user@$ip "
 	set -e
@@ -162,7 +167,7 @@ enable_ssl() {
 	port=${port}
 	$(< "$SNIPPETS/enable-ssl.sh")
 	"
-	[[ $? -eq 0 ]] && echo "https enabled for ${domain}!"
+	[[ $? -eq 0 ]] && echo "- Https Enabled For ${domain}!"
 }
 
 remove_site() {
@@ -188,27 +193,34 @@ remove_site() {
 		die
 	fi
 
+	echo "- Making Sure ${domain} Exists..."
 	list_sites | grep "^$domain$" >/dev/null || die "It looks like $domain does not exist. Aborting..."
 	# confirm deletion
 	if [[ -z $force ]] ; then
-		confirm "Are you sure you want to remove ${domain}?" || die 'domain not removed.'
+		echo '- Confirm Site Removal'
+		confirm "  Are you sure you want to remove ${domain}?" || die 'domain not removed.'
 	fi
 
 	ssh -t $user@$ip "
 	# clean up application server configuration if its a reverse-proxy site
 	if grep proxy_pass /etc/nginx/sites-available/${domain} >/dev/null ; then
+		echo '- Removing Systemd Service -- /etc/systemd/system/${domain}.service'
 		sudo systemctl stop ${domain}
 		sudo systemctl disable ${domain}.service
 		sudo rm -f /etc/systemd/system/${domain}.service
+		echo '- Removing Sudo Config'
 		sudo rm -f /etc/sudoers.d/${domain}
 		sudo systemctl daemon-reload
 		sudo systemctl reset-failed
 	fi
 
+	echo '- Removing Nginx Configuration'
 	sudo rm -f /etc/nginx/sites-available/${domain}
 	sudo rm -f /etc/nginx/sites-enabled/${domain}
+	echo '- Removing Site Directory -- /srv/${domain}'
 	sudo rm -rf /srv/${domain}
 
+	echo '- Removing ${domain} User and Group'
 	# remove all users from the group
 	for user in \$(ls /home) ; do
 		sudo gpasswd -d \$user $domain >/dev/null
@@ -217,7 +229,7 @@ remove_site() {
 	sudo userdel ${domain}
 	"
 
-	[[ $? -eq 0 ]] && echo 'site removed!'
+	[[ $? -eq 0 ]] && echo '- Site Removed!'
 }
 
 build_site() {
@@ -246,7 +258,7 @@ build_site() {
 	# ensure site exists
 	list_sites | grep "^$domain$" >/dev/null || die "It looks like $domain does not exist. Aborting..."
 
-	echo "Running post-receive hook for $domain..."
+	echo "- Running Post-Receive Hook (/srv/${domain}/repo.git/hooks/post-receive) For $domain..."
 
 	# The post-receive hook will ensure that the branch being pushed is the
 	# master branch before deploying. Normally this is the behaviour we want,
@@ -280,7 +292,9 @@ show_logs() {
 		.
 		die
 	fi
+	echo '- Ensuring Site Exists'
 	list_sites | grep "^$domain$" >/dev/null || die "It looks like $domain does not exist. Aborting..."
+	echo '- Showing Logs'
 	if [[ $follow == yes ]] ; then
 		ssh $user@$ip sudo journalctl -o short-iso -f -u ${domain}
 	else
@@ -310,7 +324,7 @@ show_info() {
 		die
 	fi
 
-	# ensure site exists
+	echo '- Ensuring Site Exists'
 	list_sites | grep "^$domain$" >/dev/null || die "It looks like $domain does not exist. Aborting..."
 
 	cat <<-.

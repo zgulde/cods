@@ -1,6 +1,6 @@
 # varaibles: $domain $template
 
-echo "Setting up git deployment for $domain..."
+echo "- Setting Up Git Deployment For $domain..."
 
 sudo cp /srv/.templates/config /srv/${domain}/config
 sudo git init --bare --shared=group /srv/${domain}/repo.git

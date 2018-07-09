@@ -6,7 +6,7 @@ if egrep 'ssl\s*on;' /etc/nginx/sites-available/$domain >/dev/null ; then
 	exit 1
 fi
 
-echo 'Requesting SSL certificate... (this might take a second)'
+echo '- Requesting SSL certificate... (this might take a second)'
 sudo letsencrypt certonly\
 	--authenticator webroot\
 	--webroot-path=/srv/${domain}/public\
@@ -15,7 +15,7 @@ sudo letsencrypt certonly\
 	--email $email\
 	--renew-by-default >> /srv/letsencrypt.log
 
-echo "Setting up nginx to serve ${domain} over https..."
+echo "- Setting Up Nginx To Serve ${domain} Over Https..."
 
 # figure out whether we have a java site or a static one
 if grep proxy_pass /etc/nginx/sites-available/$domain >/dev/null ; then
@@ -29,4 +29,5 @@ sudo sed -i\
 	-e s/{{domain}}/${domain}/g\
 	-e s/{{port}}/${port}/g\
 	/etc/nginx/sites-available/${domain}
+echo '- Restarting Nginx'
 sudo systemctl restart nginx
