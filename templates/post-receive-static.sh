@@ -29,35 +29,72 @@ while read old new ref; do
     fi
 done
 
-log "cloning project to '$TMP_REPO'..."
+# if we have a build script, run it, else, just do a checkout
+if git ls-tree HEAD | cut -f 2 | grep ^.cods$ >/dev/null || git ls-tree HEAD | cut -f 2 | grep ^install.sh$  ; then
 
-git clone $(pwd) $TMP_REPO
-cd $TMP_REPO
+	log "cloning project to '$TMP_REPO'..."
+	git clone $(pwd) $TMP_REPO
+	cd $TMP_REPO
 
-if [[ -f $SITE_DIR/config ]]; then
-	source $SITE_DIR/config
-	if [[ ! -z "$source" ]] && [[ ! -z "$destination" ]]; then
-		log "Found configuration file: '${SITE_DIR}/config'!"
-		log "Copying $source file to $destination..."
-		cp $SITE_DIR/$source $TMP_REPO/$destination
+	if [[ -f $SITE_DIR/config ]]; then
+		source $SITE_DIR/config
+		if [[ ! -z "$source" ]] && [[ ! -z "$destination" ]]; then
+			log "Found configuration file: '${SITE_DIR}/config'!"
+			log "Copying $source file to $destination..."
+			cp $SITE_DIR/$source $TMP_REPO/$destination
+		else
+			log "Configuration file found '${SITE_DIR}/config', but \$source and \$destination are not set."
+			log 'Nothing copied. Continuing...'
+		fi
 	else
-		log "Configuration file found '${SITE_DIR}/config', but \$source and \$destination are not set."
-		log 'Nothing copied. Continuing...'
+		log "No configuration file ($SITE_DIR/config) found. Continuing..."
 	fi
-else
-	log "No configuration file ($SITE_DIR/config) found. Continuing..."
-fi
 
-if [[ -f install.sh ]]; then
-	log 'Found "install.sh"! Running...'
-	export SITE_DIR
-	export PUBLIC_DIR
-	export TMP_REPO
-	bash install.sh
+	if [[ -f install.sh ]] ; then
+		log 'Found "install.sh"! Running...'
+		export SITE_DIR
+		export PUBLIC_DIR
+		export TMP_REPO
+		bash install.sh
+	elif [[ -f .cods ]] ; then
+		source .cods
+
+		if [[ -z $BUILD_COMMAND ]]; then
+			log '$BUILD_COMMAND not set! (Check the .cods file)'
+			log 'Aborting...'
+			exit 1
+		fi
+		if [[ -z $OUTPUT_DIR ]]; then
+			log '$OUTPUT_DIR not set! (Check the .cods file)'
+			log 'Aborting...'
+			exit 1
+		fi
+
+		log "Running > $BUILD_COMMAND"
+		eval "$BUILD_COMMAND"
+
+		if [[ $? -ne 0 ]] ; then
+			log "ERROR: '$BUILD_COMMAND' failed."
+			log 'It looks like your build command failed (exited with a non-zero code)!'
+			log 'Aborting...'
+			exit 1
+		fi
+		if [[ ! -d $OUTPUT_DIR ]] ; then
+			log "ERROR: $OUTPUT_DIR not found."
+			log 'Aborting...'
+			exit 1
+		fi
+		log "Moving $OUTPUT_DIR to $SITE_DIR/public..."
+		# set the correct permissions and group ownership
+		chgrp {{site}} $OUTPUT_DIR
+		chmod g+rwxs $OUTPUT_DIR
+		rm -rf ${SITE_DIR}/public
+		mv $OUTPUT_DIR ${SITE_DIR}/public
+	fi
+
 else
-	log 'No "install.sh" file found.'
-	log "Replacing all files in $PUBLIC_DIR with this project"
-	mv -v $TMP_REPO/* $PUBLIC_DIR
+	log "Checking out code to ${SITE_DIR}/public"
+	git --work-tree=${SITE_DIR}/public --git-dir=${SITE_DIR}/repo.git checkout -f master
 fi
 
 log '--------------------------------------------------'
