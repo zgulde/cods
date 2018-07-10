@@ -69,7 +69,7 @@ case $1 in
 		for server_command in $(ls -d "$BASE_DATA_DIR"/*/) ; do
 			server_command="${server_command%/}"
 			server_command="${server_command##*/}"
-			echo '- Updating $server_command'
+			echo "- Updating $server_command"
 			echo "  Linking $BIN_PREFIX/$server_command To $(show_server_path)..."
 			rm "$BIN_PREFIX/$server_command"
 			ln -s "$(show_server_path)" "$BIN_PREFIX/$server_command"
