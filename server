@@ -59,7 +59,7 @@ upload_file() {
 		die
     fi
 	if [[ ! -e "$file" ]]; then
-		echo 'It appears as though that file does not exist!'
+		echo "Error: $file not found!"
 		exit 1
 	fi
 
