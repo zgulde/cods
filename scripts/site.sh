@@ -153,7 +153,7 @@ enable_ssl() {
 	fi
 
 	echo "- Finding Port Number For ${domain}..."
-	port="$(show_ports | grep ${domain} | egrep -o '\d{4,5}')"
+	port="$(ssh $user@$ip "egrep -o '[0-9]{4,5}' /etc/nginx/sites-available/${domain} | sort | uniq")"
 	if [[ -n $port ]] ; then
 		echo "  Found Port No: ${port}"
 	else
