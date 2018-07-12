@@ -1,3 +1,11 @@
+2.1.1
+
+- bugix: fix port number issue when enabling https
+- feature: better terminal output
+- docs: document adding a user by github username (in the faqs)
+- tests: add tests for static sites with a build process
+- feature: use .cods file to automatically build static sites (not yet documented)
+
 2.1.0
 
 - feature: better bash completion, all options are now completed, and
