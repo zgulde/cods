@@ -63,8 +63,29 @@ source "$BASE_DATA_DIR/config.sh"
 
 source "$SCRIPTS/util.sh"
 
+logo=(
+	"(C)(O)deup (D)eployment (S)cripts"
+	"Version: $(head -n1 "$BASE_DIR/CHANGELOG.md")"
+	''
+	' _______  _______  ______   _______'
+	'(  ____ \(  ___  )(  __  \ (  ____ \'
+	'| (    \/| ( d ) || ( e\  )| (   \/'
+	'| |      | | e | || | p ) || (_____'
+	'| |      | | u | || | l | |(_____  )'
+	'| |      | | p | || | o ) | ment ) |'
+	'| (_ __/\| (___) || (_y/  )/\____) | cripts'
+	'(_______/(_______)(______/ \_______)'
+	''
+)
+
 case $1 in
 	help) shift ; source "$SCRIPTS/interactive-help.sh";;
+	banner|logo)
+		for line in "${logo[@]}" ; do
+			echo "$line"
+			sleep 0.3
+		done
+		;;
 	update)
 		for server_command in $(ls -d "$BASE_DATA_DIR"/*/) ; do
 			server_command="${server_command%/}"
