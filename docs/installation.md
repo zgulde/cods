@@ -26,7 +26,7 @@ You'll need to install this manually, luckily, that's not too difficult
 1. Put the init script on your PATH
 
     ```
-    ln -s ~/opt/cods/bin/init.sh /usr/local/bin/cods # or wherever you prefer
+    ln -s ~/opt/cods/bin/cods.sh /usr/local/bin/cods # or wherever you prefer
     ```
 
 By default this tool will install commands in to `/usr/local/bin`, but if you

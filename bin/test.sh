@@ -2,6 +2,13 @@
 
 TESTS="$BASE_DIR/tests"
 
+if [[ ! -d $TESTS ]] ; then
+	echo "$TESTS not found!"
+	echo 'This command is used to run automated tests on the server setup, and'
+	echo 'is meant only to be used during development of the cods tool.'
+	exit 1
+fi
+
 if [[ ! -f $ENV_FILE ]]; then
 	echo 'No env file found!'
 	echo 'Currently we can only test everything with an already setup environment.'

@@ -25,7 +25,7 @@ in general:
   also be fast
 - Holds its configuration in `~/.config/cods`
 - Consist of 2 primary scripts
-    - `bin/init.sh`: is used to setup a new server, and will create a command to
+    - `bin/cods.sh`: is used to setup a new server, and will create a command to
       interact with that server (i.e. a symlink to the `server` script)
     - `server`: is the entrypoint to interacting with a setup server, e.g. for
       creating sites and databases
@@ -66,7 +66,7 @@ Assuming you already have a server setup:
    your copy of the scripts.
 
     ```
-    bin/init.sh update
+    bin/cods.sh update
     ```
 
 1. Run the `_test` subcommand. This subcommand is not shown in the help message,

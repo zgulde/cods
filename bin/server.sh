@@ -294,7 +294,7 @@ SCRIPT_NAME="$(basename "$SCRIPT_PATH")"
 while [[ -L "$SCRIPT_PATH" ]] ; do # resolve symlinks
 	SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
 done
-BASE_DIR="$( cd "$( dirname "$SCRIPT_PATH" )" && pwd )"
+BASE_DIR="$( cd "$( dirname "$SCRIPT_PATH" )"/.. && pwd )"
 BASE_DATA_DIR="$HOME/.config/cods"
 
 DATA_DIR="$BASE_DATA_DIR/$SCRIPT_NAME"
@@ -349,12 +349,7 @@ case $command in
 		;;
 
 	_test)
-		if [[ ! -f "$BASE_DIR/test" ]] ; then
-			echo "$BASE_DIR/test not found."
-			echo 'This command is meant to be used for development.'
-			exit 1
-		fi
-		source "$BASE_DIR/test"
+		source "$BASE_DIR/bin/test.sh"
 		;;
 
 	*) show_usage;;
