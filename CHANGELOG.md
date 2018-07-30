@@ -1,3 +1,13 @@
+2.1.3
+
+- I forgot to update the changelog, but still released the new version, so now
+  we're up to 2.1.3
+
+2.1.2
+
+- refactor: rename and move entrypoint scripts to bin/
+- feature: add banner (try `cods/banner`)
+
 2.1.1
 
 - bugix: fix port number issue when enabling https
