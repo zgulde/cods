@@ -1,3 +1,7 @@
+2.1.4
+
+- refactor: move script location
+
 2.1.3
 
 - I forgot to update the changelog, but still released the new version, so now
