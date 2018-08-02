@@ -35,7 +35,7 @@ usage() {
 }
 
 show_server_path() {
-	echo "$BASE_DIR/bin/server.sh"
+	echo "$SCRIPTS/server.sh"
 }
 
 # find out where this script is located so we can be sure we're running
@@ -58,9 +58,7 @@ if [[ ! -f "$BASE_DATA_DIR/config.sh" ]] ; then
 	.
 fi
 
-
 source "$BASE_DATA_DIR/config.sh"
-
 source "$SCRIPTS/util.sh"
 
 logo=(
@@ -128,7 +126,7 @@ case $1 in
 			echo 'username and ip address.'
 			exit 1
 		fi
-		ln -s "$BASE_DIR/bin/server.sh" "$BIN_PREFIX/$COMMAND_NAME"
+		ln -s "$(show_server_path)" "$BIN_PREFIX/$COMMAND_NAME"
 		DATA_DIR="$BASE_DATA_DIR/$COMMAND_NAME"
 		ENV_FILE="$DATA_DIR/env.sh"
 		mkdir -p "$DATA_DIR/db-backups"

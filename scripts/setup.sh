@@ -190,8 +190,8 @@ heading 'Finsihed Server Provisioning!'
 
 heading "Setting up '$COMMAND_NAME' command..."
 
-echo "Linking $BIN_PREFIX/$COMMAND_NAME to $BASE_DIR/bin/server.sh..."
-ln -s "$BASE_DIR/bin/server.sh" "$BIN_PREFIX/$COMMAND_NAME"
+echo "Linking $BIN_PREFIX/$COMMAND_NAME to $BASE_DIR/scripts/server.sh..."
+ln -s "$BASE_DIR/scripts/server.sh" "$BIN_PREFIX/$COMMAND_NAME"
 
 heading 'All Done!'
 

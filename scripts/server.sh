@@ -294,7 +294,7 @@ SCRIPT_NAME="$(basename "$SCRIPT_PATH")"
 while [[ -L "$SCRIPT_PATH" ]] ; do # resolve symlinks
 	SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
 done
-BASE_DIR="$( cd "$( dirname "$SCRIPT_PATH" )"/.. && pwd )"
+BASE_DIR="$( cd "$( dirname "$SCRIPT_PATH" )"/.. && pwd -P )"
 BASE_DATA_DIR="$HOME/.config/cods"
 
 DATA_DIR="$BASE_DATA_DIR/$SCRIPT_NAME"
@@ -349,7 +349,7 @@ case $command in
 		;;
 
 	_test)
-		source "$BASE_DIR/bin/test.sh"
+		source "$SCRIPTS/test.sh"
 		;;
 
 	*) show_usage;;
