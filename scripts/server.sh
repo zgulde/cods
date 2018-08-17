@@ -9,6 +9,8 @@
 # script.
 ##############################################################################
 
+[[ $_CODS_DEBUG == 1 ]] && set -x
+
 auto_renew_certs() {
     ssh -t $user@$ip email=$email "$(< $SCRIPTS/snippets/letsencrypt-cronjob.sh)"
     [[ $? -eq 0 ]] && echo 'Autorenewal enabled!'

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+[[ $_CODS_DEBUG == 1 ]] && set -x
+
 usage() {
 	cat <<-.
 	$(basename "$0") -- This command is for creating new server commands, *not*
