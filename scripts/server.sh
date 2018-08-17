@@ -278,6 +278,7 @@ show_usage() {
 	    run         -- run arbitrary commands
 	    credentials -- view server credentials (found in $DATA_DIR/credentials.txt)
 	    destroy     -- destroy the server
+		tmux        -- attach to an existing, or create a new tmux session
 
 	    bash-completion -- generate bash tab completion script
 
@@ -337,6 +338,7 @@ case $command in
 	run)       ssh -t $user@$ip "$@";;
 	root)      ssh -t $user@$ip "sudo -s";;
 	ports)     show_ports;;
+	tmux)      ssh -t $user@$ip 'tmux a || tmux';;
 	destroy)   destroy_server;;
 
 	credentials)
