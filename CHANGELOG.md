@@ -1,3 +1,8 @@
+2.1.5
+
+- bugfix: apt was prompting us for input when initially provisioning the server,
+  we'll make sure this is all automated now
+
 2.1.4
 
 - refactor: move script location
