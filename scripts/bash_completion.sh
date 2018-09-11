@@ -20,7 +20,7 @@ _{{scriptname}}() {
 	local db_subcommands site_subcommands
 
 	server_subcommands='site db devserver login upload restart reboot info'
-	server_subcommands+=' adduser addkey autorenew ping credentials'
+	server_subcommands+=' adduser addkey autorenew ping credentials pipe'
 	server_subcommands+=' bash-completion destroy ports tmux _test'
 
 	db_subcommands='create backup run remove rm list ls login'

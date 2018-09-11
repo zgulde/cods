@@ -275,7 +275,8 @@ show_usage() {
 	    swapon      -- create and enable a swapfile (requires sudo password)
 	    autorenew   -- setup ssl certs to be automatically renewed
 	    reboot      -- reboot the server
-	    run         -- run arbitrary commands
+	    run         -- run arbitrary commands (with a pty)
+	    pipe        -- run arbitrary commands (without a pty)
 	    credentials -- view server credentials (found in $DATA_DIR/credentials.txt)
 	    destroy     -- destroy the server
 		tmux        -- attach to an existing, or create a new tmux session
@@ -336,6 +337,7 @@ case $command in
 	autorenew) auto_renew_certs;;
 	ping)      ping -c5 $ip;;
 	run)       ssh -t $user@$ip "$@";;
+	pipe)      ssh -T $user@$ip "$@";;
 	root)      ssh -t $user@$ip "sudo -s";;
 	ports)     show_ports;;
 	tmux)      ssh -t $user@$ip 'tmux a || tmux';;
