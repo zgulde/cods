@@ -19,16 +19,17 @@ set -e
 
 heading 'updating + upgrading apt'
 
+heading '[DEBUG] setting DEBIAN_FRONTEND=noninteractive'
+
+export DEBIAN_FRONTEND=noninteractive
+
 apt-get update
-yes | apt-get upgrade
+apt-get upgrade -y
 
 heading 'setting up nodejs repository'
 curl -sL https://deb.nodesource.com/setup_8.x | bash -
 
 heading 'installing packages'
-
-# otherwise mysql will try to prompt us for info
-export DEBIAN_FRONTEND=noninteractive
 
 apt-get install -y\
 	nginx\
