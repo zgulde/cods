@@ -1,3 +1,7 @@
+2.1.6 -- 20181108
+
+- refactor: use `curl` instead of `wget` see 189ecaf for more detail
+
 2.1.5 -- 20180911
 
 - bugfix: apt was prompting us for input when initially provisioning the server,
