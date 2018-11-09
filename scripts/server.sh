@@ -158,7 +158,7 @@ add_user() {
 		sshkeyfile=$(mktemp)
 		trap "rm -f $sshkeyfile" EXIT
 		url="https://github.com/${github_username}.keys"
-		wget -O "$sshkeyfile" "$url"
+		curl --location --output "$sshkeyfile" "$url"
 		if [[ $? -ne 0 ]] ; then
 			echo "Error obtaining public keys for $github_username!"
 			echo "$url gave a non-200 response."

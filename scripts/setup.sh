@@ -7,10 +7,11 @@
 
 # check for the utilities we'll need
 # these should be available on a default osx install
-prereqs=(perl dig ssh scp)
+prereqs=(perl dig ssh scp curl)
 for tool in ${prereqs[@]}; do
 	which $tool >/dev/null
 	if [[ $? -ne 0 ]]; then
+        echo "Error: couldn't find $tool."
 		echo "Please install '$tool' before continuing."
 		exit 1
 	fi
