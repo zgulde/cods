@@ -62,7 +62,7 @@ _{{scriptname}}() {
 			fi
 			subsubcommand=${COMP_WORDS[2]}
 			case $subsubcommand in
-				create) _cods_complete --static --node --java --enable-ssl --spring-boot -p --port --domain -d ;;
+				create) _cods_complete --static --python --node --java --enable-ssl --spring-boot -p --port --domain -d ;;
 				build|enablessl|info) _cods_complete -d --domain;;
 				list|ls) _cods_dont_complete ;;
 				remove|rm) _cods_complete --force -f --domain -d;;
@@ -72,7 +72,7 @@ _{{scriptname}}() {
 			;;
 		_test)
 			if [[ ${COMP_WORDS[2]} == deploy ]] ; then
-				_cods_complete java static node
+				_cods_complete java static node python
 			elif [[ $prev == _test ]] ; then
 				_cods_complete util site setup deploy
 			else
