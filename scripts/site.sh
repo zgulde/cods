@@ -16,14 +16,15 @@ create_site() {
 	usage() {
 		cat <<-.
 		Setup up the server to host a new site. The domain name and one of
-		{--static --java --node} must be provided.
+		{--static, --java, --node, --python} must be provided.
 
 		-d|--domain <domain> -- (required) domain name of the site to create
 		--static             -- setup a static site
 		--java               -- setup a java site
 		--node               -- setup a node site
-		-p|--port            -- port number that the application will run on
-		                        (required for --node and --java)
+		--python             -- setup a python site
+		-p|--port <port>     -- port number that the application will run on
+		                        (required for --node, --java, and --python)
 		--spring-boot        -- (optional) designate that this is a spring boot site
 		--enable-ssl         -- (optional) enable ssl after setting up the site
 		                        (see the enablessl subcommand)
@@ -48,8 +49,9 @@ create_site() {
 			-f|--force) force=yes;;
 			--spring-boot) springboot=yes;;
 			-s|--static) [[ -n $sitetype ]] && die 'type already specified' || sitetype=static ;;
-			-j|--java) [[ -n $sitetype ]] && die 'type already specified' || sitetype=java ;;
-			-n|--node) [[ -n $sitetype ]] && die 'type already specified' || sitetype=node ;;
+			--java) [[ -n $sitetype ]] && die 'type already specified' || sitetype=java ;;
+			--node) [[ -n $sitetype ]] && die 'type already specified' || sitetype=node ;;
+			--python) [[ -n $sitetype ]] && die 'type already specified' || sitetype=python ;;
 			-p|--port) port=$1 ; shift;;
 			--port=*) port=${arg#*=};;
 	        *) echo "Unknown argument: $arg" ; exit 1;;
@@ -58,7 +60,7 @@ create_site() {
 
 	[[ -z $domain ]] && die 'Error: No domain name specified'
 	[[ -z $sitetype ]] && die 'Error: No site type specified, provide one of {--java,--node,--static}'
-	if [[ $sitetype == java || $sitetype == node ]] && [[ -z $port ]] ; then
+	if [[ $sitetype == java || $sitetype == node || $sitetype == python ]] && [[ -z $port ]] ; then
 		die 'Error: No port number specified'
 	fi
 
@@ -70,7 +72,7 @@ create_site() {
 		die
 	else echo '  ok'
 	fi
-	if [[ $sitetype == java || $sitetype == node ]] ; then
+	if [[ $sitetype == java || $sitetype == node || $sitetype == python ]] ; then
 		if [[ $port -gt 65535 || $port -lt 1024 ]] ; then
 			die "Invalid port number: ${port}, must be in the range (1024 - 65535)"
 		fi
@@ -97,6 +99,9 @@ create_site() {
 		if [[ $sitetype == java ]] ; then
 			execstart="/usr/bin/java -jar app.jar --server.port=${port}"
 			template=post-receive.sh
+		elif [[ $sitetype == python ]] ; then
+			execstart="/srv/${domain}/start_server.sh"
+			template=post-receive-python.sh
 		else
 			execstart="/usr/bin/npm start"
 			template=post-receive-node.sh

@@ -39,6 +39,7 @@ apt-get install -y\
 	unattended-upgrades\
 	maven\
 	letsencrypt\
+	python3-venv\
 	nodejs
 
 heading 'configuring nginx...'
