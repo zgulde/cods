@@ -311,7 +311,7 @@ that your teammate used in the previous step.
 Next run
 
 ```
-shared-server info --domain DOMAIN
+shared-server site info --domain example.com
 ```
 
 relacing `DOMAIN` with the name of the domain you want to push to deploy to
