@@ -12,6 +12,8 @@ eval "$(< $SCRIPTS/site.sh)" >/dev/null
 	fail 'It should exit with a non-zero status when port is not specified for a java site'
 ( create_site --domain test.com --node > /dev/null ) &&\
 	fail 'It should exit with a non-zero status when port is not specified for a node site'
+( create_site --domain test.com --python > /dev/null ) &&\
+	fail 'It should exit with a non-zero status when port is not specified for a python site'
 ( create_site --domain test.com --static --java --port 8080 > /dev/null ) &&\
 	fail 'It should exit with a non-zero status when multiple types are specified'
 ( create_site --domain test.com --static --java --port 1023 > /dev/null ) &&\
