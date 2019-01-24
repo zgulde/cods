@@ -1,3 +1,11 @@
+2.2.0 -- 20190124
+
+- feature: add python site type
+- docs: document python site setup
+- docs: improve usage guide
+- docs: split off quick reference guide from the README, and expand on it
+- tests: fix spring boot application
+
 2.1.6 -- 20181108
 
 - refactor: use `curl` instead of `wget` see 189ecaf for more detail
