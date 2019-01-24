@@ -1,10 +1,24 @@
 # Usage
 
+This document provides in-depth documentation on how to use the `cods` tool.
+
+## Table of Contents
+
 * [The `cods` command](#the-cods-command)
+    * [`init`](#init)
+    * [A Note on Credentials](#a-note-on-credentials)
+    * [`share`](#share)
+    * [`update`](#update)
 * [Commands](#commands)
+    * [General Server Commands](#general-server-commands)
+    * [Site and Database Management Commands](#site-and-database-management-commands)
+    * [Examples](#examples)
 * [Site Creation](#site-creation)
     * [Java Site Creation](#java-site-creation)
+    * [Node Site Creation](#node-site-creation)
+    * [Python](#python)
     * [Static Site Creation](#static-site-creation)
+* [Database Management](#database-management)
 * [HTTPS](#https)
 * [Sharing your server with teammates](#sharing-your-server-with-teammates)
 * [Bash Completion](#bash-completion)
@@ -247,17 +261,45 @@ command to also enable https for the site after the site is created.
 
 ### Reverse Proxy Sites
 
-For both Java and Node sites, you will need to choose a port for the application
-to use on the server. Two applications _cannot_ use the same port, and this tool
-will prevent you from configuring two separate sites to point to the same
-upstream proxy.
+Any site that is not a static site will be setup with nginx as a reverse proxy
+to your application. This means that both your application and nginx are running
+on the server, and when a request comes in, nginx will forward it to your
+application.
+
+This configuration allows for virtual hosting, i.e. multiple sites can be hosted
+on the same server, and allows nginx to handle https.
+
+#### Port Selection
+
+For Java, Node, and Python sites, you will need to choose a port for your
+application to use on the server. Two applications _cannot_ use the same port,
+and this tool will prevent you from configuring two separate sites to point to
+the same upstream proxy.
 
 The port will need to be chosen when you create the site, and you can view all
-the ports that are currently referenced by running:
+the ports that are currently in use by running:
 
 ```
 myserver ports
 ```
+
+#### Static Content
+
+For any Java, Node, or Python site, nginx will be setup to serve static content
+from a `public` directory within the site directory.
+
+For example, if you created `example.com`, any files on the server in
+`/srv/example.com/public` will be served as-is, that is, the requests will not
+be passed to your application.
+
+For Java sites, you will probably need to manually manage the contents of this
+directory, or ignore it.
+
+For Node or Python sites, if you have a `public` directory at the top level of
+your project, any content in this directory will be served directly.
+
+Of course, you can simply choose to ignore this directory and have your
+application handle static contents itself.
 
 ### Java Site Creation
 
@@ -391,7 +433,7 @@ location for the `application.properties` file in a spring boot application.
 ### Node Site Creation
 
 ```
-myserver site create --node --port 3000
+myserver site create --node --port 3000 --domain my-node-site.com
 ```
 
 This tool relies on a `npm start` command being defined on your project that
@@ -402,15 +444,88 @@ same as the port that you pass when you run the above command to create the node
 site.
 
 A git remote will be created for you, and a `post-receive` hook will be setup so
-that when you push to the site:
+that when you push the `master` branch to the remote on the server:
 
-- the new version of the code is checked out, replacing the old version (if you
-  logged in to the server and edited any files by hand, they will be overridden)
-- if a file named `install.sh` exists at the root of the project, it will be
-  run, and a variable named `SITE_DIR` will be available to it that contains the
-  location of the directory for your site (and the source code).
-- if no `install.sh` is found, a `npm install` will be run and the service will
-  be restarted
+1. The new version of the code is checked out, replacing the old version
+1. If a file named `install.sh` exists at the root of the project, it will be
+   run, and a variable named `SITE_DIR` will be available to it that contains
+   the location of the directory for your site (and the source code).
+1. If no `install.sh` is found, `npm install` will be run
+1. The site service will be restarted, i.e. the old `npm run start` process will
+   be killed, and it will be started again
+
+See [the example node site for a simplified example](https://github.com/zgulde/cods/tree/master/tests/sample-sites/node).
+
+You can find the git remote and a copy-pastable command to add it to your
+project by running:
+
+```
+myserver site info --domain my-node-site.com
+```
+
+### Python
+
+```
+myserver site create --python --port 5000 --domain example-python-site.com
+```
+
+In order to host a python site, you'll need to have an executable script named
+`start_server.sh` as part of your project. When run, this script should start
+your webserver on the port you specified in the above command.
+
+Assuming `server.py` starts the web server, your script might look like this:
+
+```bash
+#!/usr/bin/env bash
+
+# ensure the virtualenv directory is present
+if [[ ! -d env ]] ; then
+    echo 'env directory not found!'
+    exit 1
+fi
+
+# activate the venv and start the server
+source env/bin/activate
+python server.py
+```
+
+You can add a file named `install.sh` to the root of your project to run custom
+code whenever the site is deployed as well. This script will have an environment
+variable, `SITE_DIR` available to it, that specifies the location of your source
+code on the server.
+
+For example, if your wanted to re-create the virtual environment everytime the
+site is deployed, your `install.sh` script might look like this:
+
+```
+#!/usr/bin/env bash
+
+cd $SITE_DIR
+
+echo "[install.sh] (re-)creating the venv"
+echo '[install.sh] - rm -rf env'
+rm -rf env
+echo '[install.sh] python3 -m venv env'
+python3 -m venv env
+echo '[install.sh] source env/bin/activate'
+source env/bin/activate
+echo '[install.sh] python3 -m pip install -r requirements.txt'
+python3 -m pip install -r requirements.txt
+```
+
+When you push to the git remote on the server:
+
+1. The new source code will be checked out, replacing the old version
+1. If a `install.sh` file is found, it will be run
+1. The currently running server process will be killed, and the server will be
+   started again.
+
+You can find the git remote and a copy-pastable command to add it to your
+project by running:
+
+```
+myserver site info --domain example-python-site.com
+```
 
 ### Static Site Creation
 
@@ -431,6 +546,8 @@ To find the deployment remote.
 
 Deploying a static site is as simple as pushing, when you push, the contents of
 your site will be replaced with the most recent contents of your git repository.
+
+[Here is a very minimal example of a static site](https://github.com/zgulde/cods/tree/master/tests/sample-sites/static).
 
 #### 404 Page and Rewrites
 
@@ -458,9 +575,30 @@ myserver restart --service=nginx
 Of course some static sites have a build process (e.g. webpack or sass). This
 tool is setup to accomodate these as well.
 
-Similarly to java deployment, if there is a file named `install.sh` in the root
-of the project, instead of copying the contents of the repository, the
-`install.sh` script will be run after pushing to the deployment remote.
+##### `.cods` file
+
+If your site can be built with a single command and outputs a single directory,
+it is easy to setup automated builds when you deploy.
+
+Create a file named `.cods` at the root of your project. It should have the
+following contents:
+
+```
+BUILD_COMMAND='npm run build'
+OUTPUT_DIR='build'
+```
+
+Replacing `npm run build` with the command used to build your project, and
+`build` with the name of the directory that contains your site's contents. If
+this file is setup, everytime you push to the git remote on the server, the
+build command will be run, and the contents of the output directory will be
+deployed.
+
+##### Custom Deployment
+
+If there is a file named `install.sh` in the root of the project, instead of
+copying the contents of the repository, the `install.sh` script will be run
+after pushing to the deployment remote.
 
 The script will be run with the current working directory as a fresh clone of
 your project. The clone will be removed when the `install.sh` script finishes
@@ -499,7 +637,7 @@ myserver site build -d example.com
 
 This will run the same commands that run when you push to the remote.
 
-### Database Management
+## Database Management
 
 While theoretically you might not need to do this, most applications will need
 to talk to a database in some form or fashion.
@@ -510,7 +648,12 @@ myserver db create -n some_db -u some_user
 
 This command will create a database and a user that has all permissions on that
 database (but not any others). The new user's password will be automatically
-generated and put into the `credentials.txt` file.
+generated and put into the `credentials.txt` file, which can be viewed by
+running:
+
+```bash
+myserver credentials
+```
 
 ## HTTPS
 
@@ -566,7 +709,7 @@ enablessl` commands back to back.
     myserver adduser -u sally -f ~/sallys_ssh_key.pub
     ```
 
-1. Choose (or have your teamate choose) a password for the new user
+1. Take note of the randomly generated password
 
 1. (Optionally) log into your mysql server and create a database administrator
    account for the new user.
@@ -586,22 +729,19 @@ enablessl` commands back to back.
     cods share shared-server
     ```
 
-## Uploads
+### Adding a User From Github
 
-Nginx is set up to first try to serve static files out of the public directory
-for a site, before passing the request to the upstream proxy.
-
-One example of putting this to use would be to setup an `uploads` directory
-inside the public directory, as this directory and its contents will persist
-even if you deploy a new version of your application. For example, you could
-tell your application to write uploaded files to
+You can also add a user to the server based on their github username. For
+example, to add `zgulde` to your server, you would run:
 
 ```
-/srv/example.com/public/uploads
+myserver adduser --github-username zgulde
 ```
 
-Then any url like `https://example.com/uploads/123abc.png` will be served out of
-the uploads directory.
+This command will create a user with the same login as the github username, a
+randomly chosen password, and will use whatever public keys are associated with
+the user's github account (you can find these by going to, e.g.,
+https://github.com/zgulde.keys).
 
 ## Bash Completion
 
