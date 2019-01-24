@@ -36,11 +36,11 @@ if [[ -f install.sh ]] ; then
 	bash install.sh
 else
 	npm install
-	log 'Restarting {{site}} service...'
-	sudo systemctl restart {{site}}
 fi
+
+log 'Restarting {{site}} service...'
+sudo systemctl restart {{site}}
 
 log '--------------------------------------------------'
 log '> All done!'
 log '--------------------------------------------------'
-
