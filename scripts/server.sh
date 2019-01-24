@@ -118,6 +118,7 @@ restart_service() {
 	[[ $? -eq 0 ]] && echo "$service restarted!"
 }
 
+# TODO: add user to all existing sites `sudo usermod -a -G somegroup newuser`
 add_user() {
 	while [[ $# -gt 0 ]] ; do
 		arg="$1" ; shift
