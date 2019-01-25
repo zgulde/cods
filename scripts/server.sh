@@ -9,7 +9,15 @@
 # script.
 ##############################################################################
 
-[[ $_CODS_DEBUG == 1 ]] && set -x
+
+if [[ $_CODS_DEBUG == 1 ]] ; then
+	logfile="cods-debug.log"
+	echo >&2 "Started logging to $logfile"
+	PS4='${BASH_SOURCE}::${FUNCNAME[0]}::$LINENO)'
+	exec 99>$logfile
+	BASH_XTRACEFD=99
+	set -x
+fi
 
 auto_renew_certs() {
     ssh -t $user@$ip email=$email "$(< $SCRIPTS/snippets/letsencrypt-cronjob.sh)"
