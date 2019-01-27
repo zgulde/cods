@@ -167,6 +167,7 @@ add_user() {
 		sshkeyfile=$(mktemp)
 		trap "rm -f $sshkeyfile" EXIT
 		url="https://github.com/${github_username}.keys"
+		echo "- Downloading Ssh Key(s) for $github_username"
 		curl --location --output "$sshkeyfile" "$url"
 		if [[ $? -ne 0 ]] ; then
 			echo "Error obtaining public keys for $github_username!"
@@ -191,7 +192,6 @@ add_user() {
 
 	password="$(mkpassword)"
 	echo "Creating user ${new_user}... (enter *your* sudo password when prompted)"
-
 	ssh -t $user@$ip "
 	set -e
 	sudo useradd --create-home --shell /bin/bash --groups sudo,web $new_user
@@ -199,6 +199,11 @@ add_user() {
 	sudo mkdir -p /home/$new_user/.ssh
 	cat <<< '$(cat "$sshkeyfile")' | sudo tee /home/$new_user/.ssh/authorized_keys >/dev/null
 	sudo chown --recursive $new_user:$new_user /home/$new_user
+	for site in /etc/nginx/sites-available/* ; do
+		site=\$(basename \$site)
+		[[ \$site == default ]] && continue
+		sudo usermod -a -G \$site $new_user
+	done
 	"
 	if [[ $? -eq 0 ]] ; then
 		echo "User ${new_user}: $password" >> "$DATA_DIR/credentials.txt"

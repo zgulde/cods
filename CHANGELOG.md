@@ -1,3 +1,7 @@
+2.2.1 -- 20190127
+
+- bugfix: [new users can now deploy to existing sites](https://github.com/zgulde/cods/issues/8)
+
 2.2.0 -- 20190124
 
 - feature: add python site type
