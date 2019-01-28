@@ -293,7 +293,7 @@ show_usage() {
 	    pipe        -- run arbitrary commands (without a pty)
 	    credentials -- view server credentials (found in $DATA_DIR/credentials.txt)
 	    destroy     -- destroy the server
-		tmux        -- attach to an existing, or create a new tmux session
+	    tmux        -- attach to an existing, or create a new tmux session
 
 	    bash-completion -- generate bash tab completion script
 
