@@ -132,6 +132,9 @@ Deploying a java spring-boot database backed blog application:
     python server.py
     .
     chmod +x start_server.sh
+
+    git add start_server.sh
+    git commit -m 'Add script for managing server startup'
     ```
 
     Assuming you are using a virtual environment

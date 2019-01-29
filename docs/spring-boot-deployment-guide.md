@@ -7,74 +7,27 @@ applications.
 See also the [FAQs](faq.md), and the [usage guide](usage.md) for more in-depth
 documentation.
 
+* [Prerequisites](#prerequisites)
+* [Overview](#overview)
+* [Get Your Application Ready For Deployment](#get-your-application-ready-for-deployment)
+* [Site Setup](#site-setup)
+* [Debugging](#debugging)
+
+## Prerequisites
+
+1. A server setup with cods. [See the initial server setup guide
+   here](initial-server-setup.md)
+1. DNS Records for the domain you wish to deploy to configured properly. Check
+   out [the DNS configuration guide here](dns-configuration.md)
+1. A working spring boot application. That is, you should be able to run the app
+   locally without any errors.
+
 ## Overview
 
-*Note that if you are looking to add a site to an existing server, you should
-skip the "First Time Server Setup" section.*
-
-1. [First Time Server Setup](#first-time-server-setup)
 1. [Get Your Application Ready For Deployment](#get-your-application-ready-for-deployment)
 1. [Site Setup](#site-setup)
 
-## First Time Server Setup
-
-1. Sign up for digital ocean
-
-1. Create a droplet on digitalocean.com
-
-    Choose Ubuntu 16.04x64 as the operating system, and the $5/month, 1GB RAM
-    option for the size of the server.
-
-    Make sure to add your ssh key to the droplet! The command below will copy
-    your public key to your clipboard.
-
-    ```
-    cat ~/.ssh/id_rsa.pub | pbcopy
-    ```
-
-1. Install the deployment tool
-
-    ```
-    brew install zgulde/zgulde/cods
-    ```
-
-    See the [installation guide](installation.md) if you are not on MacOS.
-
-1. Perform the initial setup
-
-    ```
-    cods init myserver
-    ```
-
-    The `myserver` part of the command above specifies the name of the command
-    that will be created that you will use to interact with your server. You can
-    choose something different here (e.g. `my-awesome-server`), but this guide
-    will assume you have chosen `myserver`.
-
-    The script will prompt you for the server's IP address, so have it ready.
-
-    Read the prompts that appear, and provide the necessary information.
-
-After the last step above, you will be able to run the command
-
-```
-myserver
-```
-
-to interact with your server. In addition, a file located at
-`~/.config/cods/myserver/credentials.txt` will be created. This file contains
-the admin password for your server, as well as admin password for the mysql
-installation on the server.
-
-You can access the credentials to your server by running:
-
-```
-myserver credentials
-```
-
-*If you are worried about storing the credentials in plain text, you can delete
-this file and save your passwords in a password manager. However, if you lose
-your passwords, they are _not_ recoverable!*
+This document assumes your server command is `myserver`.
 
 ## Get Your Application Ready For Deployment
 
@@ -187,20 +140,6 @@ as a `jar` and run it.
 
 ## Site Setup
 
-1. Buy a domain name (we recommend namecheap), and point the DNS nameservers for
-   that domain to digital ocean
-
-    ```
-    ns1.digitalocean.com
-    ns2.digitalocean.com
-    ns3.digitalocean.com
-    ```
-
-1. [Configure your domain's DNS settings with digital ocean.](https://cloud.digitalocean.com/networking)
-
-    - Add an 'A' record that points to your droplet
-    - optionally, add the 'www' subdomain, or all subdomains
-
 1. Create a database for your site
 
     ```
@@ -282,3 +221,44 @@ as a `jar` and run it.
     ```
     git push production master
     ```
+
+## Debugging
+
+In general, debugging will fall into one of two categories, either something
+goes wrong during the build process, that is, when you do a push, or something
+goes wrong while the app is running, or starting up.
+
+In general, try to reproduce any errors locally, so that your can solve them
+locally, then push the fixes to production.
+
+### Building
+
+If anything goes wrong during the build process, you should see the output /
+error messages after running a `git push` to production.
+
+Occasionally, you will want to re-run the build process even though you don't
+have any changes to push. In this case, you can run:
+
+```bash
+myserver site build --domain example.com
+```
+
+To trigger the same process that happens when you do a `git push`.
+
+### While the app is running
+
+Even if your application is built successfully, something might go wrong when
+your application initially starts up, or at some point when it is running. You
+can view the logs for your application by running:
+
+```
+myserver site logs --domain example.com
+```
+
+And you can watch the log file in realtime by running:
+
+```
+myserver site logs --domain example.com --follow
+```
+
+Press Ctrl-C to stop watching the log file.

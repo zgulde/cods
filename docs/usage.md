@@ -489,6 +489,11 @@ source env/bin/activate
 python server.py
 ```
 
+This script should start the application in production mode, for example, you
+may use this script to start your application with one of python's wsgi web
+servers, e.g. `gunicorn` or `waitress` (I.e. don't start your app in
+development/debugging mode!).
+
 You can add a file named `install.sh` to the root of your project to run custom
 code whenever the site is deployed as well. This script will have an environment
 variable, `SITE_DIR` available to it, that specifies the location of your source
