@@ -51,5 +51,3 @@ git reset --hard origin/master
 # or a specific version
 git checkout v0.2.3
 ```
-
-

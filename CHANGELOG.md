@@ -1,3 +1,9 @@
+2.2.2 -- 20190201
+
+- docs: more of them, and more modular
+- bugfix: whitespace in CLI help message
+- enhancement: more logging output in post-receive scripts
+
 2.2.1 -- 20190127
 
 - bugfix: [new users can now deploy to existing sites](https://github.com/zgulde/cods/issues/8)

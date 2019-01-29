@@ -28,8 +28,11 @@ cods help
 
 - [Quick Reference](docs/quick-reference.md)
 - [Installation](docs/installation.md)
+- [Initial Server Setup](docs/initial-server-setup.md)
+- [Domain DNS Configuration](docs/dns-configuration.md)
 - [Usage Guide](docs/usage.md)
-- [Step by Step Deployment Guide For a Spring Boot Application](docs/deployment-guide.md)
 - [Frequently Asked Questions](docs/faq.md)
+- [Step by Step Deployment Guide For a Spring Boot Application](docs/spring-boot-deployment-guide.md)
+- [Step by Step Deployment Guide For a Node + Webpack Application](docs/node-movies-deployment-guide.md)
 - [How It Works](docs/how-it-works.md)
 
