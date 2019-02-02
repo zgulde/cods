@@ -52,6 +52,7 @@ if git ls-tree HEAD | cut -f 2 | grep ^.cods$ >/dev/null || git ls-tree HEAD | c
 
 	if [[ -f install.sh ]] ; then
 		log 'Found "install.sh"! Running...'
+		log "Exporting SITE_DIR=$SITE_DIR, PUBLIC_DIR=$PUBLIC_DIR, TMP_REPO=$TMP_REPO"
 		export SITE_DIR
 		export PUBLIC_DIR
 		export TMP_REPO

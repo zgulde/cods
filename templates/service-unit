@@ -6,8 +6,8 @@ WorkingDirectory=/srv/{{domain}}
 ExecStart={{execstart}}
 
 Restart=always
-# Restart service after 10 seconds if it crashes
-RestartSec=10
+# Restart service after 30 seconds if it crashes
+RestartSec=30
 
 # Output to syslog
 StandardOutput=syslog

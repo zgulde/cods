@@ -9,7 +9,7 @@ log() {
 }
 
 cleanup() {
-	log "cleaning up temp files ($TMP_REPO)..."
+	log "cleaning up temp files ($TMP_REPO)"
 	rm -rf $TMP_REPO
 }
 
@@ -27,18 +27,20 @@ while read old new ref; do
     fi
 done
 
+log 'Checking out the most recent version of the code'
 git --work-tree=${SITE_DIR} --git-dir=${SITE_DIR}/repo.git checkout -f master
 
 cd $SITE_DIR
 
 if [[ -f install.sh ]] ; then
 	export SITE_DIR
+	log 'Running install.sh'
 	bash install.sh
 else
 	npm install
 fi
 
-log 'Restarting {{site}} service...'
+log 'Restarting {{site}} service'
 sudo systemctl restart {{site}}
 
 log '--------------------------------------------------'
