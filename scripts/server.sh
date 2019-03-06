@@ -20,8 +20,13 @@ if [[ $_CODS_DEBUG == 1 ]] ; then
 fi
 
 auto_renew_certs() {
-    ssh -t $user@$ip email=$email "$(< $SCRIPTS/snippets/letsencrypt-cronjob.sh)"
-    [[ $? -eq 0 ]] && echo 'Autorenewal enabled!'
+	if [[ -z $email ]] ; then
+		echo 'It looks like you have not setup an email address. Please ensure you'
+		echo "have one in $ENV_FILE before running this command."
+		exit 1
+	fi
+	ssh -t $user@$ip email=$email "$(< $SCRIPTS/snippets/letsencrypt-cronjob.sh)"
+	[[ $? -eq 0 ]] && echo 'Autorenewal enabled!'
 }
 
 show_ports() {
