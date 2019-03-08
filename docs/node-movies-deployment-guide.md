@@ -79,8 +79,13 @@ In addition to running and being error free, we'll need to ensure 2 things:
 ## Create the site
 
 ```sh
-myserver site create --domain example.com
+myserver site create --domain example.com --node --port 3000
 ```
+
+Replacing `example.com` with the domain name you want to deploy to.
+
+You might also need to replace `3000` here if your application runs on a
+different port number.
 
 ## Deploy your application
 
