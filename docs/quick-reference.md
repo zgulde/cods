@@ -1,5 +1,12 @@
 # Quick Reference
 
+* [Initial Server Setup](#initial-server-setup)
+* [Java + Spring Boot Site](#java--spring-boot-site)
+* [Static Site](#static-site)
+* [Node Site](#node-site)
+* [Python Site](#python-site)
+* [Enable Https](#enable-https)
+
 ## Initial Server Setup
 
 0. Setup
