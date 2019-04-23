@@ -241,6 +241,7 @@ myserver upload -f ~/Downloads/kittens.png -d /srv/example.com/public/uploads
     - A java web application with an embedded webserver (e.g. embedded tomcat)
       packaged as a jar
     - a node application
+    - a python application
     - A static site (optionally with a build step)
 1. For any domain (or subdomain) you want to host on your server, you will need
    to have the DNS records already configured to point to your server's IP.
@@ -266,8 +267,8 @@ to your application. This means that both your application and nginx are running
 on the server, and when a request comes in, nginx will forward it to your
 application.
 
-This configuration allows for virtual hosting, i.e. multiple sites can be hosted
-on the same server, and allows nginx to handle https.
+This configuration allows for virtual hosting, i.e. multiple domains can be
+hosted on the same server, and allows nginx to handle https.
 
 #### Port Selection
 
