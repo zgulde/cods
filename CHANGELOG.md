@@ -1,3 +1,9 @@
+2.2.3 -- 20190422
+
+- docs: minor improvements/tweaks
+- bugfix: update deps in python sample site
+- bugfix: put https cert renewal into external script that runs in a cronjob
+
 2.2.2 -- 20190201
 
 - docs: more of them, and more modular
