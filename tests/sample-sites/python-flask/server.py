@@ -13,13 +13,6 @@ def json_index():
         'message': 'Hello, World!'
     })
 
-@app.errorhandler(404)
-def handle404(error):
-    return jsonify({
-        'status': 404,
-        'error': str(error)
-    })
-
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
