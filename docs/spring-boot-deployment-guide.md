@@ -185,7 +185,7 @@ as a `jar` and run it.
 
     ```
     cd ~/IdeaProjects/springboot-blog
-    myserver upload --file src/main/resources/application.properties --destination /srv/example.com/
+    myserver upload --file src/main/resources/application.properties --destination /srv/example.com
     ```
 
     Then changing the relevant values. That is, change the database user and
