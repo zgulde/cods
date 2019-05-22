@@ -59,7 +59,7 @@ create_site() {
 	done
 
 	[[ -z $domain ]] && die 'Error: No domain name specified'
-	[[ -z $sitetype ]] && die 'Error: No site type specified, provide one of {--java,--node,--static}'
+	[[ -z $sitetype ]] && die 'Error: No site type specified, provide one of {--java,--node,--static,--python}'
 	if [[ $sitetype == java || $sitetype == node || $sitetype == python ]] && [[ -z $port ]] ; then
 		die 'Error: No port number specified'
 	fi
