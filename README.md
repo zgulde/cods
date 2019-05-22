@@ -31,4 +31,5 @@ This project is probably **not** for you if:
 - [Frequently Asked Questions](docs/faq.md)
 - [Step by Step Deployment Guide For a Spring Boot Application](docs/spring-boot-deployment-guide.md)
 - [Step by Step Deployment Guide For a Node + Webpack Application](docs/node-movies-deployment-guide.md)
+- [Step by Step Deployment Guide For a Python Flask Application](docs/python-deployment-guide.md)
 - [Getting More Help](SUPPORT.md)
