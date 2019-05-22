@@ -85,6 +85,8 @@ you already setup this script, you can skip the rest of this section.)
     Take a look at the code snippet below:
 
     ```
+    #!/usr/bin/env bash
+
     set -e # cause the script to exit on any errors
 
     echo '[start_server.sh] Activating Virtual Environment'
@@ -93,7 +95,7 @@ you already setup this script, you can skip the rest of this section.)
     python server.py
     ```
 
-    Copy the code above into a file named `start_server.py`. If your virtual
+    Copy the code above into a file named `start_server.sh`. If your virtual
     environment is not in a directory named `env`, or your application
     entrypoint is not `server.py` you'll need to tweak the code above,
     otherwise, you shouldn't need to make any changes.
@@ -110,7 +112,6 @@ Copy the following into a file named `install.sh`:
 ```
 # Script used for deployment with cods (https://github.com/zgulde/cods)
 set -e
-set -u
 
 cd $SITE_DIR
 
