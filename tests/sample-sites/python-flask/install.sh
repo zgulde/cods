@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -u
+
 # Script used for deployment with cods (https://github.com/zgulde/cods)
 
 cd $SITE_DIR
