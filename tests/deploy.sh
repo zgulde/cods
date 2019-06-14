@@ -4,7 +4,7 @@ usage() {
 	echo '    myserver _test deploy java testing.example.com'
 	echo '    myserver _test deploy static testing.example.com'
 	echo
-	echo 'Where site type is one of {java,static,node,python}'
+	echo 'Where site type is one of {java,static,node,python,php}'
 	echo
 }
 
@@ -63,7 +63,7 @@ case $test_type in
 			  as a response from $DOMAIN
 			.
 		else
-			echo "[test] Found expected response from java site: $DOMAIN"
+			echo -e "[test] \e[1msuccess\e[0m Found expected response from java site deployed at $DOMAIN"
 		fi
 
 		echo '[test] Removing site...'
@@ -106,7 +106,7 @@ case $test_type in
 			  as a response from $DOMAIN
 			.
 		else
-			echo "[test] Found expected response from node site: $DOMAIN"
+			echo -e "[test] \e[1msuccess\e[0m Found expected response from node site deployed at $DOMAIN"
 		fi
 
 		echo '[test] Removing site...'
@@ -149,7 +149,7 @@ case $test_type in
 			  as a response from $DOMAIN
 			.
 		else
-			echo "[test] Found expected response from python site: $DOMAIN"
+			echo -e "[test] \e[1msuccess\e[0m Found expected response from python site deployed at $DOMAIN"
 		fi
 
 		echo '[test] Removing site...'
@@ -183,7 +183,7 @@ case $test_type in
 			  as a response from $DOMAIN
 			.
 		else
-			echo "[test] Found expected response from static site deployed at $DOMAIN"
+			echo -e "[test] \e[1msuccess\e[0m Found expected response from static site deployed at $DOMAIN"
 			success '[test] Pass'
 		fi
 
@@ -216,7 +216,7 @@ case $test_type in
 			  as a response from $DOMAIN
 			.
 		else
-			echo "[test] Found expected response from static install.sh deploy at $DOMAIN"
+			echo -e "[test] \e[1msuccess\e[0m Found expected response from static install.sh deploy at $DOMAIN"
 			success '[test] Pass'
 		fi
 
@@ -249,7 +249,7 @@ case $test_type in
 			  as a response from $DOMAIN
 			.
 		else
-			echo "[test] Found expected response from static .cods deploy at $DOMAIN"
+			echo -e "[test] \e[1msuccess\e[0m Found expected response from static .cods deploy at $DOMAIN"
 			success '[test] Pass'
 		fi
 
@@ -257,6 +257,49 @@ case $test_type in
 		remove_site --domain $DOMAIN --force
 
 		rm -rf $BASE_DIR/tests/sample-sites/static-with-dot-cods/.git
+		;;
+	php)
+		heading '[TESTING] Creating and Deploying PHP site...'
+
+		GIT="git -C $BASE_DIR/tests/sample-sites/php"
+
+		echo '[test] Creating site...'
+		create_site --domain $DOMAIN --force --php
+
+		$GIT init
+		$GIT add .
+		$GIT commit -m first
+		$GIT remote add origin $user@$ip:/srv/$DOMAIN/repo.git
+		echo '[test] Pushing to deploy...'
+		$GIT push origin master
+
+		echo '[test] We will wait 5 seconds for the app to startup...'
+		# fancy progress bar
+		for i in {1..10} ; do
+			echo -ne "\r[test] $((i / 2))/5 [$(repeat = $i)$(repeat ' ' $((10 - i)))]"
+			sleep 0.5
+		done
+		echo
+
+		expected='PHP site is working!'
+		response="$(curl -Ss http://$DOMAIN)"
+
+		if [[ $expected != $response ]] ; then
+			fail 'PHP Site Deployement'
+			cat <<-.
+			  expected to find  "$expected"
+			  but instead found "$response"
+
+			  as a response from $DOMAIN
+			.
+		else
+			echo -e "[test] \e[1msuccess\e[0m Found expected response from php site: $DOMAIN"
+		fi
+
+		echo '[test] Removing site...'
+		remove_site --domain $DOMAIN --force
+
+		rm -rf $BASE_DIR/tests/sample-sites/php/.git
 		;;
 	*) usage ; exit 1;;
 esac

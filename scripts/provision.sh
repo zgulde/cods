@@ -17,34 +17,32 @@ heading(){
 
 set -e
 
-heading 'updating + upgrading apt'
-
-heading '[DEBUG] setting DEBIAN_FRONTEND=noninteractive'
-
+# prevent installed packages (namely mysql) from trying to prompt for
+# information in an interactive way. We'll do the setup progromatically
+# ourselves.
 export DEBIAN_FRONTEND=noninteractive
+
+heading 'updating + upgrading apt'
 
 apt-get update
 apt-get upgrade -y
 
-heading 'setting up nodejs repository'
-curl -sL https://deb.nodesource.com/setup_8.x | bash -
-
 heading 'installing packages'
 
 apt-get install -y\
-	nginx\
-	openjdk-11-jdk-headless\
-	openjdk-8-jdk-headless\
+	letsencrypt nginx\
+	openjdk-11-jdk-headless openjdk-8-jdk-headless maven\
+	python3-venv python3-pip virtualenv\
+	nodejs npm\
+    php7.2-fpm php7.2-cli php7.2-bcmath php7.2-json php7.2-mbstring php7.2-xml\
+    php7.2-tokenizer php7.2-mysql php7.2-sqlite3 php7.2-pgsql php7.2-zip\
+	php7.2-curl php7.2-gd composer\
 	ufw\
 	mysql-server\
 	unattended-upgrades\
-	maven\
-	letsencrypt\
-	python3-venv\
-	nodejs\
-	php7.2-fpm
+	zip htop apache2-utils
 
-heading 'configuring nginx...'
+heading 'configuring nginx'
 
 # group we'll use use for all of our web-admin needs
 groupadd web

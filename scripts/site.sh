@@ -16,13 +16,14 @@ create_site() {
 	usage() {
 		cat <<-.
 		Setup up the server to host a new site. The domain name and one of
-		{--static, --java, --node, --python} must be provided.
+		{--static, --java, --node, --python, --php} must be provided.
 
 		-d|--domain <domain> -- (required) domain name of the site to create
 		--static             -- setup a static site
 		--java               -- setup a java site
 		--node               -- setup a node site
 		--python             -- setup a python site
+		--php                -- setup a php site
 		-p|--port <port>     -- port number that the application will run on
 		                        (required for --node, --java, and --python)
 		--spring-boot        -- (optional) designate that this is a spring boot site
@@ -52,6 +53,7 @@ create_site() {
 			--java) [[ -n $sitetype ]] && die 'type already specified' || sitetype=java ;;
 			--node) [[ -n $sitetype ]] && die 'type already specified' || sitetype=node ;;
 			--python) [[ -n $sitetype ]] && die 'type already specified' || sitetype=python ;;
+			--php) [[ -n $sitetype ]] && die 'type already specified' || sitetype=php ;;
 			-p|--port) port=$1 ; shift;;
 			--port=*) port=${arg#*=};;
 	        *) echo "Unknown argument: $arg" ; exit 1;;
@@ -59,7 +61,7 @@ create_site() {
 	done
 
 	[[ -z $domain ]] && die 'Error: No domain name specified'
-	[[ -z $sitetype ]] && die 'Error: No site type specified, provide one of {--java,--node,--static,--python}'
+	[[ -z $sitetype ]] && die 'Error: No site type specified, provide one of {--java,--node,--static,--python,--php}'
 	if [[ $sitetype == java || $sitetype == node || $sitetype == python ]] && [[ -z $port ]] ; then
 		die 'Error: No port number specified'
 	fi
@@ -94,6 +96,9 @@ create_site() {
 	if [[ $sitetype == static ]] ; then
 		site_create_snippet="$SNIPPETS/create-static-site.sh"
 		template=post-receive-static.sh
+	elif [[ $sitetype == php ]] ; then
+		site_create_snippet="$SNIPPETS/create-php-site.sh"
+		template=post-receive-php.sh
 	else
 		site_create_snippet="$SNIPPETS/create-reverse-proxy-site.sh"
 		if [[ $sitetype == java ]] ; then
@@ -162,7 +167,7 @@ enable_ssl() {
 	if [[ -n $port ]] ; then
 		echo "  Found Port No: ${port}"
 	else
-		echo '  No Port Found, Setting Up A Static Site'
+		echo '  No port number found, this must be a php or static site'
 	fi
 
 	ssh -t $user@$ip "
@@ -208,7 +213,7 @@ remove_site() {
 
 	ssh -t $user@$ip "
 	# clean up application server configuration if its a reverse-proxy site
-	if grep proxy_pass /etc/nginx/sites-available/${domain} >/dev/null ; then
+	if grep -q proxy_pass /etc/nginx/sites-available/${domain} && ! grep -q 'include fastcgi_params' /etc/nginx/sites-available/${domain} ; then
 		echo '- Removing Systemd Service -- /etc/systemd/system/${domain}.service'
 		sudo systemctl stop ${domain}
 		sudo systemctl disable ${domain}.service

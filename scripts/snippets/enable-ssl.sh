@@ -13,12 +13,15 @@ sudo letsencrypt certonly\
 	--domain ${domain}\
 	--agree-tos\
 	--email $email\
+	--non-interactive\
 	--renew-by-default >> /srv/letsencrypt.log
 
 echo "- Setting Up Nginx To Serve ${domain} Over Https..."
 
-# figure out whether we have a java site or a static one
-if grep proxy_pass /etc/nginx/sites-available/$domain >/dev/null ; then
+# figure out what kind of site we have
+if egrep -q 'include fastcgi_params;' /etc/nginx/sites-available/$domain ; then
+	template=ssl-php-site.nginx.conf
+elif grep proxy_pass /etc/nginx/sites-available/$domain >/dev/null ; then
 	template=ssl-site.nginx.conf
 else
 	template=static-ssl-site.nginx.conf
