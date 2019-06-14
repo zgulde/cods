@@ -33,14 +33,16 @@ heading 'installing packages'
 
 apt-get install -y\
 	nginx\
-	default-jdk\
+	openjdk-11-jdk-headless\
+	openjdk-8-jdk-headless\
 	ufw\
 	mysql-server\
 	unattended-upgrades\
 	maven\
 	letsencrypt\
 	python3-venv\
-	nodejs
+	nodejs\
+	php7.2-fpm
 
 heading 'configuring nginx...'
 

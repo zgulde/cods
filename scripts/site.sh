@@ -214,7 +214,7 @@ remove_site() {
 		sudo systemctl disable ${domain}.service
 		sudo rm -f /etc/systemd/system/${domain}.service
 		echo '- Removing Sudo Config'
-		sudo rm -f /etc/sudoers.d/${domain}
+		sudo rm -f /etc/sudoers.d/${domain//./-}
 		sudo systemctl daemon-reload
 		sudo systemctl reset-failed
 	fi
@@ -228,10 +228,10 @@ remove_site() {
 	echo '- Removing ${domain} User and Group'
 	# remove all users from the group
 	for user in \$(ls /home) ; do
-		sudo gpasswd -d \$user $domain >/dev/null
+		sudo gpasswd -d \$user ${domain//./-} >/dev/null
 	done
-	sudo gpasswd -d www-data $domain >/dev/null
-	sudo userdel ${domain}
+	sudo gpasswd -d www-data ${domain//./-} >/dev/null
+	sudo userdel ${domain//./-}
 	"
 
 	[[ $? -eq 0 ]] && echo '- Site Removed!'

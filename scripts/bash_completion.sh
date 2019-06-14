@@ -22,6 +22,7 @@ _{{scriptname}}() {
 	server_subcommands='site db devserver login upload restart reboot info'
 	server_subcommands+=' adduser addkey autorenew ping credentials pipe'
 	server_subcommands+=' bash-completion destroy ports tmux _test'
+	server_subcommands+=' switch-java-version'
 
 	db_subcommands='create backup run remove rm list ls login'
 	site_subcommands='list ls create remove rm build enablessl info logs'

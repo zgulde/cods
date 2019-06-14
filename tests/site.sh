@@ -30,19 +30,19 @@ echo -n '  Running tests...'
 ssh -T $user@$ip sudo bash >/dev/null <<'test'
 fail() { echo -e "  \033[01;31m[FAIL]\033[0m $@" >&2 ; }
 
-id -u test.com >/dev/null || fail 'Expected to find a user account for the site'
-[[ $(getent passwd test.com | cut -d: -f7) == /bin/false ]] ||\
+id -u test-com >/dev/null || fail 'Expected to find a user account for the site'
+[[ $(getent passwd test-com | cut -d: -f7) == /bin/false ]] ||\
 	fail 'Expected test.com users shell to be /bin/false'
 
 [[ -d /srv/test.com/ ]] ||\
 	fail 'Expected to find a directory created in /srv'
 stat=$(stat --format='%G:%U' /srv/test.com)
-[[ $stat == 'test.com:test.com' ]] ||\
+[[ $stat == 'test-com:test-com' ]] ||\
 	fail 'Expected /srv/test.com to be owned by "test.com:test.com"'
 [[ -d /srv/test.com/public ]] ||\
 	fail 'Expected to find a public directory for the site'
 stat=$(stat --format='%G' /srv/test.com/public)
-[[ $stat == 'test.com' ]] ||\
+[[ $stat == 'test-com' ]] ||\
 	fail "Expected the public directory to be owned by 'test.com' group, found '$stat'"
 [[ -f /etc/nginx/sites-available/test.com ]] ||\
 	fail 'Expected /etc/nginx/sites-available/test.com to exist'
@@ -71,10 +71,10 @@ stat=$(stat --format='%G' /srv/test.com/public)
 	fail 'Expected to find a service file setup'
 grep 'java -jar app.jar' /etc/systemd/system/test.com.service ||\
 	fail 'Excepted to find "java -jar app.jar" in the service unit'
-grep 'User=test.com' /etc/systemd/system/test.com.service ||\
-	fail 'Expected the service to run as user test.com'
-grep 'Group=test.com' /etc/systemd/system/test.com.service ||\
-	fail 'Expected the service to run as group test.com'
+grep 'User=test-com' /etc/systemd/system/test.com.service ||\
+	fail 'Expected the service to run as user test-com'
+grep 'Group=test-com' /etc/systemd/system/test.com.service ||\
+	fail 'Expected the service to run as group test-com'
 systemctl list-unit-files | grep enabled | grep test.com >/dev/null ||\
 	fail 'Expected the service for test.com to be enabled'
 
@@ -104,7 +104,7 @@ fail() { echo -e "  \033[01;31m[FAIL]\033[0m $@" >&2 ; }
 	fail 'expected the nginx config in /etc/nginx/sites-available to be removed'
 [[ -f /etc/systemd/system/test.com.service ]] &&\
 	fail 'expected service file to be removed'
-[[ -f /etc/sudoers.d/test.com ]] &&\
+[[ -f /etc/sudoers.d/test-com ]] &&\
 	fail 'expected sudoers config to be removed'
 .
 echo ' done.'
@@ -123,7 +123,7 @@ fail() { echo -e "  \033[01;31m[FAIL]\033[0m $@" >&2 ; }
 [[ -d /srv/test.com/public ]] ||\
 	fail 'Expected a public directory to be created'
 stat=$(stat --format='%G' /srv/test.com/public)
-[[ $stat == 'test.com' ]] ||\
+[[ $stat == 'test-com' ]] ||\
 	fail "Expected public directory to be owned by group test.com, instead found $stat"
 [[ -f /etc/nginx/sites-available/test.com ]] ||\
 	fail 'Expected /etc/nginx/sites-available/test.com to exist'

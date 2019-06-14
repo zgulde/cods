@@ -26,7 +26,7 @@ initial_server_setup() {
 	Create a Server (Digital Ocean calls these "droplets") with the following
 	specifications:
 
-	- Ubuntu 16.04x64
+	- Ubuntu 18.04x64
 	- At least 1GB of Memory (RAM)
 
 	If you have already created a droplet in the past, you can skip the step

@@ -300,7 +300,8 @@ show_usage() {
 	    destroy     -- destroy the server
 	    tmux        -- attach to an existing, or create a new tmux session
 
-	    bash-completion -- generate bash tab completion script
+	    switch-java-version -- switch the default version of java on the server
+	    bash-completion     -- generate bash tab completion script
 
 	    upload  -f <file> [-d <destination>]
 	    restart -s <service>
@@ -361,6 +362,10 @@ case $command in
 	ports)     show_ports;;
 	tmux)      ssh -t $user@$ip 'tmux a || tmux';;
 	destroy)   destroy_server;;
+
+	switch-java-version)
+		ssh -t $user@$ip sudo update-alternatives --config java
+		;;
 
 	credentials)
 		if [[ -f "$DATA_DIR/credentials.txt" ]] ; then

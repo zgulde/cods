@@ -1,15 +1,17 @@
 # variables: $domain
 
+username=${domain//./-}
+
 echo "- Creating User + Group For ${domain}"
-sudo useradd --no-create-home ${domain} --shell /bin/false
+sudo useradd --no-create-home ${username} --shell /bin/false
 # add admin users to new group
-for user in $(ls /home) ; do sudo usermod -a -G ${domain} ${user} ; done
+for user in $(ls /home) ; do sudo usermod -a -G ${username} ${user} ; done
 # and ngnix
-sudo usermod -a -G ${domain} www-data
+sudo usermod -a -G ${username} www-data
 
 echo "- Creating Site Directory -- /srv/${domain}"
 sudo mkdir -p /srv/${domain}/public
-sudo chown -R ${domain}:${domain} /srv/${domain}
+sudo chown -R ${username}:${username} /srv/${domain}
 sudo chmod g+srw /srv/${domain}
 sudo chmod g+srw /srv/${domain}/public
 
@@ -25,5 +27,5 @@ sudo systemctl restart nginx
 # We'll put something there so that we can at least see a page to see if the
 # site was properly setup
 echo "<h1>$domain ready to go!</h1>" | sudo tee /srv/${domain}/public/index.html > /dev/null
-sudo chown ${domain}:${domain} /srv/${domain}/public/index.html
+sudo chown ${username}:${username} /srv/${domain}/public/index.html
 sudo chmod g+rw /srv/${domain}/public/index.html

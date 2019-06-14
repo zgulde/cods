@@ -10,7 +10,7 @@ ssh access to a server.
 
     A "droplet" is what digital ocean calls it's virtual servers.
 
-    Choose Ubuntu 16.04x64 as the operating system, and the $5/month, 1GB RAM
+    Choose Ubuntu 18.04x64 as the operating system, and the $5/month, 1GB RAM
     option for the size of the server.
 
     Make sure to add your ssh key to the droplet! The command below will copy

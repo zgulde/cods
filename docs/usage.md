@@ -48,7 +48,7 @@ server.
 
 Before running the `init` command make sure you have
 
-1. A server with a fresh ubuntu 16.04 install
+1. A server with a fresh ubuntu 18.04 install
 1. Your ssh key on that server with access to the root account
 1. The server's ip address ready
 

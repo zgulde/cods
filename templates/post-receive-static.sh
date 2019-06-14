@@ -87,7 +87,7 @@ if git ls-tree HEAD | cut -f 2 | grep ^.cods$ >/dev/null || git ls-tree HEAD | c
 		fi
 		log "Moving $OUTPUT_DIR to $SITE_DIR/public..."
 		# set the correct permissions and group ownership
-		chgrp {{site}} $OUTPUT_DIR
+		chgrp --recursive {{username}} $OUTPUT_DIR
 		chmod g+rwxs $OUTPUT_DIR
 		rm -rf ${SITE_DIR}/public
 		mv $OUTPUT_DIR ${SITE_DIR}/public
