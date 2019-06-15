@@ -107,7 +107,7 @@ case $1 in
 	init)
 		[[ -z $2 ]] && usage
 		COMMAND_NAME="$2"
-		if [[ -L "$BIN_PREFIX/$COMMAND_NAME" ]] || which "$COMMAND_NAME">/dev/null ; then
+		if [[ -L "$BIN_PREFIX/$COMMAND_NAME" ]] || which "$COMMAND_NAME">/dev/null 2>&1 ; then
 			echo "$COMMAND_NAME already exists!"
 			echo 'Choose another name, or rename/delete the existing command.'
 			exit 1
@@ -121,7 +121,7 @@ case $1 in
 	share)
 		[[ -z $2 ]] && usage
 		COMMAND_NAME="$2"
-		if [[ -L "$BIN_PREFIX/$COMMAND_NAME" ]] || which $COMMAND_NAME >/dev/null ; then
+		if [[ -L "$BIN_PREFIX/$COMMAND_NAME" ]] || which $COMMAND_NAME >/dev/null 2>&1 ; then
 			echo "$COMMAND_NAME already exists in $BIN_PREFIX"
 			echo 'Choose another name, or rename/delete the existing command.'
 			exit 1
