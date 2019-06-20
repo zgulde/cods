@@ -135,7 +135,7 @@ stat=$(stat --format='%G' /srv/test.com/public)
 grep proxy_pass /etc/nginx/sites-available/test.com >/dev/null &&\
 	fail 'Expected not to find "proxy_pass" in nginx site config'
 egrep 'listen\s*443;' /etc/nginx/sites-available/test.com >/dev/null &&\
-	fail 'Expected not to find ssl nginx configuration.'
+	fail 'Expected not to find https nginx configuration.'
 egrep 'server_name\s*test.com' /etc/nginx/sites-available/test.com ||\
 	fail "Expected to see a server name of test.com, instead found '$(grep server_name)'"
 

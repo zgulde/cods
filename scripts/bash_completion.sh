@@ -25,7 +25,7 @@ _{{scriptname}}() {
 	server_subcommands+=' switch-java-version'
 
 	db_subcommands='create backup run remove rm list ls login'
-	site_subcommands='list ls create remove rm build enablessl info logs'
+	site_subcommands='list ls create remove rm build enablehttps info logs'
 
 	COMPREPLY=()
 
@@ -63,8 +63,8 @@ _{{scriptname}}() {
 			fi
 			subsubcommand=${COMP_WORDS[2]}
 			case $subsubcommand in
-				create) _cods_complete --static --python --node --java --enable-ssl --spring-boot -p --port --domain -d --php ;;
-				build|enablessl|info) _cods_complete -d --domain;;
+				create) _cods_complete --static --python --node --java --enable-https --spring-boot -p --port --domain -d --php ;;
+				build|enablehttps|info) _cods_complete -d --domain;;
 				list|ls) _cods_dont_complete ;;
 				remove|rm) _cods_complete --force -f --domain -d;;
 				logs) _cods_complete -d --domain -f --follow;;

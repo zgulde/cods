@@ -156,7 +156,7 @@ a new version.
 1. (Optionally) enable https for your site
 
     ```
-    myserver site enablessl --domain example.com
+    myserver site enablehttps --domain example.com
     ```
 
     Again, replacing `example.com` with your domain.

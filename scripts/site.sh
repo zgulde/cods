@@ -27,26 +27,26 @@ create_site() {
 		-p|--port <port>     -- port number that the application will run on
 		                        (required for --node, --java, and --python)
 		--spring-boot        -- (optional) designate that this is a spring boot site
-		--enable-ssl         -- (optional) enable ssl after setting up the site
-		                        (see the enablessl subcommand)
+		--enable-https       -- (optional) enable https after setting up the site
+		                        (see the enablehttps subcommand)
 
 		Examples:
 		    $(basename "$0") site create -d example.com
 		    $(basename "$0") site create --domain=example.com --node --port=3000
-		    $(basename "$0") site create --domain=example.com --java -p 8080 --enable-ssl --spring-boot
+		    $(basename "$0") site create --domain=example.com --java -p 8080 --enable-https --spring-boot
 		    $(basename "$0") site create --domain example.com --static
 		.
 	}
 	if [[ $# -eq 0 || $1 == *help || $1 = -h ]] ; then
 		usage ; die
 	fi
-	local domain enablessl force springboot sitetype port arg
+	local domain enablehttps force springboot sitetype port arg
 	while [[ $# -gt 0 ]] ; do
 	    arg=$1 ; shift
 	    case $arg in
 			-d|--domain) domain=$1 ; shift;;
 			--domain=*) domain=${arg#*=};;
-			--enable-ssl) enablessl=yes;;
+			--enable-https) https=yes;;
 			-f|--force) force=yes;;
 			--spring-boot) springboot=yes;;
 			-s|--static) [[ -n $sitetype ]] && die 'type already specified' || sitetype=static ;;
@@ -132,13 +132,13 @@ create_site() {
 
 	[[ $? -eq 0 ]] && echo "- Finished Setting Up ${domain}"
 
-	if [[ $ssl == yes ]] ; then
+	if [[ $https == yes ]] ; then
 		echo "- Enabling Https For $domain..."
-		enable_ssl --domain $domain
+		enable_https --domain $domain
 	fi
 }
 
-enable_ssl() {
+enable_https() {
 	local domain
 	while [[ $# -gt 0 ]] ; do
 	    arg=$1 ; shift
@@ -157,7 +157,7 @@ enable_ssl() {
 		-d|--domain <domain> -- domain name of the site to enable https for
 
 		Example:
-		    $(basename "$0") site enablessl -d example.com
+		    $(basename "$0") site enablehttps -d example.com
 		.
 		die
 	fi
@@ -175,7 +175,7 @@ enable_ssl() {
 	domain=${domain}
 	email=${email}
 	port=${port}
-	$(< "$SNIPPETS/enable-ssl.sh")
+	$(< "$SNIPPETS/enable-https.sh")
 	"
 	[[ $? -eq 0 ]] && echo "- Https Enabled For ${domain}!"
 }
@@ -362,12 +362,12 @@ show_help() {
 
 	    list -- list the sites setup on your server
 
-	    create    -d <domain> {--static|--java|--node} [--enable-ssl] [--spring-boot] [-p <port>]
-	    remove    -d <domain> [--force]
-	    build     -d <domain>
-	    enablessl -d <domain>
-	    info      -d <domain>
-	    logs      -d <domain> [-f]
+	    create      -d <domain> {--static|--java|--node} [--enable-https] [--spring-boot] [-p <port>]
+	    remove      -d <domain> [--force]
+	    build       -d <domain>
+	    enablehttps -d <domain>
+	    info        -d <domain>
+	    logs        -d <domain> [-f]
 
 	help
 }
@@ -376,13 +376,13 @@ command=$1
 shift
 
 case $command in
-	list|ls)   list_sites;;
-	create)    create_site "$@";;
-	remove|rm) remove_site "$@";;
-	build)	   build_site "$@";;
-	enablessl) enable_ssl "$@";;
-	info)      show_info "$@";;
-	logs)      show_logs "$@";;
-	deploy)	   deploy_site "$@";;
-	*)         show_help;;
+	list|ls)     list_sites;;
+	create)      create_site "$@";;
+	remove|rm)   remove_site "$@";;
+	build)	     build_site "$@";;
+	enablehttps) enable_https "$@";;
+	info)        show_info "$@";;
+	logs)        show_logs "$@";;
+	deploy)	     deploy_site "$@";;
+	*)           show_help;;
 esac

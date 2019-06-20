@@ -147,7 +147,7 @@ mysql -p < my-script.sql # you'll be promted for your db password
 **You can only do this if your DNS records are properly configured.**
 
 ```
-myserver site enablessl -d example.com
+myserver site enablehttps -d example.com
 ```
 
 See the `HTTPS` section in the main README for more details
@@ -155,7 +155,7 @@ See the `HTTPS` section in the main README for more details
 You can also do this when setting up a site:
 
 ```
-myserver site create -d example.com --enable-ssl
+myserver site create -d example.com --enable-https
 ```
 
 ## Can I redeploy my project without a `git push`?

@@ -14,7 +14,7 @@ in general:
 - static content served w/ nginx
 - a systemd service unit is created for each site to handle starting/stopping
   and logging for each site
-- ssl through nginx + letsencrypt
+- https through nginx + letsencrypt
 - each application/site runs as it's own user/group
 
 ## This Tool
@@ -88,7 +88,7 @@ Assuming you already have a server setup:
 - Will attempt to serve static content first, if not found
     - the request will be passed to the application server
     - `404.html` in the webroot will be served
-- handles ssl connections when https is setup for a site
+- handles https connections when https is setup for a site
 
 ### Git Deployment
 

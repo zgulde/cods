@@ -87,7 +87,7 @@ fi
 echo
 echo '- Enter Email Address'
 echo
-echo '  We will need an email address for obtaining a ssl certificate, while this'
+echo '  We will need an email address for obtaining a https certificate, while this'
 echo '  is optional, it is recommended so that you can be contacted if anything'
 echo '  goes wrong with your site.'
 echo

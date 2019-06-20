@@ -163,5 +163,5 @@ Deploying a java spring-boot database backed blog application:
 ## Enable Https
 
 ```
-my-awesome-server site enablessl -d myblog.com
+my-awesome-server site enablehttps -d myblog.com
 ```

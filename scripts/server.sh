@@ -292,7 +292,7 @@ show_usage() {
 	    ports       -- show the ports that are being reverse proxied to
 	    ping        -- ping the server
 	    swapon      -- create and enable a swapfile (requires sudo password)
-	    autorenew   -- setup ssl certs to be automatically renewed
+	    autorenew   -- setup https certs to be automatically renewed
 	    reboot      -- reboot the server
 	    run         -- run arbitrary commands (with a pty)
 	    pipe        -- run arbitrary commands (without a pty)

@@ -175,7 +175,7 @@ you will need to enter the database administrator password.
 - `logs`: view the log files for a site
 - `remove`: remove a site. Will remove the nginx config for the site, as well as
   any previously deployed `jar`s
-- `enablessl`: enable https for a site
+- `enablehttps`: enable https for a site
 - `info`: show general information for a site
 
 `db`
@@ -257,7 +257,7 @@ DNS records for the given domain point to your server. You will be given a
 warning if they do not, but you can go ahead and create the site anyway if you
 are still configuring DNS, or waiting for the records to propogate.
 
-If the DNS records are setup, you can pass `--enable-ssl` to the `site create`
+If the DNS records are setup, you can pass `--enable-https` to the `site create`
 command to also enable https for the site after the site is created.
 
 ### Reverse Proxy Sites
@@ -539,7 +539,7 @@ myserver site info --domain example-python-site.com
 myserver site create --static --domain example.com
 ```
 
-Like creating a java site, you can also pass `--enable-ssl` to activate https
+Like creating a java site, you can also pass `--enable-https` to activate https
 for the site after creating it.
 
 Like a java site, git deployment is setup when you create the site. You can run
@@ -677,7 +677,7 @@ Agreement](https://letsencrypt.org/documents/LE-SA-v1.1.1-August-1-2016.pdf).**
 Simply run
 
 ```bash
-myserver site enablessl -d myawesomesite.com
+myserver site enablehttps -d myawesomesite.com
 ```
 
 After enabling https for a site, you can enable the automatic renewal of certificates:
@@ -692,11 +692,11 @@ need to set up automatic certificate renewal once.
 You can also enable https when the site is being created:
 
 ```
-myserver site create --domain example.com --enable-ssl
+myserver site create --domain example.com --enable-https
 ```
 
 This is functionally the same thing as running the `site create` and `site
-enablessl` commands back to back.
+enablehttps` commands back to back.
 
 ## Sharing your server with teammates
 
