@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ##############################################################################
 # Entrypoint for the cli interface
@@ -131,98 +131,6 @@ restart_service() {
 	[[ $? -eq 0 ]] && echo "$service restarted!"
 }
 
-# TODO: add user to all existing sites `sudo usermod -a -G somegroup newuser`
-add_user() {
-	while [[ $# -gt 0 ]] ; do
-		arg="$1" ; shift
-		case $arg in
-			-f|--sshkeyfile) sshkeyfile="$1" ; shift;;
-			--sshkeyfile=*) sshkeyfile="${arg#*=}" ; sshkeyfile="${sshkeyfile/#\~/$HOME}";;
-			-u|--user) new_user=$1 ; shift;;
-			--user=*) new_user=${arg#*=};;
-			--github-username) github_username=$1 ; shift;;
-			--github-username=*) github_username=${arg#*=};;
-			*) echo "Unknown argument: $arg" ; exit 1;;
-		esac
-	done
-    if [[ -z $new_user || -z "$sshkeyfile" ]] && [[ -z $github_username ]] ; then
-		cat <<-.
-		Add a new admin user to the server. A password will be randomly
-		generated for the new user.
-
-		Can be used by either specifying a username and public key file, or a
-		github username and the public keys will be extracted from github
-		(https://github.com/\$USERNAME.keys)
-
-		-f|--sshkeyfile <sshkeyfile>  -- path to the new user's public key
-		-u|--user <username>          -- username for the new user
-		--github-username <username>  -- github username to lookup public keys;
-		                                 will also be used as server username
-
-		Examples:
-		    $(basename "$0") adduser -u sally -f ~/sallys-ssh-key.pub
-		    $(basename "$0") adduser --user=sally --sshkeyfile=~/key.pub
-		    $(basename "$0") adduser --github-username gocodeup
-		.
-		die
-    fi
-
-	if [[ -n $github_username ]] ; then
-		new_user=$github_username
-		sshkeyfile=$(mktemp)
-		trap "rm -f $sshkeyfile" EXIT
-		url="https://github.com/${github_username}.keys"
-		echo "- Downloading Ssh Key(s) for $github_username"
-		curl --location --output "$sshkeyfile" "$url"
-		if [[ $? -ne 0 ]] ; then
-			echo "Error obtaining public keys for $github_username!"
-			echo "$url gave a non-200 response."
-			echo 'Aborting...'
-			exit 1
-		fi
-		if [[ ! -s $sshkeyfile ]] ; then
-			echo "Error! It looks like this user doesn't have any public keys tied to"
-			echo "their github account. Check ($url)."
-			echo 'Aborting...'
-			exit 1
-		fi
-		echo 'Downloaded public ssh key(s)!'
-	fi
-
-	if [[ ! -f "$sshkeyfile" && ! -r "$sshkeyfile" ]]; then
-		echo 'Please enter a valid ssh key file.'
-		echo "$sshkeyfile does not exist or is not readable."
-		exit 1
-	fi
-
-	password="$(mkpassword)"
-	echo "Creating user ${new_user}... (enter *your* sudo password when prompted)"
-	ssh -t $user@$ip "
-	set -e
-	sudo useradd --create-home --shell /bin/bash --groups sudo,web $new_user
-	echo '$new_user:$password' | sudo chpasswd
-	sudo mkdir -p /home/$new_user/.ssh
-	cat <<< '$(cat "$sshkeyfile")' | sudo tee /home/$new_user/.ssh/authorized_keys >/dev/null
-	sudo chown --recursive $new_user:$new_user /home/$new_user
-	for site in /etc/nginx/sites-available/* ; do
-		site=\$(basename \$site)
-		[[ \$site == default ]] && continue
-		sudo usermod -a -G \$site $new_user
-	done
-	"
-	if [[ $? -eq 0 ]] ; then
-		echo "User ${new_user}: $password" >> "$DATA_DIR/credentials.txt"
-		cat <<-.
-		User ${new_user} created!
-		Password for ${new_user}: ${password}
-		[NOTICE] credentials for ${new_user} have been added to $DATA_DIR/credentials.txt
-		.
-	else
-		echo 'Uh oh, something went wrong! Check the output for details.'
-	fi
-
-}
-
 add_sshkey() {
 	while [[ $# -gt 0 ]] ; do
 	    arg=$1 ; shift
@@ -284,6 +192,7 @@ show_usage() {
 
 	    site -- manage sites
 	    db   -- manage databases
+	    user -- manage users
 
 	    devserver -- development web server
 
@@ -306,7 +215,6 @@ show_usage() {
 	    upload  -f <file> [-d <destination>]
 	    restart -s <service>
 	    addkey  -f <sshkeyfile>
-	    adduser [-u <username> -f <sshkeyfile>] [--github-username <username>]
 
 	help_message
 }
@@ -344,6 +252,7 @@ case $command in
 	site)      source "$SCRIPTS/site.sh";;
 	db)        source "$SCRIPTS/db.sh";;
 	devserver) source "$SCRIPTS/devserver.sh";;
+	user)      source "$SCRIPTS/user.sh";;
 
 	# server managment
 	login)     ssh $user@$ip;;
@@ -352,7 +261,6 @@ case $command in
 	reboot)    ssh -t $user@$ip 'sudo reboot';;
 	info)      show_info;;
 	swapon)    enable_swap;;
-	adduser)   add_user "$@";;
 	addkey)    add_sshkey "$@";;
 	autorenew) auto_renew_certs;;
 	ping)      ping -c5 $ip;;
