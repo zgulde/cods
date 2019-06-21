@@ -44,6 +44,10 @@ apt-get install -y\
 
 heading 'configuring nginx'
 
+# generate a stronger key for ssl connections
+mkdir -p /etc/nginx/ssl
+openssl dhparam -dsaparam -out /etc/nginx/ssl/dhparam.pem 2048
+
 # group we'll use use for all of our web-admin needs
 groupadd web
 
@@ -62,7 +66,7 @@ nginx_conf
 rm -rf /var/www/*
 # don't expose OS and version information
 sed -i -e 's/# server_tokens off;/server_tokens off;/' /etc/nginx/nginx.conf
-systemctl restart nginx
+service nginx restart
 
 echo 'Nginx configured and restarted!'
 
@@ -85,3 +89,4 @@ ufw allow ssh
 ufw allow http
 ufw allow https
 echo y | ufw enable
+service ufw restart
