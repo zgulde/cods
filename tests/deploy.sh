@@ -301,5 +301,12 @@ case $test_type in
 
 		rm -rf $BASE_DIR/tests/sample-sites/php/.git
 		;;
+	all)
+		$0 _test deploy java $DOMAIN
+		$0 _test deploy node $DOMAIN
+		$0 _test deploy static $DOMAIN
+		$0 _test deploy python $DOMAIN
+		$0 _test deploy php $DOMAIN
+		;;
 	*) usage ; exit 1;;
 esac
