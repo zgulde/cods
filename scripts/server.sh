@@ -276,7 +276,9 @@ case $command in
 		;;
 
 	credentials)
-		if [[ -f "$DATA_DIR/credentials.txt" ]] ; then
+		if [[ $1 == path ]] ; then
+			echo "$DATA_DIR/credentials.txt"
+		elif [[ -f "$DATA_DIR/credentials.txt" ]] ; then
 			cat "$DATA_DIR/credentials.txt"
 		else
 			echo 'No credentials found.'
