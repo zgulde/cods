@@ -5,19 +5,11 @@ This document provides in-depth documentation on how to use the `cods` tool.
 ## Table of Contents
 
 * [The `cods` command](#the-cods-command)
-    * [`init`](#init)
-    * [A Note on Credentials](#a-note-on-credentials)
-    * [`share`](#share)
-    * [`update`](#update)
 * [Commands](#commands)
     * [General Server Commands](#general-server-commands)
     * [Site and Database Management Commands](#site-and-database-management-commands)
     * [Examples](#examples)
 * [Site Creation](#site-creation)
-    * [Java Site Creation](#java-site-creation)
-    * [Node Site Creation](#node-site-creation)
-    * [Python](#python)
-    * [Static Site Creation](#static-site-creation)
 * [Database Management](#database-management)
 * [HTTPS](#https)
 * [Sharing your server with teammates](#sharing-your-server-with-teammates)
@@ -79,11 +71,11 @@ If this is not an acceptable security tradeoff for you, you should remove the
 `credentials.txt` file for your server, and update your password storage
 solution whenever a new user or database account is generated.
 
-### `share`
+### `add`
 
-If a teammate of yours granted you access to a shared server, you can use the
-`share` command to create a command to interface with the shared server. See the
-section on server sharing below.
+To add a server command to interact with an existing server that was setup
+elsewhere (either by yourself on another computer or by a teammate) you can use
+the `add` command.  See the section on server sharing below.
 
 ### `update`
 
@@ -732,7 +724,7 @@ enablehttps` commands back to back.
 1. Setup the command
 
     ```
-    cods share shared-server
+    cods add shared-server
     ```
 
 ### Adding a User From Github

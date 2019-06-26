@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [[ $_CODS_DEBUG == 1 ]] ; then
 	logfile="cods-debug.log"
@@ -23,9 +23,9 @@ usage() {
 	                                   server, this name will be the name of
 	                                   the command that is created.
 
-	share: Add a shared server -- You will need to have ssh access to the
-	                              server, and provide a name for the shared
-	                              server command
+	add: Add an existing server -- You will need to have ssh access to the
+	                               server, and provide a name for the new
+	                               server command
 
 	update -- Update all the existing already setup server commands
 
@@ -33,8 +33,8 @@ usage() {
 	    $(basename "$0") init myserver
 	    $(basename "$0") init my-awesome-server
 
-	    $(basename "$0") share shared-server
-	    $(basename "$0") share some-project-server
+	    $(basename "$0") add shared-server
+	    $(basename "$0") add some-project-server
 
 	    $(basename "$0") update
 
@@ -118,7 +118,7 @@ case $1 in
 		mkdir -p "$DATA_DIR/db-backups"
 		source "$BASE_DIR/scripts/setup.sh"
 		;;
-	share)
+	add)
 		[[ -z $2 ]] && usage
 		COMMAND_NAME="$2"
 		if [[ -L "$BIN_PREFIX/$COMMAND_NAME" ]] || which $COMMAND_NAME >/dev/null 2>&1 ; then
