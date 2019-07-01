@@ -1,3 +1,19 @@
+3.0.0
+
+- enhancement: Use debian 10 (buster)
+- enhancement: stronger https config with nginx
+- feature: add PHP site support (including laravel)
+- feature: manage different java versions (8 and 11)
+- feature: allow passwordless sudoing
+- refactor: rename `install.sh` to `cods.sh`
+- refactor: seperate user management into it's own subcommand
+- refactor: rename `cods share` to `cods add`
+- refactor: rename any user-facing command with ssl to https
+- docs: add api doc page
+- removed: the `devserver` subcommand
+- tests: laravel + php site deployment tests
+- tests: add subcommand shortcut to run all
+
 2.2.3 -- 20190422
 
 - docs: minor improvements/tweaks
