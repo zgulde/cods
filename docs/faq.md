@@ -399,7 +399,15 @@ myserver run sudo nano /etc/nginx/sites-available/example.com
 myserver restart --service=nginx
 ```
 
-## Do I need to do anything differently if I have multiple Java installations?
+## How do I Work With Multiple Java Versions?
+
+```
+myserver switch-java-version
+```
+
+Will control which version of java is running on the server.
+
+### For Local Development
 
 If you have multiple versions of java installed and you are deploying a spring
 boot v1.x application, you'll want to specify that you are using Java 8 when you
@@ -407,7 +415,7 @@ run your application from the command line.
 
 This consists of two steps:
 
-- Configuring Maven
+1. Configuring Maven
 
     ```
     echo "JAVA_HOME=$(/usr/libexec/java_home -v 1.8)" > ~/.mavenrc
@@ -417,7 +425,7 @@ This consists of two steps:
     that will specify that maven should use Java 8 when running from the command
     line
 
-- Configuration for the `java` command
+1. Configuration for the `java` command
 
     We'll want to specify that we want to use java 8 when we run the `java`
     command.
