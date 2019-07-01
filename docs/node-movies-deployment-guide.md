@@ -55,13 +55,13 @@ In addition to running and being error free, we'll need to ensure 2 things:
     Take note of the port number that your site is running on, we'll need this
     information later when we create a site.
 
-1. Create a `install.sh` file.
+1. Create a `cods.sh` file.
 
     This file will tell our server what needs to be done when the site is
     deployed. In our case, we'll want to install the dependencies, and build the
     static files.
 
-    Create a file in your project root named `install.sh`. It should have the
+    Create a file in your project root named `cods.sh`. It should have the
     following contents:
 
     ```sh
@@ -110,7 +110,7 @@ production:
 git push origin master
 ```
 
-When you push, you'll see the `install.sh` script running, then you should see
+When you push, you'll see the `cods.sh` script running, then you should see
 your site live!
 
 ## Debugging

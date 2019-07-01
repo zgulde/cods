@@ -107,7 +107,7 @@ you already setup this script, you can skip the rest of this section.)
 We will also create a file that runs whenever a new version of our code is
 deployed.
 
-Copy the following into a file named `install.sh`:
+Copy the following into a file named `cods.sh`:
 
 ```
 # Script used for deployment with cods (https://github.com/zgulde/cods)
@@ -115,10 +115,10 @@ set -e
 
 cd $SITE_DIR
 
-echo "[install.sh] (re-)creating the venv"
+echo "[cods.sh] (re-)creating the venv"
 rm -rf env
 python3 -m venv env
-echo '[install.sh] Activating venv and installing dependencies'
+echo '[cods.sh] Activating venv and installing dependencies'
 source env/bin/activate
 python3 -m pip install -r requirements.txt
 ```
@@ -182,7 +182,7 @@ a new version.
     git push production master
     ```
 
-    You should see the code from your `install.sh` file run whenever you push to
+    You should see the code from your `cods.sh` file run whenever you push to
     `production`.
 
 ### Monitoring Your Application

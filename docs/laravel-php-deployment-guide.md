@@ -23,6 +23,10 @@
 1. Login to finalize setup
 
     ```
+    myserver login
+    ```
+
+    ```
     cd /srv/php-site.com
     composer install
     cp .env.example .env
@@ -30,9 +34,9 @@
     # edit .env for db secrets, environment, etc
     ```
 
-1. Add an `install.sh` script with `composer install` in it
+1. Add an `cods.sh` script with `composer install` in it
 
-    Create a file in your project root named `deploy.sh` with the following
+    Create a file in your project root named `cods.sh` with the following
     contents:
 
     ```

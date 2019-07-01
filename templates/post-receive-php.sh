@@ -23,10 +23,10 @@ git --work-tree=${SITE_DIR} --git-dir=${SITE_DIR}/repo.git checkout -f master
 
 cd $SITE_DIR
 
-if [[ -f install.sh ]] ; then
+if [[ -f cods.sh ]] ; then
 	export SITE_DIR
-	log 'Running install.sh'
-	bash install.sh
+	log 'Running cods.sh'
+	bash cods.sh
 fi
 
 log '--------------------------------------------------'

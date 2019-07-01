@@ -365,7 +365,7 @@ Take a look at the `config` file or template for more information.
 #### Customizing Deployment
 
 If your deploment needs are more complex than what is described above, you can
-create a file named `install.sh` in the root of your project. This file will be
+create a file named `cods.sh` in the root of your project. This file will be
 executed after pushing to the deployment remote if a `.cods` file is not found.
 This script will be executed after freshly cloning your project, from your
 project root, and several environment variables are available to it:
@@ -380,7 +380,7 @@ project root, and several environment variables are available to it:
 The cloned repo that is created will be deleted after the `post-receive` hook
 finishes running.
 
-Example `install.sh`
+Example `cods.sh`
 
 ```bash
 # exit the script on any errors
@@ -395,16 +395,16 @@ cp $SITE_DIR/env.js src/main/javascript/env.js
 
 # 2. Do any pre-build steps you need to (e.g. compiling css/js assets)
 #    Any custom build/deployment logic should go here
-echo '[install.sh] Installing dependencies...'
-echo '[install.sh] > npm install'
+echo '[cods.sh] Installing dependencies...'
+echo '[cods.sh] > npm install'
 npm install
-echo '[install.sh] Building JS...'
-echo '[install.sh] > npm run build'
+echo '[cods.sh] Building JS...'
+echo '[cods.sh] > npm run build'
 npm run build
 
 # 3. Build the jar file and put it in the right place
-echo '[install.sh] Building war file...'
-echo '[install.sh] > ./mvnw package'
+echo '[cods.sh] Building war file...'
+echo '[cods.sh] > ./mvnw package'
 ./mvnw package
 mv target/my-awesome-project.jar $JAR_TARGET_LOCATION
 
@@ -440,10 +440,10 @@ A git remote will be created for you, and a `post-receive` hook will be setup so
 that when you push the `master` branch to the remote on the server:
 
 1. The new version of the code is checked out, replacing the old version
-1. If a file named `install.sh` exists at the root of the project, it will be
+1. If a file named `cods.sh` exists at the root of the project, it will be
    run, and a variable named `SITE_DIR` will be available to it that contains
    the location of the directory for your site (and the source code).
-1. If no `install.sh` is found, `npm install` will be run
+1. If no `cods.sh` is found, `npm install` will be run
 1. The site service will be restarted, i.e. the old `npm run start` process will
    be killed, and it will be started again
 
@@ -487,34 +487,34 @@ may use this script to start your application with one of python's wsgi web
 servers, e.g. `gunicorn` or `waitress` (I.e. don't start your app in
 development/debugging mode!).
 
-You can add a file named `install.sh` to the root of your project to run custom
+You can add a file named `cods.sh` to the root of your project to run custom
 code whenever the site is deployed as well. This script will have an environment
 variable, `SITE_DIR` available to it, that specifies the location of your source
 code on the server.
 
 For example, if your wanted to re-create the virtual environment everytime the
-site is deployed, your `install.sh` script might look like this:
+site is deployed, your `cods.sh` script might look like this:
 
 ```
 #!/usr/bin/env bash
 
 cd $SITE_DIR
 
-echo "[install.sh] (re-)creating the venv"
-echo '[install.sh] - rm -rf env'
+echo "[cods.sh] (re-)creating the venv"
+echo '[cods.sh] - rm -rf env'
 rm -rf env
-echo '[install.sh] python3 -m venv env'
+echo '[cods.sh] python3 -m venv env'
 python3 -m venv env
-echo '[install.sh] source env/bin/activate'
+echo '[cods.sh] source env/bin/activate'
 source env/bin/activate
-echo '[install.sh] python3 -m pip install -r requirements.txt'
+echo '[cods.sh] python3 -m pip install -r requirements.txt'
 python3 -m pip install -r requirements.txt
 ```
 
 When you push to the git remote on the server:
 
 1. The new source code will be checked out, replacing the old version
-1. If a `install.sh` file is found, it will be run
+1. If a `cods.sh` file is found, it will be run
 1. The currently running server process will be killed, and the server will be
    started again.
 
@@ -594,12 +594,12 @@ deployed.
 
 ##### Custom Deployment
 
-If there is a file named `install.sh` in the root of the project, instead of
-copying the contents of the repository, the `install.sh` script will be run
+If there is a file named `cods.sh` in the root of the project, instead of
+copying the contents of the repository, the `cods.sh` script will be run
 after pushing to the deployment remote.
 
 The script will be run with the current working directory as a fresh clone of
-your project. The clone will be removed when the `install.sh` script finishes
+your project. The clone will be removed when the `cods.sh` script finishes
 running, so after you preform any build steps, you should move the built files
 to the public directory for your project (see example below).
 
@@ -608,20 +608,20 @@ When the script is run, several variables will be available to it:
 - `SITE_DIR`: the location on the server that holds the site's configuration
 - `PUBLIC_DIR`: the location of files for your site
 
-Example `install.sh`:
+Example `cods.sh`:
 
 ```
 # exit script on any error
 set -e
 
-echo '[install.sh] Building...'
+echo '[cods.sh] Building...'
 npm install
 npm run build
 
-echo '[install.sh] Build Success, deploying...'
+echo '[cods.sh] Build Success, deploying...'
 mv build/* $PUBLIC_DIR
 
-echo '[install.sh] All Done!'
+echo '[cods.sh] All Done!'
 ```
 
 ### Manually Triggering A Build for a Site

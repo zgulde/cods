@@ -192,7 +192,7 @@ case $test_type in
 
 		rm -rf $BASE_DIR/tests/sample-sites/static/.git
 
-		heading '[TESTING] Creating and Deploying static site with a install.sh file...'
+		heading '[TESTING] Creating and Deploying static site with a cods.sh file...'
 		GIT="git -C $BASE_DIR/tests/sample-sites/static-with-build"
 		echo '[test] Creating site...'
 		create_site --domain $DOMAIN --static --force
@@ -208,7 +208,7 @@ case $test_type in
 		response="$(curl -Ss http://$DOMAIN)"
 
 		if [[ $expected != $response ]] ; then
-			fail 'Static Site with install.sh file Deployement'
+			fail 'Static Site with cods.sh file Deployement'
 			cat <<-.
 			  expected to find  "$expected"
 			  but instead found "$response"
@@ -216,7 +216,7 @@ case $test_type in
 			  as a response from $DOMAIN
 			.
 		else
-			echo -e "[test] \e[1msuccess\e[0m Found expected response from static install.sh deploy at $DOMAIN"
+			echo -e "[test] \e[1msuccess\e[0m Found expected response from static cods.sh deploy at $DOMAIN"
 			success '[test] Pass'
 		fi
 

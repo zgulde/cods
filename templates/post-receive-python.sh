@@ -32,10 +32,10 @@ git --work-tree=${SITE_DIR} --git-dir=${SITE_DIR}/repo.git checkout -f master
 
 cd $SITE_DIR
 
-if [[ -f install.sh ]] ; then
-	log "Found install.sh, running with SITE_DIR=$SITE_DIR"
+if [[ -f cods.sh ]] ; then
+	log "Found cods.sh, running with SITE_DIR=$SITE_DIR"
 	export SITE_DIR
-	bash install.sh
+	bash cods.sh
 fi
 
 log 'Restarting {{site}} service...'
