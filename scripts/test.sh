@@ -32,14 +32,5 @@ case $command in
 		source $TESTS/site.sh
 		source $TESTS/deploy.sh
 		;;
-	_sudo)
-		# Enable passwordless sudo
-		# Intentionally undocumented, as we probably don't want end users doing
-		# this, but for running the automated tests, this is the only sane way
-		# to do things, as almost everything we want to test requires a sudo
-		# password multiple times.
-		ssh -t $user@$ip "echo '$user ALL=(ALL) NOPASSWD: ALL' | sudo EDITOR='tee -a' visudo"
-		;;
-
 	* ) echo 'util | site | setup | deploy';;
 esac

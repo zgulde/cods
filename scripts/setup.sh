@@ -177,6 +177,8 @@ echo '$user:$password' | chpasswd
 mkdir -p /home/$user/.ssh
 cp \$HOME/.ssh/authorized_keys /home/$user/.ssh/
 chown --recursive $user:$user /home/$user/.ssh
+# allow passwordless sudo
+echo '$user ALL=(ALL) NOPASSWD: ALL' | sudo EDITOR='tee -a' visudo
 
 # disable password login + root login
 perl -i -pe 's/(PasswordAuthentication\s*)yes/\1no/' /etc/ssh/sshd_config

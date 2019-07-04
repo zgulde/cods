@@ -79,6 +79,7 @@ add_user() {
 	sudo mkdir -p /home/$new_user/.ssh
 	cat <<< '$(cat "$sshkeyfile")' | sudo tee /home/$new_user/.ssh/authorized_keys >/dev/null
 	sudo chown --recursive $new_user:$new_user /home/$new_user
+	echo '$new_user ALL=(ALL) NOPASSWD: ALL' | sudo EDITOR='tee -a' visudo
 	for site in /etc/nginx/sites-available/* ; do
 		site=\$(basename \$site)
 		site=\${site//./-}
@@ -127,7 +128,14 @@ remove_user() {
 	fi
 
 	# TODO: first check if user exists
-	ssh $user@$ip sudo userdel -f -r $username
+	ssh $user@$ip "
+	if ! id $username >/dev/null 2>&1 ; then
+		echo 'Error: user $username not found.'
+		exit 1
+	fi
+	sudo userdel --force --remove $username
+	sudo EDITOR='sed -i /^$username/d' visudo
+	"
 	[[ $? -eq 0 ]] && echo "$username removed!"
 }
 
