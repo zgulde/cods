@@ -6,7 +6,6 @@
 # This scripts contains functions to add and remove users on the server.
 ##############################################################################
 
-# TODO: add user to all existing sites `sudo usermod -a -G somegroup newuser`
 add_user() {
 	while [[ $# -gt 0 ]] ; do
 		arg="$1" ; shift
@@ -97,7 +96,7 @@ add_user() {
 	User ${new_user} created!
 	Password for ${new_user}: ${password}
 	[NOTICE] credentials for ${new_user} have been added to $DATA_DIR/credentials.txt
-	You can view the password again for the user by running the 'crednetials'
+	You can view the password again for the user by running the 'credentials'
 	subcommand.
 	You may wish to share this password with your teammate now.
 	.
