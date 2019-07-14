@@ -17,15 +17,15 @@ _cods_complete_files() {
 
 _{{scriptname}}() {
 	local cur prev subcommand subsubcommand server_subcommands
-	local db_subcommands site_subcommands
+	local db_subcommands site_subcommands user_subcommands
 
-	server_subcommands='site db devserver login upload restart reboot info'
-	server_subcommands+=' adduser addkey autorenew ping credentials pipe'
-	server_subcommands+=' bash-completion destroy ports tmux _test'
-	server_subcommands+=' switch-java-version'
+	server_subcommands='site db devserver login upload restart reboot info tmux'
+	server_subcommands+=' user addkey autorenew ping credentials pipe ports'
+	server_subcommands+=' bash-completion destroy _test switch-java-version'
 
 	db_subcommands='create backup run remove rm list ls login'
 	site_subcommands='list ls create remove rm build enablehttps info logs'
+	user_subcommands='add remove rm'
 
 	COMPREPLY=()
 
@@ -34,8 +34,9 @@ _{{scriptname}}() {
 
 	case $subcommand in
 		# no further completions for any of these
-		devserver|login|info|ports|ping|swapon|autorenew|reboot|run|credentials|destroy|bash-completion)
+		devserver|login|info|ports|ping|swapon|autorenew|reboot|run|destroy|bash-completion)
 			_cods_dont_complete;;
+		credentials) _cods_complete path edit add ;;
 		upload)
 			case $prev in
 				-f|--file) _cods_complete_files;;
@@ -47,11 +48,6 @@ _{{scriptname}}() {
 			case $prev in
 				-f|--sshkeyfile) _cods_complete_files;;
 				*) _cods_complete -f --sshkeyfile ;;
-			esac ;;
-		adduser)
-			case $prev in
-				-f|--sshkeyfile) _cods_complete_files;;
-				*) _cods_complete -u --username -f --sshkeyfile --github-username;;
 			esac ;;
 		site)
 			if [[ $prev == --domain || $prev == -d ]] ; then
@@ -91,6 +87,14 @@ _{{scriptname}}() {
 						*) _cods_complete --name -n -o --outfile ;;
 					esac ;;
 				*) _cods_complete $db_subcommands
+			esac
+			;;
+		user)
+			subsubcommand=${COMP_WORDS[2]}
+			case $subsubcommand in
+				add) _cods_complete -f --sshkeyfile -u --username --github-username;;
+				rm|remove) _cods_complete -u --username ;;
+				*) _cods_complete $user_subcommands
 			esac
 			;;
 		*) _cods_complete $server_subcommands ;;

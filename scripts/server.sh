@@ -102,7 +102,7 @@ destroy_server() {
 		rm -rfv "$DATA_DIR"
 		rm -v "$BIN_PREFIX/$SCRIPT_NAME"
 		echo "Removing $ip from ~/.ssh/known_hosts"
-		sed -i -e /^$ip/d "$HOME/.ssh/known_hosts"
+		sed -i .bak -e /^$ip/d "$HOME/.ssh/known_hosts"
 	fi
 }
 
@@ -276,14 +276,16 @@ case $command in
 		;;
 
 	credentials)
-		if [[ $1 == path ]] ; then
-			echo "$DATA_DIR/credentials.txt"
-		elif [[ -f "$DATA_DIR/credentials.txt" ]] ; then
-			cat "$DATA_DIR/credentials.txt"
-		else
-			echo 'No credentials found.'
-		fi;;
-
+		case $1 in
+			path) echo "$DATA_DIR/credentials.txt";;
+			edit) $EDITOR "$DATA_DIR/credentials.txt";;
+			add) shift ; echo "$@" >> "$DATA_DIR/credentials.txt";;
+			*)
+				if [[ ! -f "$DATA_DIR/credentials.txt" ]] ; then
+					die "Error: $DATA_DIR/credentials.txt not found."
+				fi
+				cat "$DATA_DIR/credentials.txt" ;;
+		esac ;;
 	bash-completion)
 		sed -e s/{{scriptname}}/$(basename "$0")/g "$SCRIPTS/bash_completion.sh"
 		;;
