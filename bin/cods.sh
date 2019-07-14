@@ -85,8 +85,10 @@ logo=(
 	''
 )
 
-case $1 in
-	help) shift ; source "$SCRIPTS/interactive-help.sh";;
+subcommand=$1 ; shift
+
+case $subcommand in
+	help) source "$SCRIPTS/interactive-help.sh";;
 	banner|logo)
 		for line in "${logo[@]}" ; do
 			echo "$line"
@@ -105,8 +107,8 @@ case $1 in
 		echo '- All Done!'
 		;;
 	init)
-		[[ -z $2 ]] && usage
-		COMMAND_NAME="$2"
+		[[ -z $1 ]] && usage
+		COMMAND_NAME="$1" ; shift
 		if [[ -L "$BIN_PREFIX/$COMMAND_NAME" ]] || which "$COMMAND_NAME">/dev/null 2>&1 ; then
 			echo "$COMMAND_NAME already exists!"
 			echo 'Choose another name, or rename/delete the existing command.'
@@ -116,19 +118,49 @@ case $1 in
 		DATA_DIR="$BASE_DATA_DIR/$COMMAND_NAME"
 		ENV_FILE="$DATA_DIR/env.sh"
 		mkdir -p "$DATA_DIR/db-backups"
+
+		while [[ $# -gt 0 ]] ; do
+		    arg=$1 ; shift
+		    case $arg in
+				-i|--ip) export ip=$1 ; shift;;
+				--ip=*) export ip=${arg#*=};;
+				-u|--user) export user=$1 ; shift;;
+				--user=*) export user=${arg#*=};;
+				-e|--email) export email=$1 ; shift;;
+				--email=*) export email=${arg#*=};;
+		        *) echo "Unknown argument: $arg" ; exit 1;;
+		    esac
+		done
+
 		source "$BASE_DIR/scripts/setup.sh"
 		;;
 	add)
-		[[ -z $2 ]] && usage
-		COMMAND_NAME="$2"
+		[[ -z $1 ]] && usage
+		COMMAND_NAME="$1" ; shift
 		if [[ -L "$BIN_PREFIX/$COMMAND_NAME" ]] || which $COMMAND_NAME >/dev/null 2>&1 ; then
 			echo "$COMMAND_NAME already exists in $BIN_PREFIX"
 			echo 'Choose another name, or rename/delete the existing command.'
 			exit 1
 		fi
 
-		read -p "- Enter the server's ip address: " ip
-		read -p "- Enter your username: " user
+		while [[ $# -gt 0 ]] ; do
+		    arg=$1 ; shift
+		    case $arg in
+		        -i|--ip) ip=$1 ; shift;;
+		        --ip=*) ip=${arg#*=};;
+				-u|--user) user=$1 ; shift;;
+				--user=*) user=${arg#*=};;
+		        *) echo "Unknown argument: $arg" ; exit 1;;
+		    esac
+		done
+
+		if [[ -z $ip ]] ; then
+			read -p "- Enter the server's ip address: " ip
+		fi
+		if [[ -z $user ]] ; then
+			read -p "- Enter your username: " user
+		fi
+
 		if ! ssh $user@$ip true ; then
 			echo "Unable to login! Command: ssh $user@$ip true"
 			echo 'Make sure you have access to the server and have the correct'
