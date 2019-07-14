@@ -29,5 +29,5 @@ sudo ln -s /etc/nginx/sites-available/${domain} /etc/nginx/sites-enabled/${domai
 echo '- Restarting Nginx'
 sudo systemctl restart nginx
 echo '- Restarting php-fpm'
-sudo systemctl restart php7.2-fpm
+sudo systemctl restart php7.3-fpm
 

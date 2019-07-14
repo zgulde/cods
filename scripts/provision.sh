@@ -27,18 +27,25 @@ heading 'updating + upgrading apt'
 apt-get update
 apt-get upgrade -y
 
+heading 'Adding adoptopenjdk repos'
+
+apt-get install -y gnupg2 software-properties-common # we need this first to setup new repos
+apt-key add <(curl -LSs https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public)
+sudo add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
+sudo apt-get update
+
 heading 'installing packages'
 
 apt-get install -y\
 	letsencrypt nginx\
-	openjdk-11-jdk-headless openjdk-8-jdk-headless maven\
+	adoptopenjdk-8-hotspot adoptopenjdk-11-hotspot maven\
 	python3-venv python3-pip virtualenv\
 	nodejs npm\
-    php7.2-fpm php7.2-cli php7.2-bcmath php7.2-json php7.2-mbstring php7.2-xml\
-    php7.2-tokenizer php7.2-mysql php7.2-sqlite3 php7.2-pgsql php7.2-zip\
-	php7.2-curl php7.2-gd composer\
+    php7.3-fpm php7.3-cli php7.3-bcmath php7.3-json php7.3-mbstring php7.3-xml\
+    php7.3-tokenizer php7.3-mysql php7.3-sqlite3 php7.3-pgsql php7.3-zip\
+	php7.3-curl php7.3-gd composer\
 	ufw\
-	mysql-server\
+	default-mysql-server\
 	unattended-upgrades\
 	zip htop apache2-utils
 
