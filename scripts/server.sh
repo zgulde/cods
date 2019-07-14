@@ -194,8 +194,6 @@ show_usage() {
 	    db   -- manage databases
 	    user -- manage users
 
-	    devserver -- development web server
-
 	    login       -- login to the server
 	    info        -- display information about the server
 	    ports       -- show the ports that are being reverse proxied to
@@ -251,7 +249,6 @@ case $command in
 	# sub commands
 	site)      source "$SCRIPTS/site.sh";;
 	db)        source "$SCRIPTS/db.sh";;
-	devserver) source "$SCRIPTS/devserver.sh";;
 	user)      source "$SCRIPTS/user.sh";;
 
 	# server managment

@@ -19,7 +19,7 @@ _{{scriptname}}() {
 	local cur prev subcommand subsubcommand server_subcommands
 	local db_subcommands site_subcommands user_subcommands
 
-	server_subcommands='site db devserver login upload restart reboot info tmux'
+	server_subcommands='site db login upload restart reboot info tmux'
 	server_subcommands+=' user addkey autorenew ping credentials pipe ports'
 	server_subcommands+=' bash-completion destroy _test switch-java-version'
 
@@ -34,7 +34,7 @@ _{{scriptname}}() {
 
 	case $subcommand in
 		# no further completions for any of these
-		devserver|login|info|ports|ping|swapon|autorenew|reboot|run|destroy|bash-completion)
+		login|info|ports|ping|swapon|autorenew|reboot|run|destroy|bash-completion)
 			_cods_dont_complete;;
 		credentials) _cods_complete path edit add ;;
 		upload)
