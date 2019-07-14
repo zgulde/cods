@@ -46,7 +46,7 @@ if ! grep -q "^$ip" ~/.ssh/known_hosts ; then
 fi
 
 # make sure we can access that server
-ssh root@$ip ls > /dev/null
+ssh $root_user@$ip ls > /dev/null
 if [[ $? -ne 0 ]]; then
 	echo "Error: Cannot login to $ip!"
 	echo 'Make sure:'
@@ -144,7 +144,7 @@ echo "$ENV_FILE file created!"
 
 heading 'running provision script'
 
-ssh root@$ip bash < "$SCRIPTS/provision.sh"
+ssh $root_user@$ip bash < "$SCRIPTS/provision.sh"
 
 # make sure provisioning went okay
 if [[ $? -ne 0 ]]; then
@@ -165,12 +165,12 @@ fi
 
 heading 'Copying over templates'
 
-scp -r "$BASE_DIR/templates" root@$ip:/srv/.templates
+scp -r "$BASE_DIR/templates" $root_user@$ip:/srv/.templates
 
 heading 'securing mysql installation...'
 
 # secure the mysql install
-ssh root@$ip 'mysql -u root' <<sql
+ssh $root_user@$ip 'mysql -u root' <<sql
 CREATE USER $user@localhost IDENTIFIED BY '$db_password';
 GRANT ALL ON *.* TO $user@localhost WITH GRANT OPTION;
 SET PASSWORD FOR 'root'@'localhost' = PASSWORD('$db_password');
@@ -184,7 +184,7 @@ sql
 
 heading 'creating user'
 
-ssh root@$ip bash <<setup_user
+ssh $root_user@$ip bash <<setup_user
 # create a user and add the ssh key
 useradd --create-home --shell /bin/bash --groups sudo,web $user
 echo '$user:$password' | chpasswd

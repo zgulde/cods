@@ -128,6 +128,8 @@ case $subcommand in
 				--user=*) export user=${arg#*=};;
 				-e|--email) export email=$1 ; shift;;
 				--email=*) export email=${arg#*=};;
+				--root-user) export root_user=$1 ; shift;;
+				--root-user=*) export root_user=${arg#*=};;
 		        *) echo "Unknown argument: $arg" ; exit 1;;
 		    esac
 		done
