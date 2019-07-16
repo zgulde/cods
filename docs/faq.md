@@ -60,7 +60,7 @@ new site you want to deploy is a spring boot application):
 1. Create the site and database on the server
 
     ```
-    myserver site create --domain example.com --spring-boot
+    myserver site create --domain example.com --java --spring-boot
     myserver db create --name example_db --user example_user
     ```
 
@@ -352,7 +352,7 @@ eval "$(myserver bash-completion)"
 Where `myserver` is the name of your server command.
 
 Close any open terminals, and when you start a new one, you will be able to use
-tab completion for all subcommands.
+tab completion for all subcommands and arguments.
 
 ## How can I upload really big files to my site?
 
