@@ -14,13 +14,13 @@ ssh access to a server.
     option for the size of the server.
 
     Make sure to add your ssh key to the droplet! The command below will copy
-    your public key to your clipboard.
+    your public key to your clipboard. Be sure to run this command on your development machine.
 
     ```
     cat ~/.ssh/id_rsa.pub | pbcopy
     ```
 
-1. Install the deployment tool
+1. Install the deployment tool to your Mac OS.
 
     ```
     brew install zgulde/zgulde/cods
@@ -28,7 +28,7 @@ ssh access to a server.
 
     See the [installation guide](installation.md) if you are not on MacOS.
 
-1. Perform the initial setup
+1. Perform the initial setup. Run this command on your development machine.
 
     ```
     cods init myserver
