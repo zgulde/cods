@@ -4,7 +4,7 @@ usage() {
 	echo '    myserver _test deploy java testing.example.com'
 	echo '    myserver _test deploy static testing.example.com'
 	echo
-	echo 'Where site type is one of {java,static,node,python,php}'
+	echo 'Where site type is one of {java,static,node,python,php,laravel}'
 	echo
 }
 
@@ -273,14 +273,6 @@ case $test_type in
 		echo '[test] Pushing to deploy...'
 		$GIT push origin master
 
-		echo '[test] We will wait 5 seconds for the app to startup...'
-		# fancy progress bar
-		for i in {1..10} ; do
-			echo -ne "\r[test] $((i / 2))/5 [$(repeat = $i)$(repeat ' ' $((10 - i)))]"
-			sleep 0.5
-		done
-		echo
-
 		expected='PHP site is working!'
 		response="$(curl -Ss http://$DOMAIN)"
 
@@ -301,12 +293,55 @@ case $test_type in
 
 		rm -rf $BASE_DIR/tests/sample-sites/php/.git
 		;;
+	laravel)
+		heading '[TESTING] Creating and Deploying Laravel site...'
+
+		GIT="git -C $BASE_DIR/tests/sample-sites/php-laravel"
+
+		echo '[test] Creating site...'
+		create_site --domain $DOMAIN --force --php
+
+		$GIT init
+		$GIT add .
+		$GIT commit -m first
+		$GIT remote add origin $user@$ip:/srv/$DOMAIN/repo.git
+		echo '[test] Pushing to deploy...'
+		$GIT push origin master
+		echo '[test] Performing additional first-time laravel site setup'
+		ssh $user@$ip "
+		cd /srv/$DOMAIN
+		cp -v .env.example .env
+		composer install
+		./artisan key:generate
+		"
+
+		expected='Hello from Cods + Laravel!'
+		response="$(curl -Ss http://$DOMAIN)"
+
+		if [[ $expected != $response ]] ; then
+			fail 'PHP Site Deployement'
+			cat <<-.
+			  expected to find  "$expected"
+			  but instead found "$response"
+
+			  as a response from $DOMAIN
+			.
+		else
+			echo -e "[test] \e[1msuccess\e[0m Found expected response from laravel site: $DOMAIN"
+		fi
+
+		echo '[test] Removing site...'
+		remove_site --domain $DOMAIN --force
+
+		rm -rf $BASE_DIR/tests/sample-sites/php/.git
+		;;
 	all)
 		$0 _test deploy java $DOMAIN
 		$0 _test deploy node $DOMAIN
 		$0 _test deploy static $DOMAIN
 		$0 _test deploy python $DOMAIN
 		$0 _test deploy php $DOMAIN
+		$0 _test deploy laravel $DOMAIN
 		;;
 	*) usage ; exit 1;;
 esac
