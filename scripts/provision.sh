@@ -45,9 +45,10 @@ apt-get install -y\
     php7.3-tokenizer php7.3-mysql php7.3-sqlite3 php7.3-pgsql php7.3-zip\
 	php7.3-curl php7.3-gd composer\
 	ufw\
+	haveged\
 	default-mysql-server\
 	unattended-upgrades\
-	zip htop apache2-utils
+	zip htop tmux apache2-utils
 
 heading 'configuring nginx'
 
