@@ -161,12 +161,11 @@ myserver site create -d example.com --enable-https
 ## Can I redeploy my project without a `git push`?
 ## I made a typo when setting up the database credentials. What do?
 
-Login to the server and fix the typo.
+Edit the file on the server and then re-start your site. For example:
 
 ```
-myserver login
-nano /srv/example.com/application.properties
-exit
+myserver run nano /srv/example.com/application.properties
+myserver site build -d example.com
 ```
 
 In general, if you change something that is external to your project (i.e. not
