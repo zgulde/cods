@@ -31,7 +31,7 @@ create_site() {
 		                        (see the enablehttps subcommand)
 
 		Examples:
-		    $(basename "$0") site create -d example.com
+		    $(basename "$0") site create -d example.com --static
 		    $(basename "$0") site create --domain=example.com --node --port=3000
 		    $(basename "$0") site create --domain=example.com --java -p 8080 --enable-https --spring-boot
 		    $(basename "$0") site create --domain example.com --static
@@ -295,7 +295,9 @@ show_logs() {
 	done
 	if [[ -z $domain ]] ; then
 		cat <<-.
-		View server logs for a given site
+		View server logs for a given site.
+
+		Only useful for java, node, and python site.
 
 		-d|--domain <domain> -- Name of the domain to check logs for
 		-f|--follow          -- Watch the log file in real-time (press C-c to quit)
