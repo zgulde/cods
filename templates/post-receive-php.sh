@@ -1,5 +1,7 @@
 #!/bin/bash
 
+umask 0002
+
 SITE_DIR=/srv/{{site}}
 
 log() {

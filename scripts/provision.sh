@@ -50,6 +50,10 @@ apt-get install -y\
 	unattended-upgrades\
 	zip htop tmux apache2-utils
 
+heading 'setting default umask'
+
+echo 'umask 002' > /etc/profile.d/group_umask.sh
+
 heading 'configuring nginx'
 
 # generate a stronger key for ssl connections

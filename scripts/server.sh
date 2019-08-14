@@ -261,7 +261,7 @@ case $command in
 	addkey)    add_sshkey "$@";;
 	autorenew) auto_renew_certs;;
 	ping)      ping -c5 $ip;;
-	run)       ssh -t $user@$ip "$@";;
+	run)       ssh -t $user@$ip "umask 0002 && $@";;
 	pipe)      ssh -T $user@$ip "$@";;
 	root)      ssh -t $user@$ip "sudo -s";;
 	ports)     show_ports;;
