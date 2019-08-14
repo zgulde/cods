@@ -12,8 +12,8 @@ project can help you out.
 
 Primarily, these scripts are intended to be used by [Codeup](http://codeup.com)
 students going through the Java program. You might also find this project useful
-if you have a Java, Python, or Node web application you want to deploy quickly,
-or if you want to host several projects on the same server.
+if you have a Java, Python, PHP, or Node web application you want to deploy
+quickly, or if you want to host several hobby projects on the same server.
 
 This project is probably **not** for you if:
 
@@ -30,6 +30,6 @@ This project is probably **not** for you if:
 - [Usage Guide](docs/usage.md)
 - [Frequently Asked Questions](docs/faq.md)
 - [Step by Step Deployment Guide For a Spring Boot Application](docs/spring-boot-deployment-guide.md)
-- [Step by Step Deployment Guide For a Node + Webpack Application](docs/node-movies-deployment-guide.md)
+- [Step by Step Deployment Guide For a Node + Webpack Frontend Application](docs/node-movies-deployment-guide.md)
 - [Step by Step Deployment Guide For a Python Flask Application](docs/python-deployment-guide.md)
 - [Getting More Help](SUPPORT.md)

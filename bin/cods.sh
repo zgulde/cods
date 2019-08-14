@@ -180,5 +180,15 @@ case $subcommand in
 		echo "  '$COMMAND_NAME' ready to go!"
 		;;
 	_server) show_server_path;;
+	moo)
+		echo ' ______'
+		echo '< Moo! >'
+		echo ' ------'
+		echo '        \   ^__^'
+		echo '         \  (oo)\_______'
+		echo '            (__)\       )\/\'
+		echo '                ||----w |'
+		echo '                ||     ||'
+		;;
 	*) usage;;
 esac

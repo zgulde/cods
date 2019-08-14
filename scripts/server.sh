@@ -287,6 +287,17 @@ case $command in
 		sed -e s/{{scriptname}}/$(basename "$0")/g "$SCRIPTS/bash_completion.sh"
 		;;
 
+	moo)
+		echo ' ______'
+		echo '< Moo! >'
+		echo ' ------'
+		echo '        \   ^__^'
+		echo '         \  (oo)\_______'
+		echo '            (__)\       )\/\'
+		echo '                ||----w |'
+		echo '                ||     ||'
+		;;
+
 	_test)
 		source "$SCRIPTS/test.sh"
 		;;
