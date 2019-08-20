@@ -30,7 +30,7 @@ auto_renew_certs() {
 }
 
 show_ports() {
-	ssh -t $user@$ip "grep -oR '[0-9]\{4,\}' /etc/nginx/sites-available/ | awk -F: '{split(\$1, a, \"/\"); print \$2,a[5]}' | sort -nk1"
+	ssh -t $user@$ip "grep -woR '[0-9]\{4,\}' /etc/nginx/sites-available/ | awk -F: '{split(\$1, a, \"/\"); print \$2,a[5]}' | sort -nk1"
 }
 
 enable_swap() {

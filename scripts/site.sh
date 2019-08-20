@@ -163,7 +163,7 @@ enable_https() {
 	fi
 
 	echo "- Finding Port Number For ${domain}..."
-	port="$(ssh $user@$ip "egrep -o '[0-9]{4,5}' /etc/nginx/sites-available/${domain} | sort | uniq")"
+	port="$(ssh $user@$ip "egrep -wo '[0-9]{4,5}' /etc/nginx/sites-available/${domain} | sort | uniq")"
 	if [[ -n $port ]] ; then
 		echo "  Found Port No: ${port}"
 	else
