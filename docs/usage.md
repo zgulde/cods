@@ -12,7 +12,7 @@ This document provides in-depth documentation on how to use the `cods` tool.
 * [Site Creation](#site-creation)
 * [Database Management](#database-management)
 * [HTTPS](#https)
-* [Sharing your server with teammates](#sharing-your-server-with-teammates)
+* [Sharing your server](#sharing-your-server)
 * [Bash Completion](#bash-completion)
 
 ## The `cods` command
@@ -40,7 +40,7 @@ server.
 
 Before running the `init` command make sure you have
 
-1. A server with a fresh ubuntu 18.04 install
+1. A server with a fresh debian 10 (buster) install
 1. Your ssh key on that server with access to the root account
 1. The server's ip address ready
 
@@ -116,19 +116,20 @@ arguments:
 myserver
 ```
 
-The same applies for the `site` and `db` subcommands, to see their available
-subcommands, just run them by themselves:
+The same applies for the `site`, `user`, and `db` subcommands, to see their
+available subcommands, just run them by themselves:
 
 ```
 myserver site
 myserver db
+myserver user
 ```
 
 Any subcommands that require arguments can be run without arguments to see
 detailed help for the command.
 
 All command line arguments have a long form, and most have a short form as well.
-You can pass commnad line arguments in one of 3 ways:
+You can pass command line arguments in one of 3 ways:
 
 ```
 -a value
@@ -136,94 +137,8 @@ You can pass commnad line arguments in one of 3 ways:
 --arg=value
 ```
 
-In general, any password prompts will be for your server admin password (i.e.
-your sudo password), unless you are running the `db` subcommand, in which case
-you will need to enter the database administrator password.
-
-### General Server Commands
-
-- `login`: log in to the server
-- `upload`: upload a file to the server (will default to the user's home
-  directory if no destination path is specified)
-- `info`: view some general information about your server
-- `restart`: restart a specific service. Shortcut for logging in and running
-  `sudo systemctl restart ...`
-- `reboot`: reboot the server
-- `ping`: ping the server
-- `autorenew`: setup letsencrypt certificates to automatically be renewed
-- `addkey`: add an authorized ssh key to the server for your account
-- `adduser`: add an admin user account to the server
-- `ports`: view the ports that are being reverse-proxied to by nginx
-- `bash-completion`: generate the bash completion script for the command
-- `credentials`: view the auto-generated credentials for your server
-
-### Site and Database Management Commands
-
-`site`
-
-- `list`: view the sites that are currently setup on the server
-- `create`: create a new site
-- `build`: trigger a build and deployment of an existing site
-- `logs`: view the log files for a site
-- `remove`: remove a site. Will remove the nginx config for the site, as well as
-  any previously deployed `jar`s
-- `enablehttps`: enable https for a site
-- `info`: show general information for a site
-
-`db`
-
-- `login`: login to your mysql database
-- `list`: list the databases that exist on your server
-- `create`: create a new database and a user with privileges on only that
-  database
-- `backup`: create a backup of a database
-- `remove`: remove a database and user
-
-### Examples
-
-For more examples, you can run any command that accepts arguments without
-arguments and a help message will be shown. For example, to see the help for the
-`upload` subcommand, run:
-
-```
-myserver upload
-```
-
-#### View all the available subcommands
-
-```bash
-myserver
-```
-
-#### View the commands for database managment
-
-```bash
-myserver db
-```
-
-#### Login to the server
-
-```bash
-myserver login
-```
-
-#### Login to the database
-
-```bash
-myserver db login
-```
-
-#### Create a site
-
-```bash
-myserver site create -d example.com
-```
-
-#### Upload a file to a site's uploads directory
-
-```bash
-myserver upload -f ~/Downloads/kittens.png -d /srv/example.com/public/uploads/kittens.png
-```
+See the [API docs](api.md) for more details and examples for all of the
+commands.
 
 ## Site Creation
 
@@ -690,7 +605,7 @@ myserver site create --domain example.com --enable-https
 This is functionally the same thing as running the `site create` and `site
 enablehttps` commands back to back.
 
-## Sharing your server with teammates
+## Sharing your server
 
 **For person who setup the server**
 

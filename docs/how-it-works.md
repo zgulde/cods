@@ -79,6 +79,7 @@ Assuming you already have a server setup:
 - user accounts (as opposed to running as root)
 - no root logins
 - firewall denies traffic for everything but ports 22, 80, and 443
+- umask set to 0002 by default (i.e. files are group-writable by default)
 
 ### Nginx
 
