@@ -8,7 +8,7 @@ usage() {
 	echo
 }
 
-success() { echo -e "\033[01;32m$@\033[0m" ; }
+success() { echo -e "\033[01;32m[SUCCESS]\033[0m $@" ; }
 fail() { echo -e "  \033[01;31m[FAIL]\033[0m $@" ; }
 
 test_type=$1 ; shift
@@ -63,7 +63,7 @@ case $test_type in
 			  as a response from $DOMAIN
 			.
 		else
-			echo -e "[test] \e[1msuccess\e[0m Found expected response from java site deployed at $DOMAIN"
+			success "Found expected response from java site deployed at $DOMAIN"
 		fi
 
 		echo '[test] Removing site...'
@@ -106,7 +106,7 @@ case $test_type in
 			  as a response from $DOMAIN
 			.
 		else
-			echo -e "[test] \e[1msuccess\e[0m Found expected response from node site deployed at $DOMAIN"
+			success "Found expected response from node site deployed at $DOMAIN"
 		fi
 
 		echo '[test] Removing site...'
@@ -149,7 +149,7 @@ case $test_type in
 			  as a response from $DOMAIN
 			.
 		else
-			echo -e "[test] \e[1msuccess\e[0m Found expected response from python site deployed at $DOMAIN"
+			success "Found expected response from python site deployed at $DOMAIN"
 		fi
 
 		echo '[test] Removing site...'
@@ -183,8 +183,7 @@ case $test_type in
 			  as a response from $DOMAIN
 			.
 		else
-			echo -e "[test] \e[1msuccess\e[0m Found expected response from static site deployed at $DOMAIN"
-			success '[test] Pass'
+			success "Found expected response from static site deployed at $DOMAIN"
 		fi
 
 		echo '[test] Removing site...'
@@ -216,8 +215,7 @@ case $test_type in
 			  as a response from $DOMAIN
 			.
 		else
-			echo -e "[test] \e[1msuccess\e[0m Found expected response from static cods.sh deploy at $DOMAIN"
-			success '[test] Pass'
+			success "Found expected response from static cods.sh deploy at $DOMAIN"
 		fi
 
 		echo '[test] Removing site...'
@@ -249,8 +247,7 @@ case $test_type in
 			  as a response from $DOMAIN
 			.
 		else
-			echo -e "[test] \e[1msuccess\e[0m Found expected response from static .cods deploy at $DOMAIN"
-			success '[test] Pass'
+			success "Found expected response from static .cods deploy at $DOMAIN"
 		fi
 
 		echo '[test] Removing site...'
@@ -285,7 +282,7 @@ case $test_type in
 			  as a response from $DOMAIN
 			.
 		else
-			echo -e "[test] \e[1msuccess\e[0m Found expected response from php site: $DOMAIN"
+			success "Found expected response from php site: $DOMAIN"
 		fi
 
 		echo '[test] Removing site...'
@@ -327,7 +324,7 @@ case $test_type in
 			  as a response from $DOMAIN
 			.
 		else
-			echo -e "[test] \e[1msuccess\e[0m Found expected response from laravel site: $DOMAIN"
+			success "Found expected response from laravel site: $DOMAIN"
 		fi
 
 		echo '[test] Removing site...'
