@@ -135,14 +135,6 @@ a new version.
     that is, if you have multiple python application deployed on your server,
     they can't use the same port number.
 
-1. Make note of your server admin password (sudo password):
-
-    This password will be required when setting up the site:
-
-    ```
-    myserver credentials
-    ```
-
 1. Run the command below to setup the site:
 
     ```

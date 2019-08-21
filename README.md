@@ -28,6 +28,7 @@ This project is probably **not** for you if:
 - [Initial Server Setup](docs/initial-server-setup.md)
 - [Domain DNS Configuration](docs/dns-configuration.md)
 - [Usage Guide](docs/usage.md)
+- [API Docs](docs/api.md)
 - [Frequently Asked Questions](docs/faq.md)
 - [Step by Step Deployment Guide For a Spring Boot Application](docs/spring-boot-deployment-guide.md)
 - [Step by Step Deployment Guide For a Node + Webpack Frontend Application](docs/node-movies-deployment-guide.md)

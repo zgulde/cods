@@ -116,27 +116,6 @@ arguments:
 myserver
 ```
 
-The same applies for the `site`, `user`, and `db` subcommands, to see their
-available subcommands, just run them by themselves:
-
-```
-myserver site
-myserver db
-myserver user
-```
-
-Any subcommands that require arguments can be run without arguments to see
-detailed help for the command.
-
-All command line arguments have a long form, and most have a short form as well.
-You can pass command line arguments in one of 3 ways:
-
-```
--a value
---arg value
---arg=value
-```
-
 See the [API docs](api.md) for more details and examples for all of the
 commands.
 
@@ -338,7 +317,7 @@ myserver site create --domain example.com --spring-boot
 This will automatically setup the site's `config` file to match the default
 location for the `application.properties` file in a spring boot application.
 
-### Node Site Creation
+### Node
 
 ```
 myserver site create --node --port 3000 --domain my-node-site.com
@@ -439,6 +418,32 @@ project by running:
 ```
 myserver site info --domain example-python-site.com
 ```
+
+### PHP
+
+```
+myserver site create --php --domain my-php-site.com
+```
+
+A git remote will be created for you, and a `post-receive` hook will be setup so
+that when you push the `master` branch to the remote on the server:
+
+1. The new version of the code is checked out, replacing the old version.
+1. If a file named `cods.sh` exists at the root of the project, it will be
+   run, and a variable named `SITE_DIR` will be available to it that contains
+   the location of the directory for your site (and the source code).
+
+See [the example php site for a simplified example](https://github.com/zgulde/cods/tree/master/tests/sample-sites/php) or the [example laravel site](https://github.com/zgulde/cods/tree/master/tests/sample-sites/php).
+
+You can find the git remote and a copy-pastable command to add it to your
+project by running:
+
+```
+myserver site info --domain my-node-site.com
+```
+
+Note that for a php site, by default, nginx will not handle 404s, i.e. missing
+paths will be sent to your `index.php` file.
 
 ### Static Site Creation
 

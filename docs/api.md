@@ -3,88 +3,47 @@
 The document explains how all of the commands and subcommands within `cods`
 work.
 
-See also built-in help.
-
-### General Server Commands
-
-- `login`: log in to the server
-- `upload`: upload a file to the server (will default to the user's home
-  directory if no destination path is specified)
-- `info`: view some general information about your server
-- `restart`: restart a specific service. Shortcut for logging in and running
-  `sudo systemctl restart ...`
-- `reboot`: reboot the server
-- `ping`: ping the server
-- `autorenew`: setup letsencrypt certificates to automatically be renewed
-- `addkey`: add an authorized ssh key to the server for your account
-- `adduser`: add an admin user account to the server
-- `ports`: view the ports that are being reverse-proxied to by nginx
-- `bash-completion`: generate the bash completion script for the command
-- `credentials`: view the auto-generated credentials for your server
-
-### Site and Database Management Commands
-
-`site`
-
-- `list`: view the sites that are currently setup on the server
-- `create`: create a new site
-- `build`: trigger a build and deployment of an existing site
-- `logs`: view the log files for a site
-- `remove`: remove a site. Will remove the nginx config for the site, as well as
-  any previously deployed `jar`s
-- `enablehttps`: enable https for a site
-- `info`: show general information for a site
-
-`db`
-
-- `login`: login to your mysql database
-- `list`: list the databases that exist on your server
-- `create`: create a new database and a user with privileges on only that
-  database
-- `backup`: create a backup of a database
-- `remove`: remove a database and user
-
+See also the built-in help.
 
 * [The `cods` command](#the-cods-command)
-    * [`init`](#init)
-    * [`add`](#add)
+    * [`add`](#add): add a server command for an existing cloud server
+    * [`help`](#help): interactive help
+    * [`init`](#init): provision a new server and create a server command
     * [`update`](#update)
-    * [`help`](#help)
 * [`myserver` - A Command Created By Cods](#myserver---a-command-created-by-cods)
     * [General Server Commands](#general-server-commands)
-        * [`info`](#info)
-        * [`login`](#login)
-        * [`ports`](#ports)
-        * [`ping`](#ping)
-        * [`swapon`](#swapon)
-        * [`autorenew`](#autorenew)
-        * [`reboot`](#reboot)
-        * [`run`](#run)
-        * [`pipe`](#pipe)
-        * [`credentials`](#credentials)
-        * [`destroy`](#destroy)
-        * [`switch-java-version`](#switch-java-version)
-        * [`bash-completion`](#bash-completion)
-        * [`upload`](#upload)
-        * [`restart`](#restart)
-        * [`addkey`](#addkey)
+        * [`autorenew`](#autorenew): setup letsencrypt certificates to automatically be renewed
+        * [`bash-completion`](#bash-completion): generate the bash completion script for the command
+        * [`credentials`](#credentials): view the auto-generated credentials for your server
+        * [`destroy`](#destroy): destroy the local server command
+        * [`info`](#info): view some general information about your server
+        * [`login`](#login): log in to the server
+        * [`ping`](#ping): ping the server
+        * [`pipe`](#pipe): run arbitrary commands non-interactively
+        * [`ports`](#ports): view the ports that are in-use by the applications on your server
+        * [`reboot`](#reboot): reboot the server
+        * [`restart`](#restart): restart a specific service running on the server
+        * [`run`](#run): run arbitrary one-off commands on the server
+        * [`swapon`](#swapon): setup a swapfile
+        * [`switch-java-version`](#switch-java-version): change the default version of java on the server
+        * [`upload`](#upload): upload a file to the server (will default to the user's home directory if no destination path is specified)
     * [`site` Commands for site management](#site-commands-for-site-management)
-        * [`list`](#list)
-        * [`create`](#create)
-        * [`remove`](#remove)
-        * [`build`](#build)
-        * [`enablehttps`](#enablehttps)
-        * [`info`](#info-1)
-        * [`logs`](#logs)
+        * [`build`](#build): re-build a site
+        * [`create`](#create): create a new site
+        * [`enablehttps`](#enablehttps): setup a site to be served over https
+        * [`info`](#info-1): view information about the server
+        * [`list`](#list): view the sites setup on the server
+        * [`logs`](#logs): view the logs for a python, node, or java site
+        * [`remove`](#remove): remove an existing site
     * [`db` Commands for database management](#db-commands-for-database-management)
-        * [`login`](#login-1)
-        * [`list`](#list-1)
-        * [`create`](#create-1)
-        * [`remove`](#remove-1)
-        * [`backup`](#backup)
+        * [`backup`](#backup): make a database backup
+        * [`create`](#create-1): create a new database and associated user
+        * [`list`](#list-1): list databases that are setup
+        * [`login`](#login-1): login to production database
+        * [`remove`](#remove-1): remove an existing database and user
     * [`user` Commands for user management](#user-commands-for-user-management)
-        * [`add`](#add-1)
-        * [`remove`](#remove-2)
+        * [`add`](#add-1): add a new user
+        * [`remove`](#remove-2): remove an existing user
 
 ## The `cods` command
 
@@ -202,6 +161,37 @@ cods help
 
 While `cods` can create commands with any name, for the rest of this document we
 will assume we are working with a command named `myserver`.
+
+`myserver` contains various subcommands for performing different activities on the
+server.
+
+To see all the available subcommands, run the `myserver` command without any
+arguments:
+
+```
+myserver
+```
+
+The same applies for the `site`, `user`, and `db` subcommands, to see their
+available subcommands, just run them by themselves:
+
+```
+myserver site
+myserver db
+myserver user
+```
+
+Any subcommands that require arguments can be run without arguments to see
+detailed help for the command.
+
+All command line arguments have a long form, and most have a short form as well.
+You can pass command line arguments in one of 3 ways:
+
+```
+-a value
+--arg value
+--arg=value
+```
 
 ### General Server Commands
 
@@ -451,22 +441,6 @@ Restart the `nginx` service
 
 ```
 myserver restart --service nginx
-```
-
-#### `addkey`
-
-Add an additional authorized ssh key to your account.
-
-**Arguments**
-
-- `-f` or `--sshkeyfile`: local path to the public ssh key to add
-
-**Examples**
-
-Add another public key file that you have saved locally
-
-```
-myserver addkey -f ~/.ssh/my-other-computer.pub
 ```
 
 ### `site` Commands for site management

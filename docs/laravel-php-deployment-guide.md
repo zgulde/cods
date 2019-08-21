@@ -43,5 +43,6 @@
     composer install
     ```
 
-    This file will be run whenever you deploy the site
+    This file will be run (i.e. `composer install` will run) whenever you push
+    to the production remote and deploy the site.
 
