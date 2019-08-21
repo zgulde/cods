@@ -5,6 +5,46 @@ work.
 
 See also built-in help.
 
+### General Server Commands
+
+- `login`: log in to the server
+- `upload`: upload a file to the server (will default to the user's home
+  directory if no destination path is specified)
+- `info`: view some general information about your server
+- `restart`: restart a specific service. Shortcut for logging in and running
+  `sudo systemctl restart ...`
+- `reboot`: reboot the server
+- `ping`: ping the server
+- `autorenew`: setup letsencrypt certificates to automatically be renewed
+- `addkey`: add an authorized ssh key to the server for your account
+- `adduser`: add an admin user account to the server
+- `ports`: view the ports that are being reverse-proxied to by nginx
+- `bash-completion`: generate the bash completion script for the command
+- `credentials`: view the auto-generated credentials for your server
+
+### Site and Database Management Commands
+
+`site`
+
+- `list`: view the sites that are currently setup on the server
+- `create`: create a new site
+- `build`: trigger a build and deployment of an existing site
+- `logs`: view the log files for a site
+- `remove`: remove a site. Will remove the nginx config for the site, as well as
+  any previously deployed `jar`s
+- `enablehttps`: enable https for a site
+- `info`: show general information for a site
+
+`db`
+
+- `login`: login to your mysql database
+- `list`: list the databases that exist on your server
+- `create`: create a new database and a user with privileges on only that
+  database
+- `backup`: create a backup of a database
+- `remove`: remove a database and user
+
+
 * [The `cods` command](#the-cods-command)
     * [`init`](#init)
     * [`add`](#add)
@@ -50,13 +90,118 @@ See also built-in help.
 
 ### `init`
 
+The `init` subcommand is used to provision a server and setup a local server
+command. The server must be "fresh" (i.e. not setup by any other provisioning
+tools), and you must have root ssh access to the server.
+
+The name of the server command bust be provided, then any optional arguments.
+
+**Arguments**
+
+- `-i` or `--ip`: (optional) the ip address of the server. If not provided, you
+  will be prompted for it.
+- `-u` or `--user`: (optional) the username to setup for yourself on the server.
+  If not provided, you will be prompted for it.
+- `-e` or `--email`: (optional) your email address. If note provided, you will
+  be prompted for it.
+- `--root-user`: username of the user that has root access to the server.
+  Defaults to `root`.
+
+**Examples**
+
+- Create a command named `myserver`
+
+    ```
+    cods init myserver
+    ```
+
+    You will be prompted for the server's ip address, a username for yourself,
+    and your email address.
+
+- Create a command named `myserver`
+
+    ```
+    cods init myserver --ip 123.123.123.123 --user codeup --email info@codeup.com
+    ```
+
+    Here you will **not** be prompted for the server's ip address, a username
+    for yourself, and your email address because they were provided as command
+    line arguments.
+
+- Create a `myserver` command using a different root user for the initial setup
+
+    ```
+    cods init myserver --root-user debian
+    ```
+
 ### `add`
+
+The `add` subcommand is used to create a local server command for an existing
+server. You will need to have ssh access to an existing user account on the
+server.
+
+You might use this command if:
+
+- you want to get access to a shared server that your teammate setup and gave
+  you an account on
+- you want to be able to access from your desktop pc a server that you setup on
+  your laptop
+
+The name of the server command bust be provided, then any optional arguments.
+
+**Arguments**
+
+- `-i` or `--ip`: (optional) the ip address of the server. If not provided, you
+  will be prompted for it.
+- `-u` or `--user`: (optional) the username to setup for yourself on the server.
+  If not provided, you will be prompted for it.
+
+**Examples**
+
+- Create a command named `myserver`
+
+    ```
+    cods add myserver
+    ```
+
+    You will be prompted for the server's ip address and your username.
+
+- Create a command named `myserver`
+
+    ```
+    cods init myserver --ip 123.123.123.123 --user codeup --email info@codeup.com
+    ```
+
+    Here you will **not** be prompted for the server's ip address or your
+    username for yourself because they were provided as command line arguments.
 
 ### `update`
 
+Updates any existing server commands to the most recent version of the `cods`
+scripts.
+
+You should run this after you update `cods`.
+
+**Example**
+
+```
+cods update
+```
+
 ### `help`
 
+Launch the interactive help system.
+
+**Example**
+
+```
+cods help
+```
+
 ## `myserver` - A Command Created By Cods
+
+While `cods` can create commands with any name, for the rest of this document we
+will assume we are working with a command named `myserver`.
 
 ### General Server Commands
 
