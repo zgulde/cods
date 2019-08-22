@@ -1,3 +1,7 @@
+3.0.1 -- 20190822
+
+- enhancement: upgrade flask sample site deps
+
 3.0.0 -- 20190822
 
 - enhancement: Use debian 10 (buster)
