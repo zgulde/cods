@@ -1,3 +1,7 @@
+3.0.2 -- 20190822
+
+- bugfix: provide default value for `root_user` in initial server setup
+
 3.0.1 -- 20190822
 
 - enhancement: upgrade flask sample site deps

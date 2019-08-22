@@ -134,6 +134,10 @@ case $subcommand in
 		    esac
 		done
 
+		if [[ -z $root_user ]] ; then
+			export root_user=root
+		fi
+
 		source "$BASE_DIR/scripts/setup.sh"
 		;;
 	add)
