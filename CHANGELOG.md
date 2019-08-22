@@ -1,4 +1,4 @@
-3.0.0
+3.0.0 -- 20190822
 
 - enhancement: Use debian 10 (buster)
 - enhancement: stronger https config with nginx
