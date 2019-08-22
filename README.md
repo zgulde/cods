@@ -19,7 +19,7 @@ This project is probably **not** for you if:
 
 - You want to use a database that is not MySQL
 - You don't want to put nginx in front of your application
-- You want to use an operating system that is not Ubuntu on your server
+- You want to use an operating system that is not Debian on your server
 
 ## Documentation
 

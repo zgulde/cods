@@ -4,6 +4,8 @@
 
 3.0.0 -- 20190822
 
+- **Note that this is a breaking change, and not 100% backwards compatible with
+  any servers setup with cods v2.x**
 - enhancement: Use debian 10 (buster)
 - enhancement: stronger https config with nginx
 - feature: add PHP site support (including laravel)
