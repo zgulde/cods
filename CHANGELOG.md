@@ -1,3 +1,7 @@
+3.0.3 -- 20190822
+
+- bugfix: install curl before trying to use it
+
 3.0.2 -- 20190822
 
 - bugfix: provide default value for `root_user` in initial server setup

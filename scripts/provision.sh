@@ -16,6 +16,7 @@ heading(){
 }
 
 set -e
+set -x
 
 # prevent installed packages (namely mysql) from trying to prompt for
 # information in an interactive way. We'll do the setup progromatically
@@ -26,10 +27,10 @@ heading 'updating + upgrading apt'
 
 apt-get update
 apt-get upgrade -y
+apt-get install -y gnupg2 software-properties-common curl # we need this first to setup new repos
 
 heading 'Adding adoptopenjdk repos'
 
-apt-get install -y gnupg2 software-properties-common # we need this first to setup new repos
 apt-key add <(curl -LSs https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public)
 sudo add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
 sudo apt-get update
