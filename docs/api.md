@@ -197,13 +197,28 @@ You can pass command line arguments in one of 3 ways:
 
 #### `info`
 
-Show general information about the server
+Show general information about the server. Another argument can be passed to
+show just the server's ip address, or just the remote username.
 
 **Example**
 
-```
-myserver info
-```
+- Show general information
+
+    ```
+    myserver info
+    ```
+
+- Show the server's ip address
+
+    ```
+    myserver info ip
+    ```
+
+- Show the remote username
+
+    ```
+    myserver info user
+    ```
 
 #### `login`
 
@@ -565,7 +580,20 @@ myserver site enablehttps -d example.com
 
 #### `info`
 
-Show various information about a site.
+Show various information about a site. Optionally, just print the deployment
+remote.
+
+**Arguments**
+
+- `-d` or `--domain`: domain name of the site to show information for
+- `--show-remote`: just print the deployment git remote
+
+**Examples**
+
+```
+myserver site info -d example.com
+myserver site info --show-remote --domain example.com
+```
 
 #### `logs`
 

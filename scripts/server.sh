@@ -163,22 +163,29 @@ add_sshkey() {
 }
 
 show_info() {
-	cat <<-info
-		Information about your server:
+	if [[ $# -eq 0 ]] ; then
+		cat <<-info
+			Information about your server:
 
-		Cods Version: $(head -n1 "$BASE_DIR/CHANGELOG.md")
+			Cods Version: $(head -n1 "$BASE_DIR/CHANGELOG.md")
 
-		ip address: $ip
-		login:      $user
+			ip address: $ip
+			user:       $user
 
-		MySQL port: 3306
-		ssh port:   22
+			MySQL port: 3306
+			ssh port:   22
 
-		data directory:   $DATA_DIR
-		database backups: $DATA_DIR/db-backups/
-		command:          $0
-		base directory:   $BASE_DIR
-	info
+			data directory:   $DATA_DIR
+			database backups: $DATA_DIR/db-backups/
+			command:          $0
+			base directory:   $BASE_DIR
+		info
+	elif [[ $1 == ip ]] ; then
+		echo $ip
+	elif [[ $1 == user ]] ; then
+		echo $user
+	fi
+
 }
 
 show_usage() {
@@ -256,7 +263,7 @@ case $command in
 	upload)    upload_file "$@";;
 	restart)   restart_service "$@";;
 	reboot)    ssh -t $user@$ip 'sudo reboot';;
-	info)      show_info;;
+	info)      show_info "$@";;
 	swapon)    enable_swap;;
 	addkey)    add_sshkey "$@";;
 	autorenew) auto_renew_certs;;

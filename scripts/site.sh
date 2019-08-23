@@ -321,6 +321,7 @@ show_info() {
 	    case $arg in
 	        -d|--domain) domain=$1 ; shift;;
 	        --domain=*) domain=${arg#*=};;
+			--show-remote) show_remote=1 ;;
 	        *) echo "Unknown argument: $arg" ; exit 1;;
 	    esac
 	done
@@ -329,6 +330,7 @@ show_info() {
 		Show information about a site that is setup on the server
 
 		-d|--domain <domain> -- name of the site to show information about
+		--show-remote        -- show just the git deployment remote
 
 		Example:
 		    $(basename "$0") site info -d example.com
@@ -336,21 +338,25 @@ show_info() {
 		die
 	fi
 
-	echo '- Ensuring Site Exists'
+	echo '- Ensuring Site Exists' >&2
 	list_sites | grep "^$domain$" >/dev/null || die "It looks like $domain does not exist. Aborting..."
 
-	cat <<-.
-		Site: $domain
+	if [[ $show_remote -eq 1 ]] ; then
+		echo $user@$ip:/srv/$domain/repo.git
+	else
+		cat <<-.
+			Site: $domain
 
-		public directory:      /srv/$domain/public
-		nginx config file:     /etc/nginx/sites-available/$domain
-		deployment git remote: $user@$ip:/srv/$domain/repo.git
+			public directory:      /srv/$domain/public
+			nginx config file:     /etc/nginx/sites-available/$domain
+			deployment git remote: $user@$ip:/srv/$domain/repo.git
 
-		To add the deployment remote for this domain, run:
+			To add the deployment remote for this domain, run:
 
-		    git remote add production $user@$ip:/srv/$domain/repo.git
+				git remote add production $user@$ip:/srv/$domain/repo.git
 
-	.
+		.
+	fi
 }
 
 show_help() {
@@ -368,7 +374,7 @@ show_help() {
 	    remove      -d <domain> [--force]
 	    build       -d <domain>
 	    enablehttps -d <domain>
-	    info        -d <domain>
+	    info        -d <domain> [--show-remote]
 	    logs        -d <domain> [-f]
 
 	help

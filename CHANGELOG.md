@@ -1,3 +1,7 @@
+3.1.0 -- 20190823
+
+- feature: more fine-grained control over `info` subcommands
+
 3.0.3 -- 20190822
 
 - bugfix: install curl before trying to use it
