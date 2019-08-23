@@ -1,3 +1,7 @@
+3.1.1 -- 20190823
+
+- enhancement: be more safe when adding groups for new users
+
 3.1.0 -- 20190823
 
 - feature: more fine-grained control over `info` subcommands

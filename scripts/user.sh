@@ -83,7 +83,9 @@ add_user() {
 		site=\$(basename \$site)
 		site=\${site//./-}
 		[[ \$site == default ]] && continue
-		sudo usermod -a -G \$site $new_user
+		if cut -d: -f 1 /etc/group | grep \$site ; then
+			sudo usermod -a -G \$site $new_user
+		fi
 	done
 	"
 	if [[ $? -ne 0 ]] ; then
