@@ -70,7 +70,7 @@ add_user() {
 	fi
 
 	password="$(mkpassword)"
-	echo "Creating user ${new_user}... (enter *your* sudo password when prompted)"
+	echo "Creating user ${new_user}..."
 	ssh -t $user@$ip "
 	set -e
 	sudo useradd --create-home --shell /bin/bash --groups sudo,web $new_user

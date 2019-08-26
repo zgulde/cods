@@ -113,7 +113,7 @@ create_site() {
 		fi
 	fi
 
-	echo "- Logging In To Create ${domain}... (sudo password will be required)"
+	echo "- Logging In To Create ${domain}..."
 
 	ssh -t $user@$ip "
 	set -e
