@@ -47,9 +47,8 @@ apt-get install -y\
 	php7.3-curl php7.3-gd composer\
 	ufw\
 	haveged\
-	default-mysql-server\
 	unattended-upgrades\
-	zip htop tmux apache2-utils
+	zip htop tmux apache2-utils mg
 
 heading 'setting default umask'
 
