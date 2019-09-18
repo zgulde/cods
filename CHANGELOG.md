@@ -1,3 +1,8 @@
+3.2.0 -- 20190918
+
+- Remove default-mysql-server install. This is a temporary workaround as we will
+  install mysql v5.7 in production, and eventually this will be automated.
+
 3.1.1 -- 20190823
 
 - enhancement: be more safe when adding groups for new users
