@@ -285,7 +285,7 @@ See also the relevant section in the usage guide.
 run
 
 ```
-myserver adduser --github-username=USERNAME
+myserver user add --github-username=USERNAME
 ```
 
 replacing `USERNAME` with your teammte's github username

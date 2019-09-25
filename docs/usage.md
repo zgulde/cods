@@ -616,7 +616,7 @@ enablehttps` commands back to back.
 
 1. Make sure you want to give admin access to your teammate.
 
-    The `myserver adduser` command will create another user account on the
+    The `myserver user add` command will create another user account on the
     server **with admin privileges**.
 
 1. Get your teamate's public ssh key and save it locally
@@ -624,7 +624,7 @@ enablehttps` commands back to back.
 1. Run the appropriate `myserver` command
 
     ```bash
-    myserver adduser -u sally -f ~/sallys_ssh_key.pub
+    myserver user add -u sally -f ~/sallys_ssh_key.pub
     ```
 
 1. Take note of the randomly generated password
@@ -653,7 +653,7 @@ You can also add a user to the server based on their github username. For
 example, to add `zgulde` to your server, you would run:
 
 ```
-myserver adduser --github-username zgulde
+myserver user add --github-username zgulde
 ```
 
 This command will create a user with the same login as the github username, a
