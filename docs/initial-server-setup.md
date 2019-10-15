@@ -64,3 +64,58 @@ myserver credentials
 this file and save your passwords in a password manager. However, if you lose
 your passwords, they are _not_ recoverable!*
 
+## MySQL Setup
+
+After the server is provisioned, we will log in to the server and install mysql.
+
+1. Login to the server
+
+    ```
+    myserver login
+    ```
+
+1. Configure the mysql installation process
+
+    ```
+    # from the server
+    sudo -s
+    wget http://repo.mysql.com/mysql-apt-config_0.8.13-1_all.deb
+    dpkg -i mysql-apt-config_0.8.13-1_all.deb
+    ```
+
+    1. From here, choose option 1, "MySQL Server & Cluster".
+    1. Next choose version 5.7
+
+1. Install mysql
+
+    ```
+    # still from the server
+    apt update && apt install -y mysql-server
+    ```
+
+    Leave the root password blank
+
+1. Setup your admin user
+
+    1. Login to the mysql server
+
+        ```
+        # still logged in to the production server...
+        mysql -uroot
+        ```
+
+    1. Create your admin mysql user
+
+        ```
+        CREATE USER you@localhost IDENTIFIED BY 'password';
+        GRANT ALL on *.* TO zach@localhost WITH GRANT OPTION;
+        ```
+
+        Replacing `you` with your server username, and `password` with your
+        admin db password (found with `myserver credentials`).
+
+1. Logout of the server.
+
+    ```
+    exit
+    ```
