@@ -1,27 +1,30 @@
 # variables: $domain, $email, $port
 
 if egrep 'ssl\s*on;' /etc/nginx/sites-available/$domain >/dev/null ; then
-	echo "It looks like SSL is already setup for $domain"
+	echo "It looks like https is already setup for $domain"
 	echo 'Doing nothing.'
 	exit 1
 fi
 
-echo '- Requesting SSL certificate... (this might take a second)'
+echo '- Requesting HTTPS certificate... (this might take a second)'
 sudo letsencrypt certonly\
 	--authenticator webroot\
 	--webroot-path=/srv/${domain}/public\
 	--domain ${domain}\
 	--agree-tos\
 	--email $email\
+	--non-interactive\
 	--renew-by-default >> /srv/letsencrypt.log
 
 echo "- Setting Up Nginx To Serve ${domain} Over Https..."
 
-# figure out whether we have a java site or a static one
-if grep proxy_pass /etc/nginx/sites-available/$domain >/dev/null ; then
-	template=ssl-site.nginx.conf
+# figure out what kind of site we have
+if egrep -q 'include fastcgi_params;' /etc/nginx/sites-available/$domain ; then
+	template=https-php-site.nginx.conf
+elif grep proxy_pass /etc/nginx/sites-available/$domain >/dev/null ; then
+	template=https-site.nginx.conf
 else
-	template=static-ssl-site.nginx.conf
+	template=static-https-site.nginx.conf
 fi
 
 sudo cp /srv/.templates/$template /etc/nginx/sites-available/${domain}

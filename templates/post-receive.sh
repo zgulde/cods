@@ -1,5 +1,7 @@
 #!/bin/bash
 
+umask 0002
+
 SITE_DIR=/srv/{{site}}
 JAR_TARGET_LOCATION=/srv/{{site}}/app.jar
 
@@ -88,20 +90,21 @@ if [[ -f .cods ]]; then
 	rm -f $JAR_TARGET_LOCATION
 	mv $JAR_FILE $JAR_TARGET_LOCATION
 
-	log 'Restarting {{site}}...'
-	sudo systemctl restart {{site}}
-
-	log '{{site}} deployed!'
-
-elif [[ -f install.sh ]]; then
-	log 'Found "install.sh"! Running...'
+elif [[ -f cods.sh ]]; then
+	log 'Found "cods.sh"! Running...'
+	log "Exporting SITE_DIR=$SITE_DIR, JAR_TARGET_LOCATION=$JAR_TARGET_LOCATION, TMP_REPO=$TMP_REPO"
 	export SITE_DIR
 	export JAR_TARGET_LOCATION
 	export TMP_REPO
-	bash install.sh
+	bash cods.sh
 else
-	log 'No ".cods" file or "install.sh" file found.'
+	log 'No ".cods" file or "cods.sh" file found.'
 fi
+
+log 'Restarting {{site}}...'
+sudo systemctl restart {{site}}
+
+log '{{site}} deployed!'
 
 log '--------------------------------------------------'
 log '> All done!'

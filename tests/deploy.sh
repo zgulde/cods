@@ -4,11 +4,11 @@ usage() {
 	echo '    myserver _test deploy java testing.example.com'
 	echo '    myserver _test deploy static testing.example.com'
 	echo
-	echo 'Where site type is one of {java,static,node}'
+	echo 'Where site type is one of {java,static,node,python,php,laravel}'
 	echo
 }
 
-success() { echo -e "\033[01;32m$@\033[0m" ; }
+success() { echo -e "\033[01;32m[SUCCESS]\033[0m $@" ; }
 fail() { echo -e "  \033[01;31m[FAIL]\033[0m $@" ; }
 
 test_type=$1 ; shift
@@ -63,7 +63,7 @@ case $test_type in
 			  as a response from $DOMAIN
 			.
 		else
-			echo "[test] Found expected response from java site: $DOMAIN"
+			success "Found expected response from java site deployed at $DOMAIN"
 		fi
 
 		echo '[test] Removing site...'
@@ -89,7 +89,7 @@ case $test_type in
 		echo '[test] We will wait 5 seconds for the app to startup...'
 		# fancy progress bar
 		for i in {1..10} ; do
-			echo -ne "\r[test] $((i / 2))/20 [$(repeat = $i)$(repeat ' ' $((10 - i)))]"
+			echo -ne "\r[test] $((i / 2))/5 [$(repeat = $i)$(repeat ' ' $((10 - i)))]"
 			sleep 0.5
 		done
 		echo
@@ -106,13 +106,56 @@ case $test_type in
 			  as a response from $DOMAIN
 			.
 		else
-			echo "[test] Found expected response from node site: $DOMAIN"
+			success "Found expected response from node site deployed at $DOMAIN"
 		fi
 
 		echo '[test] Removing site...'
 		remove_site --domain $DOMAIN --force
 
 		rm -rf $BASE_DIR/tests/sample-sites/node/.git
+		;;
+	python)
+		heading '[TESTING] Creating and Deploying Python site...'
+
+		GIT="git -C $BASE_DIR/tests/sample-sites/python-flask"
+
+		echo '[test] Creating site...'
+		create_site --domain $DOMAIN --force --python --port 54321
+
+		$GIT init
+		$GIT add .
+		$GIT commit -m first
+		$GIT remote add origin $user@$ip:/srv/$DOMAIN/repo.git
+		echo '[test] Pushing to deploy...'
+		$GIT push origin master
+
+		echo '[test] We will wait 5 seconds for the app to startup...'
+		# fancy progress bar
+		for i in {1..10} ; do
+			echo -ne "\r[test] $((i / 2))/5 [$(repeat = $i)$(repeat ' ' $((10 - i)))]"
+			sleep 0.5
+		done
+		echo
+
+		expected='Python Flask site is working!'
+		response="$(curl -Ss http://$DOMAIN)"
+
+		if [[ $expected != $response ]] ; then
+			fail 'Python Site Deployement'
+			cat <<-.
+			  expected to find  "$expected"
+			  but instead found "$response"
+
+			  as a response from $DOMAIN
+			.
+		else
+			success "Found expected response from python site deployed at $DOMAIN"
+		fi
+
+		echo '[test] Removing site...'
+		remove_site --domain $DOMAIN --force
+
+		rm -rf $BASE_DIR/tests/sample-sites/python-flask/.git
 		;;
 	static)
 		heading '[TESTING] Creating and Deploying static site...'
@@ -140,8 +183,7 @@ case $test_type in
 			  as a response from $DOMAIN
 			.
 		else
-			echo "[test] Found expected response from static site deployed at $DOMAIN"
-			success '[test] Pass'
+			success "Found expected response from static site deployed at $DOMAIN"
 		fi
 
 		echo '[test] Removing site...'
@@ -149,7 +191,7 @@ case $test_type in
 
 		rm -rf $BASE_DIR/tests/sample-sites/static/.git
 
-		heading '[TESTING] Creating and Deploying static site with a install.sh file...'
+		heading '[TESTING] Creating and Deploying static site with a cods.sh file...'
 		GIT="git -C $BASE_DIR/tests/sample-sites/static-with-build"
 		echo '[test] Creating site...'
 		create_site --domain $DOMAIN --static --force
@@ -165,7 +207,7 @@ case $test_type in
 		response="$(curl -Ss http://$DOMAIN)"
 
 		if [[ $expected != $response ]] ; then
-			fail 'Static Site with install.sh file Deployement'
+			fail 'Static Site with cods.sh file Deployement'
 			cat <<-.
 			  expected to find  "$expected"
 			  but instead found "$response"
@@ -173,8 +215,7 @@ case $test_type in
 			  as a response from $DOMAIN
 			.
 		else
-			echo "[test] Found expected response from static install.sh deploy at $DOMAIN"
-			success '[test] Pass'
+			success "Found expected response from static cods.sh deploy at $DOMAIN"
 		fi
 
 		echo '[test] Removing site...'
@@ -206,14 +247,98 @@ case $test_type in
 			  as a response from $DOMAIN
 			.
 		else
-			echo "[test] Found expected response from static .cods deploy at $DOMAIN"
-			success '[test] Pass'
+			success "Found expected response from static .cods deploy at $DOMAIN"
 		fi
 
 		echo '[test] Removing site...'
 		remove_site --domain $DOMAIN --force
 
 		rm -rf $BASE_DIR/tests/sample-sites/static-with-dot-cods/.git
+		;;
+	php)
+		heading '[TESTING] Creating and Deploying PHP site...'
+
+		GIT="git -C $BASE_DIR/tests/sample-sites/php"
+
+		echo '[test] Creating site...'
+		create_site --domain $DOMAIN --force --php
+
+		$GIT init
+		$GIT add .
+		$GIT commit -m first
+		$GIT remote add origin $user@$ip:/srv/$DOMAIN/repo.git
+		echo '[test] Pushing to deploy...'
+		$GIT push origin master
+
+		expected='PHP site is working!'
+		response="$(curl -Ss http://$DOMAIN)"
+
+		if [[ $expected != $response ]] ; then
+			fail 'PHP Site Deployement'
+			cat <<-.
+			  expected to find  "$expected"
+			  but instead found "$response"
+
+			  as a response from $DOMAIN
+			.
+		else
+			success "Found expected response from php site: $DOMAIN"
+		fi
+
+		echo '[test] Removing site...'
+		remove_site --domain $DOMAIN --force
+
+		rm -rf $BASE_DIR/tests/sample-sites/php/.git
+		;;
+	laravel)
+		heading '[TESTING] Creating and Deploying Laravel site...'
+
+		GIT="git -C $BASE_DIR/tests/sample-sites/php-laravel"
+
+		echo '[test] Creating site...'
+		create_site --domain $DOMAIN --force --php
+
+		$GIT init
+		$GIT add .
+		$GIT commit -m first
+		$GIT remote add origin $user@$ip:/srv/$DOMAIN/repo.git
+		echo '[test] Pushing to deploy...'
+		$GIT push origin master
+		echo '[test] Performing additional first-time laravel site setup'
+		ssh $user@$ip "
+		cd /srv/$DOMAIN
+		cp -v .env.example .env
+		composer install
+		./artisan key:generate
+		"
+
+		expected='Hello from Cods + Laravel!'
+		response="$(curl -Ss http://$DOMAIN)"
+
+		if [[ $expected != $response ]] ; then
+			fail 'PHP Site Deployement'
+			cat <<-.
+			  expected to find  "$expected"
+			  but instead found "$response"
+
+			  as a response from $DOMAIN
+			.
+		else
+			success "Found expected response from laravel site: $DOMAIN"
+		fi
+
+		echo '[test] Removing site...'
+		remove_site --domain $DOMAIN --force
+
+		rm -rf $BASE_DIR/tests/sample-sites/php/.git
+		;;
+	all)
+		$0 _test deploy java $DOMAIN
+		$0 _test deploy node $DOMAIN
+		$0 _test deploy static $DOMAIN
+		$0 _test deploy python $DOMAIN
+		$0 _test deploy php $DOMAIN
+		$0 _test deploy laravel $DOMAIN
 		;;
 	*) usage ; exit 1;;
 esac

@@ -30,14 +30,23 @@ if [[ -e "$ENV_FILE" ]]; then
 	exit 1
 fi
 
-read -p '- Enter the servers ip address: ' ip
+echo '- IP Address'
+if [[ -z $ip ]] ; then
+	read -p $'\n  Enter the servers ip address: ' ip
+else
+	echo "  using ip address $ip"
+fi
 echo
-echo '  Since this will be the first time we will have connected to your server,'
-echo '  you will be prompted whether or not you trust the server. Type yes when'
-echo '  prompted.'
-echo
+
+if ! grep -q "^$ip" ~/.ssh/known_hosts ; then
+	echo '  Since this will be the first time we will have connected to your server,'
+	echo '  you will be prompted whether or not you trust the server. Type yes when'
+	echo '  prompted.'
+	echo
+fi
+
 # make sure we can access that server
-ssh root@$ip ls > /dev/null
+ssh $root_user@$ip ls > /dev/null
 if [[ $? -ne 0 ]]; then
 	echo "Error: Cannot login to $ip!"
 	echo 'Make sure:'
@@ -48,26 +57,30 @@ if [[ $? -ne 0 ]]; then
 	exit 1
 fi
 
-echo
-echo '- Choose A Username'
-echo
-echo '  You will need to now choose a username for the server. This is the user'
-echo '  you will log in as, as well as the database administrator user that'
-echo '  will be setup.'
-echo
-echo '  A username should start with a lowercase letter, and only consist of'
-echo '  lowercase letters, numbers, or the "_" character. It should also'
-echo '  be no longer than 30 characters.'
-echo '  Specifically: /^[a-z][a-z0-9_]{0,29}$/'
-echo
-echo '  Usually it is fine (and easier) to use the same username as the one on'
-echo '  your local machine, but if your local username does not match the given'
-echo '  rules, you should choose something different.'
-echo
-read -p "  Enter a username (default $USER): " user
-if [[ -z "$user" ]]; then
-	user=$USER
+echo '- Username'
+if [[ -z $user ]] ; then
+	echo
+	echo '  You will need to now choose a username for the server. This is the user'
+	echo '  you will log in as, as well as the database administrator user that'
+	echo '  will be setup.'
+	echo
+	echo '  A username should start with a lowercase letter, and only consist of'
+	echo '  lowercase letters, numbers, or the "_" character. It should also'
+	echo '  be no longer than 30 characters.'
+	echo '  Specifically: /^[a-z][a-z0-9_]{0,29}$/'
+	echo
+	echo '  Usually it is fine (and easier) to use the same username as the one on'
+	echo '  your local machine, but if your local username does not match the given'
+	echo '  rules, you should choose something different.'
+	echo
+	read -p "  Enter a username (default $USER): " username
+	if [[ -z "$user" ]]; then
+		user=$USER
+	fi
+else
+	echo "  using username '$user'"
 fi
+
 # validate username
 if [[ "$user" == "root" ]]; then
 	echo 'Username cannot be "root". Aborting...'
@@ -84,14 +97,17 @@ if [[ $? -ne 0 ]]; then
 	exit 1
 fi
 
-echo
-echo '- Enter Email Address'
-echo
-echo '  We will need an email address for obtaining a ssl certificate, while this'
-echo '  is optional, it is recommended so that you can be contacted if anything'
-echo '  goes wrong with your site.'
-echo
-read -p 'email: ' email
+echo "- Email Address"
+if [[ -z $email ]] ; then
+	echo
+	echo '  We will need an email address for obtaining a https certificate, while this'
+	echo '  is optional, it is recommended so that you can be contacted if anything'
+	echo '  goes wrong with your site.'
+	echo
+	read -p 'email: ' email
+else
+	echo "  using email: $email"
+fi
 echo
 
 echo '- Autogenerate Passwords'
@@ -100,23 +116,22 @@ db_password="$(mkpassword)"
 
 echo "  Here are your auto-generated passwords for the server:"
 echo
-echo "Sudo Password: $password" | tee -a "$DATA_DIR/credentials.txt"
-echo "DB Password:   $db_password" | tee -a "$DATA_DIR/credentials.txt"
+echo "  Sudo Password: $password" | tee -a "$DATA_DIR/credentials.txt"
+echo "  DB Password:   $db_password" | tee -a "$DATA_DIR/credentials.txt"
 echo
-echo "  These have been saved to $DATA_DIR/credentials.txt."
-echo
-echo '+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Read This ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+'
-echo '| You may wish to manage your passwords with a password manager. If    |'
-echo '| this is the case, you should remove the file referenced above. Take  |'
-echo '| care, if this file is lost, the passwords are not recoverable by     |'
-echo '| tool. Note that future generated credentials will be written to this |'
-echo '| file as well.                                                        |'
-echo '+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+'
+echo "  These have been saved to $DATA_DIR/credentials.txt, and will be accessible"
+echo "  through your server command once the setup process is complete."
 echo
 echo '  Next, we will provision the server. Please be patient, as this process'
 echo '  can take a few minutes.'
 echo
-read -p 'Press <Enter> to continue and setup the server'
+echo '  The server will be setup using the values below:'
+echo
+echo "  - ip: $ip"
+echo "  - username: $user"
+echo "  - email: $email"
+echo
+read -p 'Press <Enter> to continue and setup the server or Ctrl-C to exit.'
 
 # create the env file
 cat > "$ENV_FILE" <<EOF
@@ -129,7 +144,7 @@ echo "$ENV_FILE file created!"
 
 heading 'running provision script'
 
-ssh root@$ip bash < "$SCRIPTS/provision.sh"
+ssh $root_user@$ip bash < "$SCRIPTS/provision.sh"
 
 # make sure provisioning went okay
 if [[ $? -ne 0 ]]; then
@@ -150,12 +165,12 @@ fi
 
 heading 'Copying over templates'
 
-scp -r "$BASE_DIR/templates" root@$ip:/srv/.templates
+scp -r "$BASE_DIR/templates" $root_user@$ip:/srv/.templates
 
 heading 'securing mysql installation...'
 
 # secure the mysql install
-ssh root@$ip 'mysql -u root' <<sql
+ssh $root_user@$ip 'mysql -u root' <<sql
 CREATE USER $user@localhost IDENTIFIED BY '$db_password';
 GRANT ALL ON *.* TO $user@localhost WITH GRANT OPTION;
 SET PASSWORD FOR 'root'@'localhost' = PASSWORD('$db_password');
@@ -169,7 +184,7 @@ sql
 
 heading 'creating user'
 
-ssh root@$ip bash <<setup_user
+ssh $root_user@$ip bash <<setup_user
 # create a user and add the ssh key
 useradd --create-home --shell /bin/bash --groups sudo,web $user
 echo '$user:$password' | chpasswd
@@ -177,6 +192,8 @@ echo '$user:$password' | chpasswd
 mkdir -p /home/$user/.ssh
 cp \$HOME/.ssh/authorized_keys /home/$user/.ssh/
 chown --recursive $user:$user /home/$user/.ssh
+# allow passwordless sudo
+echo '$user ALL=(ALL) NOPASSWD: ALL' | sudo EDITOR='tee -a' visudo
 
 # disable password login + root login
 perl -i -pe 's/(PasswordAuthentication\s*)yes/\1no/' /etc/ssh/sshd_config

@@ -26,7 +26,7 @@ initial_server_setup() {
 	Create a Server (Digital Ocean calls these "droplets") with the following
 	specifications:
 
-	- Ubuntu 16.04x64
+	- Debian 10 Buster (debian-10 x64)
 	- At least 1GB of Memory (RAM)
 
 	If you have already created a droplet in the past, you can skip the step
@@ -321,17 +321,12 @@ sb_site_setup() {
 
 	Next we will tell your server that it is going to host $site
 
-	Run this command:
+	Go ahead and run this command:
 
 	    $server site create --domain $site --java --spring-boot --port $port
 
-	You'll be prompted for your sudo password, the server admin password. You
-	can also find this by running:
-
-	    $server credentials
-
-	In a separate terminal, or running it before you run the site create
-	command.
+	You should see some output that explains what is being setup, ending with
+	"- Finished Setting Up $site"
 	.
 	wait_to_continue
 

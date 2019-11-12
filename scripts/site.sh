@@ -16,40 +16,44 @@ create_site() {
 	usage() {
 		cat <<-.
 		Setup up the server to host a new site. The domain name and one of
-		{--static --java --node} must be provided.
+		{--static, --java, --node, --python, --php} must be provided.
 
 		-d|--domain <domain> -- (required) domain name of the site to create
 		--static             -- setup a static site
 		--java               -- setup a java site
 		--node               -- setup a node site
-		-p|--port            -- port number that the application will run on
-		                        (required for --node and --java)
+		--python             -- setup a python site
+		--php                -- setup a php site
+		-p|--port <port>     -- port number that the application will run on
+		                        (required for --node, --java, and --python)
 		--spring-boot        -- (optional) designate that this is a spring boot site
-		--enable-ssl         -- (optional) enable ssl after setting up the site
-		                        (see the enablessl subcommand)
+		--enable-https       -- (optional) enable https after setting up the site
+		                        (see the enablehttps subcommand)
 
 		Examples:
-		    $(basename "$0") site create -d example.com
+		    $(basename "$0") site create -d example.com --static
 		    $(basename "$0") site create --domain=example.com --node --port=3000
-		    $(basename "$0") site create --domain=example.com --java -p 8080 --enable-ssl --spring-boot
+		    $(basename "$0") site create --domain=example.com --java -p 8080 --enable-https --spring-boot
 		    $(basename "$0") site create --domain example.com --static
 		.
 	}
 	if [[ $# -eq 0 || $1 == *help || $1 = -h ]] ; then
 		usage ; die
 	fi
-	local domain enablessl force springboot sitetype port arg
+	local domain enablehttps force springboot sitetype port arg
 	while [[ $# -gt 0 ]] ; do
 	    arg=$1 ; shift
 	    case $arg in
 			-d|--domain) domain=$1 ; shift;;
 			--domain=*) domain=${arg#*=};;
-			--enable-ssl) enablessl=yes;;
+			--enable-https) https=yes;;
 			-f|--force) force=yes;;
 			--spring-boot) springboot=yes;;
 			-s|--static) [[ -n $sitetype ]] && die 'type already specified' || sitetype=static ;;
-			-j|--java) [[ -n $sitetype ]] && die 'type already specified' || sitetype=java ;;
-			-n|--node) [[ -n $sitetype ]] && die 'type already specified' || sitetype=node ;;
+			--java) [[ -n $sitetype ]] && die 'type already specified' || sitetype=java ;;
+			--node) [[ -n $sitetype ]] && die 'type already specified' || sitetype=node ;;
+			--python) [[ -n $sitetype ]] && die 'type already specified' || sitetype=python ;;
+			--php) [[ -n $sitetype ]] && die 'type already specified' || sitetype=php ;;
 			-p|--port) port=$1 ; shift;;
 			--port=*) port=${arg#*=};;
 	        *) echo "Unknown argument: $arg" ; exit 1;;
@@ -57,8 +61,8 @@ create_site() {
 	done
 
 	[[ -z $domain ]] && die 'Error: No domain name specified'
-	[[ -z $sitetype ]] && die 'Error: No site type specified, provide one of {--java,--node,--static}'
-	if [[ $sitetype == java || $sitetype == node ]] && [[ -z $port ]] ; then
+	[[ -z $sitetype ]] && die 'Error: No site type specified, provide one of {--java,--node,--static,--python,--php}'
+	if [[ $sitetype == java || $sitetype == node || $sitetype == python ]] && [[ -z $port ]] ; then
 		die 'Error: No port number specified'
 	fi
 
@@ -70,7 +74,7 @@ create_site() {
 		die
 	else echo '  ok'
 	fi
-	if [[ $sitetype == java || $sitetype == node ]] ; then
+	if [[ $sitetype == java || $sitetype == node || $sitetype == python ]] ; then
 		if [[ $port -gt 65535 || $port -lt 1024 ]] ; then
 			die "Invalid port number: ${port}, must be in the range (1024 - 65535)"
 		fi
@@ -92,18 +96,24 @@ create_site() {
 	if [[ $sitetype == static ]] ; then
 		site_create_snippet="$SNIPPETS/create-static-site.sh"
 		template=post-receive-static.sh
+	elif [[ $sitetype == php ]] ; then
+		site_create_snippet="$SNIPPETS/create-php-site.sh"
+		template=post-receive-php.sh
 	else
 		site_create_snippet="$SNIPPETS/create-reverse-proxy-site.sh"
 		if [[ $sitetype == java ]] ; then
 			execstart="/usr/bin/java -jar app.jar --server.port=${port}"
 			template=post-receive.sh
+		elif [[ $sitetype == python ]] ; then
+			execstart="/srv/${domain}/start_server.sh"
+			template=post-receive-python.sh
 		else
 			execstart="/usr/bin/npm start"
 			template=post-receive-node.sh
 		fi
 	fi
 
-	echo "- Logging In To Create ${domain}... (sudo password will be required)"
+	echo "- Logging In To Create ${domain}..."
 
 	ssh -t $user@$ip "
 	set -e
@@ -122,13 +132,13 @@ create_site() {
 
 	[[ $? -eq 0 ]] && echo "- Finished Setting Up ${domain}"
 
-	if [[ $ssl == yes ]] ; then
+	if [[ $https == yes ]] ; then
 		echo "- Enabling Https For $domain..."
-		enable_ssl --domain $domain
+		enable_https --domain $domain
 	fi
 }
 
-enable_ssl() {
+enable_https() {
 	local domain
 	while [[ $# -gt 0 ]] ; do
 	    arg=$1 ; shift
@@ -147,17 +157,17 @@ enable_ssl() {
 		-d|--domain <domain> -- domain name of the site to enable https for
 
 		Example:
-		    $(basename "$0") site enablessl -d example.com
+		    $(basename "$0") site enablehttps -d example.com
 		.
 		die
 	fi
 
 	echo "- Finding Port Number For ${domain}..."
-	port="$(ssh $user@$ip "egrep -o '[0-9]{4,5}' /etc/nginx/sites-available/${domain} | sort | uniq")"
+	port="$(ssh $user@$ip "egrep -wo '[0-9]{4,5}' /etc/nginx/sites-available/${domain} | sort | uniq")"
 	if [[ -n $port ]] ; then
 		echo "  Found Port No: ${port}"
 	else
-		echo '  No Port Found, Setting Up A Static Site'
+		echo '  No port number found, this must be a php or static site'
 	fi
 
 	ssh -t $user@$ip "
@@ -165,7 +175,7 @@ enable_ssl() {
 	domain=${domain}
 	email=${email}
 	port=${port}
-	$(< "$SNIPPETS/enable-ssl.sh")
+	$(< "$SNIPPETS/enable-https.sh")
 	"
 	[[ $? -eq 0 ]] && echo "- Https Enabled For ${domain}!"
 }
@@ -203,13 +213,13 @@ remove_site() {
 
 	ssh -t $user@$ip "
 	# clean up application server configuration if its a reverse-proxy site
-	if grep proxy_pass /etc/nginx/sites-available/${domain} >/dev/null ; then
+	if grep -q proxy_pass /etc/nginx/sites-available/${domain} && ! grep -q 'include fastcgi_params' /etc/nginx/sites-available/${domain} ; then
 		echo '- Removing Systemd Service -- /etc/systemd/system/${domain}.service'
 		sudo systemctl stop ${domain}
 		sudo systemctl disable ${domain}.service
 		sudo rm -f /etc/systemd/system/${domain}.service
 		echo '- Removing Sudo Config'
-		sudo rm -f /etc/sudoers.d/${domain}
+		sudo rm -f /etc/sudoers.d/${domain//./-}
 		sudo systemctl daemon-reload
 		sudo systemctl reset-failed
 	fi
@@ -223,10 +233,10 @@ remove_site() {
 	echo '- Removing ${domain} User and Group'
 	# remove all users from the group
 	for user in \$(ls /home) ; do
-		sudo gpasswd -d \$user $domain >/dev/null
+		sudo gpasswd -d \$user ${domain//./-} >/dev/null
 	done
-	sudo gpasswd -d www-data $domain >/dev/null
-	sudo userdel ${domain}
+	sudo gpasswd -d www-data ${domain//./-} >/dev/null
+	sudo userdel ${domain//./-}
 	"
 
 	[[ $? -eq 0 ]] && echo '- Site Removed!'
@@ -285,7 +295,9 @@ show_logs() {
 	done
 	if [[ -z $domain ]] ; then
 		cat <<-.
-		View server logs for a given site
+		View server logs for a given site.
+
+		Only useful for java, node, and python site.
 
 		-d|--domain <domain> -- Name of the domain to check logs for
 		-f|--follow          -- Watch the log file in real-time (press C-c to quit)
@@ -309,6 +321,7 @@ show_info() {
 	    case $arg in
 	        -d|--domain) domain=$1 ; shift;;
 	        --domain=*) domain=${arg#*=};;
+			--show-remote) show_remote=1 ;;
 	        *) echo "Unknown argument: $arg" ; exit 1;;
 	    esac
 	done
@@ -317,6 +330,7 @@ show_info() {
 		Show information about a site that is setup on the server
 
 		-d|--domain <domain> -- name of the site to show information about
+		--show-remote        -- show just the git deployment remote
 
 		Example:
 		    $(basename "$0") site info -d example.com
@@ -324,21 +338,25 @@ show_info() {
 		die
 	fi
 
-	echo '- Ensuring Site Exists'
+	echo '- Ensuring Site Exists' >&2
 	list_sites | grep "^$domain$" >/dev/null || die "It looks like $domain does not exist. Aborting..."
 
-	cat <<-.
-		Site: $domain
+	if [[ $show_remote -eq 1 ]] ; then
+		echo $user@$ip:/srv/$domain/repo.git
+	else
+		cat <<-.
+			Site: $domain
 
-		public directory:      /srv/$domain/public
-		nginx config file:     /etc/nginx/sites-available/$domain
-		deployment git remote: $user@$ip:/srv/$domain/repo.git
+			public directory:      /srv/$domain/public
+			nginx config file:     /etc/nginx/sites-available/$domain
+			deployment git remote: $user@$ip:/srv/$domain/repo.git
 
-		To add the deployment remote for this domain, run:
+			To add the deployment remote for this domain, run:
 
-		    git remote add production $user@$ip:/srv/$domain/repo.git
+				git remote add production $user@$ip:/srv/$domain/repo.git
 
-	.
+		.
+	fi
 }
 
 show_help() {
@@ -352,12 +370,12 @@ show_help() {
 
 	    list -- list the sites setup on your server
 
-	    create    -d <domain> {--static|--java|--node} [--enable-ssl] [--spring-boot] [-p <port>]
-	    remove    -d <domain> [--force]
-	    build     -d <domain>
-	    enablessl -d <domain>
-	    info      -d <domain>
-	    logs      -d <domain> [-f]
+	    create      -d <domain> {--static|--java|--node} [--enable-https] [--spring-boot] [-p <port>]
+	    remove      -d <domain> [--force]
+	    build       -d <domain>
+	    enablehttps -d <domain>
+	    info        -d <domain> [--show-remote]
+	    logs        -d <domain> [-f]
 
 	help
 }
@@ -366,13 +384,13 @@ command=$1
 shift
 
 case $command in
-	list|ls)   list_sites;;
-	create)    create_site "$@";;
-	remove|rm) remove_site "$@";;
-	build)	   build_site "$@";;
-	enablessl) enable_ssl "$@";;
-	info)      show_info "$@";;
-	logs)      show_logs "$@";;
-	deploy)	   deploy_site "$@";;
-	*)         show_help;;
+	list|ls)     list_sites;;
+	create)      create_site "$@";;
+	remove|rm)   remove_site "$@";;
+	build)	     build_site "$@";;
+	enablehttps) enable_https "$@";;
+	info)        show_info "$@";;
+	logs)        show_logs "$@";;
+	deploy)	     deploy_site "$@";;
+	*)           show_help;;
 esac

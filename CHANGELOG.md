@@ -1,3 +1,70 @@
+3.2.0 -- 20190918
+
+- Remove default-mysql-server install. This is a temporary workaround as we will
+  install mysql v5.7 in production, and eventually this will be automated.
+
+3.1.1 -- 20190823
+
+- enhancement: be more safe when adding groups for new users
+
+3.1.0 -- 20190823
+
+- feature: more fine-grained control over `info` subcommands
+
+3.0.3 -- 20190822
+
+- bugfix: install curl before trying to use it
+
+3.0.2 -- 20190822
+
+- bugfix: provide default value for `root_user` in initial server setup
+
+3.0.1 -- 20190822
+
+- enhancement: upgrade flask sample site deps
+
+3.0.0 -- 20190822
+
+- **Note that this is a breaking change, and not 100% backwards compatible with
+  any servers setup with cods v2.x**
+- enhancement: Use debian 10 (buster)
+- enhancement: stronger https config with nginx
+- feature: add PHP site support (including laravel)
+- feature: manage different java versions (8 and 11)
+- feature: allow passwordless sudoing
+- refactor: rename `install.sh` to `cods.sh`
+- refactor: seperate user management into it's own subcommand
+- refactor: rename `cods share` to `cods add`
+- refactor: rename any user-facing command with ssl to https
+- docs: add api doc page
+- removed: the `devserver` subcommand
+- tests: laravel + php site deployment tests
+- tests: add subcommand shortcut to run all
+
+2.2.3 -- 20190422
+
+- docs: minor improvements/tweaks
+- bugfix: update deps in python sample site
+- bugfix: put https cert renewal into external script that runs in a cronjob
+
+2.2.2 -- 20190201
+
+- docs: more of them, and more modular
+- bugfix: whitespace in CLI help message
+- enhancement: more logging output in post-receive scripts
+
+2.2.1 -- 20190127
+
+- bugfix: [new users can now deploy to existing sites](https://github.com/zgulde/cods/issues/8)
+
+2.2.0 -- 20190124
+
+- feature: add python site type
+- docs: document python site setup
+- docs: improve usage guide
+- docs: split off quick reference guide from the README, and expand on it
+- tests: fix spring boot application
+
 2.1.6 -- 20181108
 
 - refactor: use `curl` instead of `wget` see 189ecaf for more detail

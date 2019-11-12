@@ -1,5 +1,7 @@
 #!/bin/bash
 
+umask 0002
+
 SITE_DIR=/srv/{{site}}
 
 TMP_REPO=$(mktemp -d)
@@ -9,7 +11,7 @@ log() {
 }
 
 cleanup() {
-	log "cleaning up temp files ($TMP_REPO)..."
+	log "cleaning up temp files ($TMP_REPO)"
 	rm -rf $TMP_REPO
 }
 
@@ -27,20 +29,22 @@ while read old new ref; do
     fi
 done
 
+log 'Checking out the most recent version of the code'
 git --work-tree=${SITE_DIR} --git-dir=${SITE_DIR}/repo.git checkout -f master
 
 cd $SITE_DIR
 
-if [[ -f install.sh ]] ; then
+if [[ -f cods.sh ]] ; then
 	export SITE_DIR
-	bash install.sh
+	log 'Running cods.sh'
+	bash cods.sh
 else
 	npm install
-	log 'Restarting {{site}} service...'
-	sudo systemctl restart {{site}}
 fi
+
+log 'Restarting {{site}} service'
+sudo systemctl restart {{site}}
 
 log '--------------------------------------------------'
 log '> All done!'
 log '--------------------------------------------------'
-

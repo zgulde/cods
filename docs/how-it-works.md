@@ -14,7 +14,7 @@ in general:
 - static content served w/ nginx
 - a systemd service unit is created for each site to handle starting/stopping
   and logging for each site
-- ssl through nginx + letsencrypt
+- https through nginx + letsencrypt
 - each application/site runs as it's own user/group
 
 ## This Tool
@@ -79,6 +79,7 @@ Assuming you already have a server setup:
 - user accounts (as opposed to running as root)
 - no root logins
 - firewall denies traffic for everything but ports 22, 80, and 443
+- umask set to 0002 by default (i.e. files are group-writable by default)
 
 ### Nginx
 
@@ -88,7 +89,7 @@ Assuming you already have a server setup:
 - Will attempt to serve static content first, if not found
     - the request will be passed to the application server
     - `404.html` in the webroot will be served
-- handles ssl connections when https is setup for a site
+- handles https connections when https is setup for a site
 
 ### Git Deployment
 

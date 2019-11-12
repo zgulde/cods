@@ -17,6 +17,12 @@ cods update
 
 You'll need to install this manually, luckily, that's not too difficult
 
+1. Dependencies
+
+    This tool assumes you have a system `python` (either `python` or `python3`,
+    either will work), and a system `perl`. Most popular linux distros come with
+    both of these already.
+
 1. Clone this repo
 
     ```
@@ -50,6 +56,6 @@ git reset --hard origin/master
 
 # or a specific version
 git checkout v0.2.3
+
+cods update
 ```
-
-

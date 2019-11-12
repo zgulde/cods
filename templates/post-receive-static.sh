@@ -1,5 +1,7 @@
 #!/bin/bash
 
+umask 0002
+
 SITE_DIR=/srv/{{site}}
 PUBLIC_DIR=/srv/{{site}}/public
 TMP_REPO=$(mktemp -d)
@@ -30,7 +32,7 @@ while read old new ref; do
 done
 
 # if we have a build script, run it, else, just do a checkout
-if git ls-tree HEAD | cut -f 2 | grep ^.cods$ >/dev/null || git ls-tree HEAD | cut -f 2 | grep ^install.sh$  ; then
+if git ls-tree HEAD | cut -f 2 | grep ^.cods$ >/dev/null || git ls-tree HEAD | cut -f 2 | grep ^cods.sh$  ; then
 
 	log "cloning project to '$TMP_REPO'..."
 	git clone $(pwd) $TMP_REPO
@@ -50,12 +52,13 @@ if git ls-tree HEAD | cut -f 2 | grep ^.cods$ >/dev/null || git ls-tree HEAD | c
 		log "No configuration file ($SITE_DIR/config) found. Continuing..."
 	fi
 
-	if [[ -f install.sh ]] ; then
-		log 'Found "install.sh"! Running...'
+	if [[ -f cods.sh ]] ; then
+		log 'Found "cods.sh"! Running...'
+		log "Exporting SITE_DIR=$SITE_DIR, PUBLIC_DIR=$PUBLIC_DIR, TMP_REPO=$TMP_REPO"
 		export SITE_DIR
 		export PUBLIC_DIR
 		export TMP_REPO
-		bash install.sh
+		bash cods.sh
 	elif [[ -f .cods ]] ; then
 		source .cods
 
@@ -86,7 +89,7 @@ if git ls-tree HEAD | cut -f 2 | grep ^.cods$ >/dev/null || git ls-tree HEAD | c
 		fi
 		log "Moving $OUTPUT_DIR to $SITE_DIR/public..."
 		# set the correct permissions and group ownership
-		chgrp {{site}} $OUTPUT_DIR
+		chgrp --recursive {{username}} $OUTPUT_DIR
 		chmod g+rwxs $OUTPUT_DIR
 		rm -rf ${SITE_DIR}/public
 		mv $OUTPUT_DIR ${SITE_DIR}/public

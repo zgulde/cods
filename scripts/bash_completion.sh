@@ -17,14 +17,15 @@ _cods_complete_files() {
 
 _{{scriptname}}() {
 	local cur prev subcommand subsubcommand server_subcommands
-	local db_subcommands site_subcommands
+	local db_subcommands site_subcommands user_subcommands
 
-	server_subcommands='site db devserver login upload restart reboot info'
-	server_subcommands+=' adduser addkey autorenew ping credentials pipe'
-	server_subcommands+=' bash-completion destroy ports tmux _test'
+	server_subcommands='site db login upload restart reboot info tmux'
+	server_subcommands+=' user addkey autorenew ping credentials pipe ports'
+	server_subcommands+=' bash-completion destroy _test switch-java-version'
 
 	db_subcommands='create backup run remove rm list ls login'
-	site_subcommands='list ls create remove rm build enablessl info logs'
+	site_subcommands='list ls create remove rm build enablehttps info logs'
+	user_subcommands='add remove rm'
 
 	COMPREPLY=()
 
@@ -33,8 +34,9 @@ _{{scriptname}}() {
 
 	case $subcommand in
 		# no further completions for any of these
-		devserver|login|info|ports|ping|swapon|autorenew|reboot|run|credentials|destroy|bash-completion)
+		login|info|ports|ping|swapon|autorenew|reboot|run|destroy|bash-completion)
 			_cods_dont_complete;;
+		credentials) _cods_complete path edit add ;;
 		upload)
 			case $prev in
 				-f|--file) _cods_complete_files;;
@@ -47,11 +49,6 @@ _{{scriptname}}() {
 				-f|--sshkeyfile) _cods_complete_files;;
 				*) _cods_complete -f --sshkeyfile ;;
 			esac ;;
-		adduser)
-			case $prev in
-				-f|--sshkeyfile) _cods_complete_files;;
-				*) _cods_complete -u --username -f --sshkeyfile --github-username;;
-			esac ;;
 		site)
 			if [[ $prev == --domain || $prev == -d ]] ; then
 				# it would be really cool if we could complete existing domain
@@ -62,8 +59,8 @@ _{{scriptname}}() {
 			fi
 			subsubcommand=${COMP_WORDS[2]}
 			case $subsubcommand in
-				create) _cods_complete --static --node --java --enable-ssl --spring-boot -p --port --domain -d ;;
-				build|enablessl|info) _cods_complete -d --domain;;
+				create) _cods_complete --static --python --node --java --enable-https --spring-boot -p --port --domain -d --php ;;
+				build|enablehttps|info) _cods_complete -d --domain;;
 				list|ls) _cods_dont_complete ;;
 				remove|rm) _cods_complete --force -f --domain -d;;
 				logs) _cods_complete -d --domain -f --follow;;
@@ -72,7 +69,7 @@ _{{scriptname}}() {
 			;;
 		_test)
 			if [[ ${COMP_WORDS[2]} == deploy ]] ; then
-				_cods_complete java static node
+				_cods_complete java static node python
 			elif [[ $prev == _test ]] ; then
 				_cods_complete util site setup deploy
 			else
@@ -90,6 +87,14 @@ _{{scriptname}}() {
 						*) _cods_complete --name -n -o --outfile ;;
 					esac ;;
 				*) _cods_complete $db_subcommands
+			esac
+			;;
+		user)
+			subsubcommand=${COMP_WORDS[2]}
+			case $subsubcommand in
+				add) _cods_complete -f --sshkeyfile -u --username --github-username;;
+				rm|remove) _cods_complete -u --username ;;
+				*) _cods_complete $user_subcommands
 			esac
 			;;
 		*) _cods_complete $server_subcommands ;;

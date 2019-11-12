@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ##############################################################################
 # Entrypoint for the cli interface
@@ -9,15 +9,28 @@
 # script.
 ##############################################################################
 
-[[ $_CODS_DEBUG == 1 ]] && set -x
+
+if [[ $_CODS_DEBUG == 1 ]] ; then
+	logfile="cods-debug.log"
+	echo >&2 "Started logging to $logfile"
+	PS4='${BASH_SOURCE}::${FUNCNAME[0]}::$LINENO)'
+	exec 99>$logfile
+	BASH_XTRACEFD=99
+	set -x
+fi
 
 auto_renew_certs() {
-    ssh -t $user@$ip email=$email "$(< $SCRIPTS/snippets/letsencrypt-cronjob.sh)"
-    [[ $? -eq 0 ]] && echo 'Autorenewal enabled!'
+	if [[ -z $email ]] ; then
+		echo 'It looks like you have not setup an email address. Please ensure you'
+		echo "have one in $ENV_FILE before running this command."
+		exit 1
+	fi
+	ssh -t $user@$ip email=$email "$(< $SCRIPTS/snippets/letsencrypt-cronjob.sh)"
+	[[ $? -eq 0 ]] && echo 'Autorenewal enabled!'
 }
 
 show_ports() {
-	ssh -t $user@$ip "grep -oR '[0-9]\{4,\}' /etc/nginx/sites-available/ | awk -F: '{split(\$1, a, \"/\"); print \$2,a[5]}' | sort -nk1"
+	ssh -qt $user@$ip "grep -woR '[0-9]\{4,\}' /etc/nginx/sites-available/ | awk -F: '{split(\$1, a, \"/\"); print \$2,a[5]}' | sort -nk1"
 }
 
 enable_swap() {
@@ -89,7 +102,7 @@ destroy_server() {
 		rm -rfv "$DATA_DIR"
 		rm -v "$BIN_PREFIX/$SCRIPT_NAME"
 		echo "Removing $ip from ~/.ssh/known_hosts"
-		sed -i -e /^$ip/d "$HOME/.ssh/known_hosts"
+		sed -i .bak -e /^$ip/d "$HOME/.ssh/known_hosts"
 	fi
 }
 
@@ -116,92 +129,6 @@ restart_service() {
 	fi
 	ssh -t $user@$ip "sudo systemctl restart $service"
 	[[ $? -eq 0 ]] && echo "$service restarted!"
-}
-
-add_user() {
-	while [[ $# -gt 0 ]] ; do
-		arg="$1" ; shift
-		case $arg in
-			-f|--sshkeyfile) sshkeyfile="$1" ; shift;;
-			--sshkeyfile=*) sshkeyfile="${arg#*=}" ; sshkeyfile="${sshkeyfile/#\~/$HOME}";;
-			-u|--user) new_user=$1 ; shift;;
-			--user=*) new_user=${arg#*=};;
-			--github-username) github_username=$1 ; shift;;
-			--github-username=*) github_username=${arg#*=};;
-			*) echo "Unknown argument: $arg" ; exit 1;;
-		esac
-	done
-    if [[ -z $new_user || -z "$sshkeyfile" ]] && [[ -z $github_username ]] ; then
-		cat <<-.
-		Add a new admin user to the server. A password will be randomly
-		generated for the new user.
-
-		Can be used by either specifying a username and public key file, or a
-		github username and the public keys will be extracted from github
-		(https://github.com/\$USERNAME.keys)
-
-		-f|--sshkeyfile <sshkeyfile>  -- path to the new user's public key
-		-u|--user <username>          -- username for the new user
-		--github-username <username>  -- github username to lookup public keys;
-		                                 will also be used as server username
-
-		Examples:
-		    $(basename "$0") adduser -u sally -f ~/sallys-ssh-key.pub
-		    $(basename "$0") adduser --user=sally --sshkeyfile=~/key.pub
-		    $(basename "$0") adduser --github-username gocodeup
-		.
-		die
-    fi
-
-	if [[ -n $github_username ]] ; then
-		new_user=$github_username
-		sshkeyfile=$(mktemp)
-		trap "rm -f $sshkeyfile" EXIT
-		url="https://github.com/${github_username}.keys"
-		curl --location --output "$sshkeyfile" "$url"
-		if [[ $? -ne 0 ]] ; then
-			echo "Error obtaining public keys for $github_username!"
-			echo "$url gave a non-200 response."
-			echo 'Aborting...'
-			exit 1
-		fi
-		if [[ ! -s $sshkeyfile ]] ; then
-			echo "Error! It looks like this user doesn't have any public keys tied to"
-			echo "their github account. Check ($url)."
-			echo 'Aborting...'
-			exit 1
-		fi
-		echo 'Downloaded public ssh key(s)!'
-	fi
-
-	if [[ ! -f "$sshkeyfile" && ! -r "$sshkeyfile" ]]; then
-		echo 'Please enter a valid ssh key file.'
-		echo "$sshkeyfile does not exist or is not readable."
-		exit 1
-	fi
-
-	password="$(mkpassword)"
-	echo "Creating user ${new_user}... (enter *your* sudo password when prompted)"
-
-	ssh -t $user@$ip "
-	set -e
-	sudo useradd --create-home --shell /bin/bash --groups sudo,web $new_user
-	echo '$new_user:$password' | sudo chpasswd
-	sudo mkdir -p /home/$new_user/.ssh
-	cat <<< '$(cat "$sshkeyfile")' | sudo tee /home/$new_user/.ssh/authorized_keys >/dev/null
-	sudo chown --recursive $new_user:$new_user /home/$new_user
-	"
-	if [[ $? -eq 0 ]] ; then
-		echo "User ${new_user}: $password" >> "$DATA_DIR/credentials.txt"
-		cat <<-.
-		User ${new_user} created!
-		Password for ${new_user}: ${password}
-		[NOTICE] credentials for ${new_user} have been added to $DATA_DIR/credentials.txt
-		.
-	else
-		echo 'Uh oh, something went wrong! Check the output for details.'
-	fi
-
 }
 
 add_sshkey() {
@@ -236,22 +163,29 @@ add_sshkey() {
 }
 
 show_info() {
-	cat <<-info
-		Information about your server:
+	if [[ $# -eq 0 ]] ; then
+		cat <<-info
+			Information about your server:
 
-		Cods Version: $(head -n1 "$BASE_DIR/CHANGELOG.md")
+			Cods Version: $(head -n1 "$BASE_DIR/CHANGELOG.md")
 
-		ip address: $ip
-		login:      $user
+			ip address: $ip
+			user:       $user
 
-		MySQL port: 3306
-		ssh port:   22
+			MySQL port: 3306
+			ssh port:   22
 
-		data directory:   $DATA_DIR
-		database backups: $DATA_DIR/db-backups/
-		command:          $0
-		base directory:   $BASE_DIR
-	info
+			data directory:   $DATA_DIR
+			database backups: $DATA_DIR/db-backups/
+			command:          $0
+			base directory:   $BASE_DIR
+		info
+	elif [[ $1 == ip ]] ; then
+		echo $ip
+	elif [[ $1 == user ]] ; then
+		echo $user
+	fi
+
 }
 
 show_usage() {
@@ -265,28 +199,27 @@ show_usage() {
 
 	    site -- manage sites
 	    db   -- manage databases
-
-	    devserver -- development web server
+	    user -- manage users
 
 	    login       -- login to the server
 	    info        -- display information about the server
 	    ports       -- show the ports that are being reverse proxied to
 	    ping        -- ping the server
 	    swapon      -- create and enable a swapfile (requires sudo password)
-	    autorenew   -- setup ssl certs to be automatically renewed
+	    autorenew   -- setup https certs to be automatically renewed
 	    reboot      -- reboot the server
 	    run         -- run arbitrary commands (with a pty)
 	    pipe        -- run arbitrary commands (without a pty)
 	    credentials -- view server credentials (found in $DATA_DIR/credentials.txt)
 	    destroy     -- destroy the server
-		tmux        -- attach to an existing, or create a new tmux session
+	    tmux        -- attach to an existing, or create a new tmux session
 
-	    bash-completion -- generate bash tab completion script
+	    switch-java-version -- switch the default version of java on the server
+	    bash-completion     -- generate bash tab completion script
 
 	    upload  -f <file> [-d <destination>]
 	    restart -s <service>
 	    addkey  -f <sshkeyfile>
-	    adduser [-u <username> -f <sshkeyfile>] [--github-username <username>]
 
 	help_message
 }
@@ -323,35 +256,53 @@ case $command in
 	# sub commands
 	site)      source "$SCRIPTS/site.sh";;
 	db)        source "$SCRIPTS/db.sh";;
-	devserver) source "$SCRIPTS/devserver.sh";;
+	user)      source "$SCRIPTS/user.sh";;
 
 	# server managment
 	login)     ssh $user@$ip;;
 	upload)    upload_file "$@";;
 	restart)   restart_service "$@";;
 	reboot)    ssh -t $user@$ip 'sudo reboot';;
-	info)      show_info;;
+	info)      show_info "$@";;
 	swapon)    enable_swap;;
-	adduser)   add_user "$@";;
 	addkey)    add_sshkey "$@";;
 	autorenew) auto_renew_certs;;
 	ping)      ping -c5 $ip;;
-	run)       ssh -t $user@$ip "$@";;
+	run)       ssh -t $user@$ip "umask 0002 && $@";;
 	pipe)      ssh -T $user@$ip "$@";;
 	root)      ssh -t $user@$ip "sudo -s";;
 	ports)     show_ports;;
 	tmux)      ssh -t $user@$ip 'tmux a || tmux';;
 	destroy)   destroy_server;;
 
-	credentials)
-		if [[ -f "$DATA_DIR/credentials.txt" ]] ; then
-			cat "$DATA_DIR/credentials.txt"
-		else
-			echo 'No credentials found.'
-		fi;;
+	switch-java-version)
+		ssh -t $user@$ip sudo update-alternatives --config java
+		;;
 
+	credentials)
+		case $1 in
+			path) echo "$DATA_DIR/credentials.txt";;
+			edit) $EDITOR "$DATA_DIR/credentials.txt";;
+			add) shift ; echo "$@" >> "$DATA_DIR/credentials.txt";;
+			*)
+				if [[ ! -f "$DATA_DIR/credentials.txt" ]] ; then
+					die "Error: $DATA_DIR/credentials.txt not found."
+				fi
+				cat "$DATA_DIR/credentials.txt" ;;
+		esac ;;
 	bash-completion)
 		sed -e s/{{scriptname}}/$(basename "$0")/g "$SCRIPTS/bash_completion.sh"
+		;;
+
+	moo)
+		echo ' ______'
+		echo '< Moo! >'
+		echo ' ------'
+		echo '        \   ^__^'
+		echo '         \  (oo)\_______'
+		echo '            (__)\       )\/\'
+		echo '                ||----w |'
+		echo '                ||     ||'
 		;;
 
 	_test)
