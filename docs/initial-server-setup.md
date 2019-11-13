@@ -107,12 +107,12 @@ After the server is provisioned, we will log in to the server and install mysql.
     1. Create your admin mysql user
 
         ```
-        CREATE USER you@localhost IDENTIFIED BY 'password';
-        GRANT ALL on *.* TO zach@localhost WITH GRANT OPTION;
+        CREATE USER 'you'@'localhost' IDENTIFIED BY 'password';
+        GRANT ALL on *.* TO 'you'@'localhost' WITH GRANT OPTION;
         ```
 
         Replacing `you` with your server username, and `password` with your
-        admin db password (found with `myserver credentials`).
+        admin db password (found with the command `myserver credentials`).
 
 1. Logout of the server.
 
