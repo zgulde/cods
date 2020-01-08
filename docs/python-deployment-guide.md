@@ -1,9 +1,22 @@
 # Python Deployment Guide
 
+* [Prerequisites](#prerequisites)
+* [Application Prep](#application-prep)
+    * [Make Sure the Application is Ready](#make-sure-the-application-is-ready)
+    * [Server Startup Script](#server-startup-script)
+    * [Deployment Script](#deployment-script)
+* [Create The Site](#create-the-site)
+* [Deploy Your Code](#deploy-your-code)
+    * [Monitoring Your Application](#monitoring-your-application)
+
 ## Prerequisites
 
-- a server setup with `cods`, we'll assume the command name is `myserver`
-- DNS records for the domain you wish to use configured to point to your server
+- A server setup with cods. [See the initial server setup guide
+  here](initial-server-setup.md). We'll assume the command name is `myserver`.
+- DNS Records for the domain you wish to deploy to configured properly. Check
+  out [the DNS configuration guide here](dns-configuration.md).
+- A working python + flask application. That is, you should be able to run the
+  app locally without any errors.
 
 ## Application Prep
 
@@ -100,6 +113,12 @@ you already setup this script, you can skip the rest of this section.)
     entrypoint is not `server.py` you'll need to tweak the code above,
     otherwise, you shouldn't need to make any changes.
 
+1. Make the startup script executable
+
+    ```
+    chmod +x start_server.sh
+    ```
+
 1. Add and commit the script.
 
 ### Deployment Script
@@ -127,7 +146,7 @@ By adding the script above, we will instruct our server to re-create our
 application's virtual environment and re-install dependencies whenever we deploy
 a new version.
 
-### Create The Site
+## Create The Site
 
 1. Make note of the port number that your application runs on
 
@@ -153,7 +172,7 @@ a new version.
 
     Again, replacing `example.com` with your domain.
 
-### Deploy Your Code
+## Deploy Your Code
 
 1. A a deployment git remote to your project
 
