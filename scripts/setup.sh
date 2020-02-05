@@ -73,13 +73,12 @@ if [[ -z $user ]] ; then
 	echo '  your local machine, but if your local username does not match the given'
 	echo '  rules, you should choose something different.'
 	echo
-	read -p "  Enter a username (default $USER): " username
+	read -p "  Enter a username (default $USER): " user
 	if [[ -z "$user" ]]; then
 		user=$USER
 	fi
-else
-	echo "  using username '$user'"
 fi
+echo "  using username '$user'"
 
 # validate username
 if [[ "$user" == "root" ]]; then
