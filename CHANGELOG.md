@@ -1,3 +1,7 @@
+3.2.2 -- 20200205
+
+- bugfix: Fix bug reading username in initial setup
+
 3.2.0 -- 20190918
 
 - Remove default-mysql-server install. This is a temporary workaround as we will
