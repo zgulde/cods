@@ -27,7 +27,10 @@ usage() {
 	                               server, and provide a name for the new
 	                               server command
 
-	update -- Update all the existing already setup server commands
+	update: Update all the existing already setup server commands
+
+	list: Show all the server commands that are setup as well as all the sites
+	      that are setup on each server
 
 	Examples:
 	    $(basename "$0") init myserver
@@ -37,6 +40,8 @@ usage() {
 	    $(basename "$0") add some-project-server
 
 	    $(basename "$0") update
+
+	    $(basename "$0") list
 
 	    $(basename "$0") help
 	.
@@ -183,7 +188,7 @@ case $subcommand in
 		echo "- All done!"
 		echo "  '$COMMAND_NAME' ready to go!"
 		;;
-	_server) show_server_path;;
+	_server|path) show_server_path;;
 	moo)
 		echo ' ______'
 		echo '< Moo! >'
@@ -193,6 +198,13 @@ case $subcommand in
 		echo '            (__)\       )\/\'
 		echo '                ||----w |'
 		echo '                ||     ||'
+		;;
+	list|ls)
+		for server_dir in $(ls -d "$BASE_DATA_DIR"/*/) ; do
+			server_command="$(basename $server_dir)"
+			echo "--- $server_command"
+			$server_command site ls
+		done
 		;;
 	*) usage;;
 esac
