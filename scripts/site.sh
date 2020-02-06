@@ -125,17 +125,29 @@ create_site() {
 	$(< "$SNIPPETS/enable-git-deployment.sh")
 	"
 
+	if [[ $? -eq 0 ]] ; then
+		echo "- Finished Setting Up ${domain}"
+	else
+		echo "Error: looks like something went wrong!"
+		echo "Check the output above for errors and try again."
+		exit 1
+	fi
+
 	if [[ $springboot == yes ]] ; then
 		echo '- Performing Extra Spring Boot Configuration'
 		ssh $user@$ip "domain=${domain} $(< $SNIPPETS/springboot-extra-config.sh)"
 	fi
-
-	[[ $? -eq 0 ]] && echo "- Finished Setting Up ${domain}"
-
 	if [[ $https == yes ]] ; then
 		echo "- Enabling Https For $domain..."
 		enable_https --domain $domain
 	fi
+
+	echo "- ${domain} is ready to go!"
+	echo "  Run the commands below to add the deployment remote and deploy the site"
+	echo
+	echo "    git remote add production $user@$ip:/srv/$domain/repo.git"
+	echo "    git push production master"
+	echo
 }
 
 enable_https() {
