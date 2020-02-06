@@ -3,5 +3,5 @@ Flask==1.1.1
 itsdangerous==1.1.0
 Jinja2==2.10.1
 MarkupSafe==1.1.1
-waitress==1.4.2
+waitress==1.4.3
 Werkzeug==0.15.5
