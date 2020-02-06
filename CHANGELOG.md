@@ -1,3 +1,9 @@
+3.3.0 -- 20200206
+
+- bugfix: don't fail silently when creating a database that already exists
+- enhancement: update python + php sample sites dependencies
+- feature: add `cods list` subcommand
+
 3.2.2 -- 20200205
 
 - bugfix: Fix bug reading username in initial setup
