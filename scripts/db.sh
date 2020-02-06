@@ -52,7 +52,7 @@ create_db() {
 	.
 
 	ssh -t $user@$ip "mysql -p <<sql
-	CREATE DATABASE IF NOT EXISTS $dbname;
+	CREATE DATABASE $dbname;
 	CREATE USER IF NOT EXISTS '$dbuser'@'localhost' IDENTIFIED BY '$db_pass';
 	GRANT ALL ON ${dbname}.* TO '$dbuser'@'localhost';
 	FLUSH PRIVILEGES;
