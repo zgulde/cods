@@ -16,7 +16,6 @@ heading(){
 }
 
 set -e
-set -x
 
 # prevent installed packages (namely mysql) from trying to prompt for
 # information in an interactive way. We'll do the setup progromatically
