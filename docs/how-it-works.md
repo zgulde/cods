@@ -72,6 +72,16 @@ Assuming you already have a server setup:
 1. Run the `_test` subcommand. This subcommand is not shown in the help message,
    but will provide an interface to the `test` script.
 
+### Debugging
+
+To debug the `cods` command and any generated server commands, you can set the `_CODS_DEBUG` environment variable.
+
+```
+export _CODS_DEBUG=1
+```
+
+Now whenever `cods` or a generated server command is run, a file named `cods-debug.log` will be generated in the current working directory that shows all of the commands that are running under the hood.
+
 ## Server Setup
 
 - Basic Security Hardening
