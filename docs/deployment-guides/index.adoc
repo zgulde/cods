@@ -1,0 +1,26 @@
+== Deployment Guides
+
+This section contains step-by-step walkthroughs for common deployment scenarios.
+
+All of these guides assume the following:
+
+* <<initial-server-setup, A server setup with cods>>
+* <<dns-configuration, DNS records properly configured>>
+* A working application
++
+That is, your application should run locally and be free from errors.
+
+Further, we assume that your server command is named `myserver`.
+
+include::static-site.adoc[leveloffset=+1]
+
+include::spring-boot.adoc[leveloffset=+1]
+
+include::hugo-static-site.adoc[leveloffset=+1]
+
+include::node-movies.adoc[leveloffset=+1]
+
+include::python-flask.adoc[leveloffset=+1]
+
+include::laravel-php.adoc[leveloffset=+1]
+

@@ -1,0 +1,83 @@
+== Static Site
+
+This section will walk you through creating and deploying a static site with
+`cods`.
+A prerequisite for this guide is a server command setup with cods, we will
+assume the command is named `+myserver+`.
+This guide is written for a "plain" static site, that is, a site where the
+contents of the repository should just be served to the public and there is no
+backend or build process.
+
+=== Create The Site
+
+This section will walk you through creating a (*_very_*) basic static
+site and initializing a git repository. Skip this section if you have an
+existing project you want to deploy.
+
+. Create an `+index.html+` file.
++
+--
+You site could be more complex, but let’s start by creating an
+`+index.html+` file. This will be the home page for your domain.
+
+[source,html]
+----
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8"/>
+    <title>My Website</title>
+  </head>
+  <body>
+    <h1>Hello From Cods!</h1>
+  </body>
+</html>
+----
+--
+. Initialize the git repository
++
+....
+git init
+git add index.html
+git commit -m 'First Commit'
+....
+. (Optionally) push your repository up to GitHub.
++
+Go to https://github.com/new[github.com/new] and create a repo, then add
+the remote and push.
++
+....
+git remote add origin ...
+git push origin master
+....
+
+=== Create The Site
+
+Next we will setup your server to host the site. Run the command below:
+
+....
+myserver site create --domain example.com --static
+....
+
+replacing `+example.com+` with your domain name (or a subdomain).
+
+=== Push To Deploy
+
+After the site creation command above finishes, you should see some
+output that gives you a copy-pastable `+git+` command to add a
+`+production+` remote to your repository.
+
+Alternatively, you can find this command by running
+
+....
+myserver info --domain example.com
+....
+
+Either way after running the command to add the production remote, go
+ahead and push:
+
+....
+git push production master
+....
+
+After pushing, you should see your site live!

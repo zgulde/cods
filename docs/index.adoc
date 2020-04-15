@@ -1,0 +1,61 @@
+= Cods Documentation
+Zach Gulde <zach.gulde@gmail.com>
+:toc: right
+:source-highlighter: highlightjs
+:sectnums:
+
+== What is this?
+
+`cods` is a tool for automatically setting up a cloud server and managing
+various applications deployed on that server.
+
+For setup and management of a single remote server and virtual hosting
+with nginx, which serves mostly as a reverse proxy to application
+servers that (optionally) talk to a mysql database.
+
+If you want to quickly deploy your application on the same server that
+hosts your database and not worry about the infastructure details that
+entails, this project can help you out.
+
+Primarily, this tool is intended to be used by http://codeup.com[Codeup]
+students going through the Java program.
+You might also find this project useful if you have a Java, Python, PHP, or Node
+web application you want to deploy quickly, or if you want to host several hobby
+projects on the same server.
+
+This project is probably *not* for you if:
+
+* You want to use a database that is not MySQL
+* You don’t want to put nginx in front of your application
+* You want to use an operating system that is not Debian on your server
+
+ifdef::build-singlepage[]
+include::quick-reference.adoc[]
+
+include::installation.adoc[]
+
+include::initial-server-setup.adoc[]
+
+include::dns-configuration.adoc[]
+
+include::usage.adoc[]
+
+include::deployment-guides/index.adoc[]
+
+include::faq.adoc[]
+
+include::api.adoc[]
+endif::build-singlepage[]
+
+ifndef::build-singlepage[]
+== Table of Contents
+
+* link:quick-reference.html[Quick Reference]
+* link:installation.html[Installation]
+* link:initial-server-setup.html[Initial Server Setup]
+* link:dns-configuration.html[DNS Configuration]
+* link:usage.html[Usage Guide]
+* link:deployment-guides/index.html[Deployment Guides]
+* link:faq.html[FAQ]
+* link:api.html[API]
+endif::build-singlepage[]

@@ -1,0 +1,143 @@
+== Node Movies App Deployment
+
+This section documents the process for deploying
+https://github.com/gocodeup/movies-application[this sample node application]. In
+short, this application is a node-powered API backend, combined with a frontend
+that is the output of a webpack build process.
+
+=== Make sure your application is ready
+
+In addition to running and being error free, we’ll need to ensure 2
+things:
+
+[arabic]
+. We have a `+npm run start+` command
++
+Make sure you have a `+"start"+` entry in the `+scripts+` section of
+your `+package.json+`.
++
+For example, if you start your application by running the `+server.js+`
+script with node, your `+package.json+` would look like this:
++
+[source,json]
+----
+{
+    ...
+    "scripts": {
+        ...
+        "start": "node server.js"
+        ...
+    }
+    ...
+}
+----
++
+You should now be able to run `+npm run start+` from the root of your
+project and have your application startup.
++
+Take note of the port number that your site is running on, we’ll need
+this information later when we create a site.
+. Create a `+cods.sh+` file.
++
+This file will tell our server what needs to be done when the site is
+deployed. In our case, we’ll want to install the dependencies, and build
+the static files.
++
+Create a file in your project root named `+cods.sh+`. It should have the
+following contents:
++
+[source,sh]
+----
+echo 'Installing dependencies'
+npm install
+echo 'Building static assets'
+npm run build
+----
++
+_We’re assuming that `+npm run build+` puts together your static assets.
+This should be the case if you are deploying the movies application, but
+if you are deploying something else, you might need to use a different
+command here._
+
+=== Create the site
+
+[source,sh]
+----
+myserver site create --domain example.com --node --port 3000
+----
+
+Replacing `+example.com+` with the domain name you want to deploy to.
+
+You might also need to replace `+3000+` here if your application runs on
+a different port number.
+
+=== Deploy your application
+
+The command below:
+
+[source,sh]
+----
+myserver site info --domain example.com
+----
+
+Will output the location of your production git remote, including a
+copy-pastable command you can use to add the git remote to your project.
+Go ahead and do so:
+
+[source,sh]
+----
+git remote add production ...
+----
+
+Then make sure all your changes are added and committed, then push to
+production:
+
+[source,sh]
+----
+git push origin master
+----
+
+When you push, you’ll see the `+cods.sh+` script running, then you
+should see your site live!
+
+=== Debugging
+
+In general, debugging will fall into one of two categories, either
+something goes wrong during the build process, that is, when you do a
+push, or something goes wrong while the app is running, or starting up.
+
+In general, try to reproduce any errors locally, so that your can solve
+them locally, then push the fixes to production.
+
+==== Building
+
+If anything goes wrong during the build process, you should see the
+output / error messages after running a `+git push+` to production.
+
+Occasionally, you will want to re-run the build process even though you
+don’t have any changes to push. In this case, you can run:
+
+[source,bash]
+----
+myserver site build --domain example.com
+----
+
+To trigger the same process that happens when you do a `+git push+`.
+
+==== While the app is running
+
+Even if your application is built successfully, something might go wrong
+when your application initially starts up, or at some point when it is
+running. You can view the logs for your application by running:
+
+....
+myserver site logs --domain example.com
+....
+
+And you can watch the log file in realtime by running:
+
+....
+myserver site logs --domain example.com --follow
+....
+
+Press Ctrl-C to stop watching the log file.

@@ -1,0 +1,164 @@
+== Quick Reference
+
+=== Initial Server Setup
+
+[arabic, start=0]
+. Setup
++
+....
+brew install zgulde/zgulde/cods
+....
++
+And Create a VPS you have root ssh access to
+. Provision the server
++
+....
+cods init myserver
+....
++
+Provide the server’s IP address, answer a couple questions, then grab a
+cup of tea while the server is setup.
++
+You’ll now have a command named `+myserver+` to interact with
+your server.
+
+=== Java + Spring Boot Site
+
+Deploying a java spring-boot database backed blog application:
+
+[arabic]
+. Create a database for the site
++
+....
+myserver db create --name blog_db --user blog_user
+....
++
+A random password will be generated for you
+. Setup the site
++
+....
+myserver site create --domain myblog.com --java --spring-boot --port 8080
+# define db secrets...
+myserver run vim /srv/myblog.com/application.properties
+....
+. Create a file that defines how to build your site
++
+....
+cat > .cods <<.
+BUILD_COMMAND='./mvnw package'
+JAR_FILE=$(find target -name \*.jar)
+.
+....
+. Add a git remote and push
++
+....
+myserver site info -d myblog.com
+....
++
+Will give you a copy-pastable command to add a `+production+` remote.
+Then:
++
+....
+git push production master
+....
++
+And you site will build and be live!
+
+=== Static Site
+
+[arabic]
+. Create the site
++
+[source,bash]
+----
+myserver site create --domain myblog.com --static
+----
+. Add a git remote and push
++
+....
+myserver site info -d myblog.com
+....
++
+Will give you a copy-pastable command to add a `+production+` remote.
+Then:
++
+....
+git push production master
+....
++
+And the contents of your repo will be live on your domain!
+
+=== Node Site
+
+[arabic]
+. Create the site
++
+[source,bash]
+----
+myserver site create --domain myblog.com --node --port 9000
+----
+. Make sure your application is ready
++
+`+npm run start+` should start your server on the port you specified in
+the last step
+. Add a git remote and push
++
+....
+myserver site info -d myblog.com
+....
++
+Will give you a copy-pastable command to add a `+production+` remote.
+Then:
++
+....
+git push production master
+....
++
+And the contents of your repo will be live on your domain!
+
+=== Python Site
+
+[arabic]
+. Create the site
++
+[source,bash]
+----
+myserver site create --domain myblog.com --python --port 5000
+----
+. Create a startup script
++
+[source,bash]
+----
+cat > start_server.sh <<.
+#!/usr/bin/env bash
+
+source env/bin/activate
+python server.py
+.
+chmod +x start_server.sh
+
+git add start_server.sh
+git commit -m 'Add script for managing server startup'
+----
++
+Assuming you are using a virtual environment
+. Add a git remote and push
++
+....
+myserver site info -d myblog.com
+....
++
+Will give you a copy-pastable command to add a `+production+` remote.
+Then:
++
+....
+git push production master
+....
++
+And the contents of your repo will be live on your domain!
+
+=== Enable Https
+
+....
+myserver site enablehttps -d myblog.com
+....

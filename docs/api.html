@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.10">
+<title>API Documentation</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
+<style>
+/* Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
+/* Uncomment @import statement to use as custom stylesheet */
+/*@import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700";*/
+article,aside,details,figcaption,figure,footer,header,hgroup,main,nav,section{display:block}
+audio,video{display:inline-block}
+audio:not([controls]){display:none;height:0}
+html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
+a{background:none}
+a:focus{outline:thin dotted}
+a:active,a:hover{outline:0}
+h1{font-size:2em;margin:.67em 0}
+abbr[title]{border-bottom:1px dotted}
+b,strong{font-weight:bold}
+dfn{font-style:italic}
+hr{-moz-box-sizing:content-box;box-sizing:content-box;height:0}
+mark{background:#ff0;color:#000}
+code,kbd,pre,samp{font-family:monospace;font-size:1em}
+pre{white-space:pre-wrap}
+q{quotes:"\201C" "\201D" "\2018" "\2019"}
+small{font-size:80%}
+sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}
+sup{top:-.5em}
+sub{bottom:-.25em}
+img{border:0}
+svg:not(:root){overflow:hidden}
+figure{margin:0}
+fieldset{border:1px solid silver;margin:0 2px;padding:.35em .625em .75em}
+legend{border:0;padding:0}
+button,input,select,textarea{font-family:inherit;font-size:100%;margin:0}
+button,input{line-height:normal}
+button,select{text-transform:none}
+button,html input[type="button"],input[type="reset"],input[type="submit"]{-webkit-appearance:button;cursor:pointer}
+button[disabled],html input[disabled]{cursor:default}
+input[type="checkbox"],input[type="radio"]{box-sizing:border-box;padding:0}
+button::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0}
+textarea{overflow:auto;vertical-align:top}
+table{border-collapse:collapse;border-spacing:0}
+*,*::before,*::after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
+html,body{font-size:100%}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
+a:hover{cursor:pointer}
+img,object,embed{max-width:100%;height:auto}
+object,embed{height:100%}
+img{-ms-interpolation-mode:bicubic}
+.left{float:left!important}
+.right{float:right!important}
+.text-left{text-align:left!important}
+.text-right{text-align:right!important}
+.text-center{text-align:center!important}
+.text-justify{text-align:justify!important}
+.hide{display:none}
+img,object,svg{display:inline-block;vertical-align:middle}
+textarea{height:auto;min-height:50px}
+select{width:100%}
+.center{margin-left:auto;margin-right:auto}
+.stretch{width:100%}
+.subheader,.admonitionblock td.content>.title,.audioblock>.title,.exampleblock>.title,.imageblock>.title,.listingblock>.title,.literalblock>.title,.stemblock>.title,.openblock>.title,.paragraph>.title,.quoteblock>.title,table.tableblock>.title,.verseblock>.title,.videoblock>.title,.dlist>.title,.olist>.title,.ulist>.title,.qlist>.title,.hdlist>.title{line-height:1.45;color:#7a2518;font-weight:400;margin-top:0;margin-bottom:.25em}
+div,dl,dt,dd,ul,ol,li,h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6,pre,form,p,blockquote,th,td{margin:0;padding:0;direction:ltr}
+a{color:#2156a5;text-decoration:underline;line-height:inherit}
+a:hover,a:focus{color:#1d4b8f}
+a img{border:0}
+p{font-family:inherit;font-weight:400;font-size:1em;line-height:1.6;margin-bottom:1.25em;text-rendering:optimizeLegibility}
+p aside{font-size:.875em;line-height:1.35;font-style:italic}
+h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{font-family:"Open Sans","DejaVu Sans",sans-serif;font-weight:300;font-style:normal;color:#ba3925;text-rendering:optimizeLegibility;margin-top:1em;margin-bottom:.5em;line-height:1.0125em}
+h1 small,h2 small,h3 small,#toctitle small,.sidebarblock>.content>.title small,h4 small,h5 small,h6 small{font-size:60%;color:#e99b8f;line-height:0}
+h1{font-size:2.125em}
+h2{font-size:1.6875em}
+h3,#toctitle,.sidebarblock>.content>.title{font-size:1.375em}
+h4,h5{font-size:1.125em}
+h6{font-size:1em}
+hr{border:solid #dddddf;border-width:1px 0 0;clear:both;margin:1.25em 0 1.1875em;height:0}
+em,i{font-style:italic;line-height:inherit}
+strong,b{font-weight:bold;line-height:inherit}
+small{font-size:60%;line-height:inherit}
+code{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;color:rgba(0,0,0,.9)}
+ul,ol,dl{font-size:1em;line-height:1.6;margin-bottom:1.25em;list-style-position:outside;font-family:inherit}
+ul,ol{margin-left:1.5em}
+ul li ul,ul li ol{margin-left:1.25em;margin-bottom:0;font-size:1em}
+ul.square li ul,ul.circle li ul,ul.disc li ul{list-style:inherit}
+ul.square{list-style-type:square}
+ul.circle{list-style-type:circle}
+ul.disc{list-style-type:disc}
+ol li ul,ol li ol{margin-left:1.25em;margin-bottom:0}
+dl dt{margin-bottom:.3125em;font-weight:bold}
+dl dd{margin-bottom:1.25em}
+abbr,acronym{text-transform:uppercase;font-size:90%;color:rgba(0,0,0,.8);border-bottom:1px dotted #ddd;cursor:help}
+abbr{text-transform:none}
+blockquote{margin:0 0 1.25em;padding:.5625em 1.25em 0 1.1875em;border-left:1px solid #ddd}
+blockquote cite{display:block;font-size:.9375em;color:rgba(0,0,0,.6)}
+blockquote cite::before{content:"\2014 \0020"}
+blockquote cite a,blockquote cite a:visited{color:rgba(0,0,0,.6)}
+blockquote,blockquote p{line-height:1.6;color:rgba(0,0,0,.85)}
+@media screen and (min-width:768px){h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2}
+h1{font-size:2.75em}
+h2{font-size:2.3125em}
+h3,#toctitle,.sidebarblock>.content>.title{font-size:1.6875em}
+h4{font-size:1.4375em}}
+table{background:#fff;margin-bottom:1.25em;border:solid 1px #dedede}
+table thead,table tfoot{background:#f7f8f7}
+table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:.5em .625em .625em;font-size:inherit;color:rgba(0,0,0,.8);text-align:left}
+table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
+table tr.even,table tr.alt{background:#f8f8f7}
+table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
+h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
+h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
+.clearfix::before,.clearfix::after,.float-group::before,.float-group::after{content:" ";display:table}
+.clearfix::after,.float-group::after{clear:both}
+:not(pre):not([class^=L])>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed;word-wrap:break-word}
+:not(pre)>code.nobreak{word-wrap:normal}
+:not(pre)>code.nowrap{white-space:nowrap}
+pre{color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;line-height:1.45;text-rendering:optimizeSpeed}
+pre code,pre pre{color:inherit;font-size:inherit;line-height:inherit}
+pre>code{display:block}
+pre.nowrap,pre.nowrap pre{white-space:pre;word-wrap:normal}
+em em{font-style:normal}
+strong strong{font-weight:400}
+.keyseq{color:rgba(51,51,51,.8)}
+kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
+.keyseq kbd:first-child{margin-left:0}
+.keyseq kbd:last-child{margin-right:0}
+.menuseq,.menuref{color:#000}
+.menuseq b:not(.caret),.menuref{font-weight:inherit}
+.menuseq{word-spacing:-.02em}
+.menuseq b.caret{font-size:1.25em;line-height:.8}
+.menuseq i.caret{font-weight:bold;text-align:center;width:.45em}
+b.button::before,b.button::after{position:relative;top:-1px;font-weight:400}
+b.button::before{content:"[";padding:0 3px 0 2px}
+b.button::after{content:"]";padding:0 2px 0 3px}
+p a>code:hover{color:rgba(0,0,0,.9)}
+#header,#content,#footnotes,#footer{width:100%;margin-left:auto;margin-right:auto;margin-top:0;margin-bottom:0;max-width:62.5em;*zoom:1;position:relative;padding-left:.9375em;padding-right:.9375em}
+#header::before,#header::after,#content::before,#content::after,#footnotes::before,#footnotes::after,#footer::before,#footer::after{content:" ";display:table}
+#header::after,#content::after,#footnotes::after,#footer::after{clear:both}
+#content{margin-top:1.25em}
+#content::before{content:none}
+#header>h1:first-child{color:rgba(0,0,0,.85);margin-top:2.25rem;margin-bottom:0}
+#header>h1:first-child+#toc{margin-top:8px;border-top:1px solid #dddddf}
+#header>h1:only-child,body.toc2 #header>h1:nth-last-child(2){border-bottom:1px solid #dddddf;padding-bottom:8px}
+#header .details{border-bottom:1px solid #dddddf;line-height:1.45;padding-top:.25em;padding-bottom:.25em;padding-left:.25em;color:rgba(0,0,0,.6);display:-ms-flexbox;display:-webkit-flex;display:flex;-ms-flex-flow:row wrap;-webkit-flex-flow:row wrap;flex-flow:row wrap}
+#header .details span:first-child{margin-left:-.125em}
+#header .details span.email a{color:rgba(0,0,0,.85)}
+#header .details br{display:none}
+#header .details br+span::before{content:"\00a0\2013\00a0"}
+#header .details br+span.author::before{content:"\00a0\22c5\00a0";color:rgba(0,0,0,.85)}
+#header .details br+span#revremark::before{content:"\00a0|\00a0"}
+#header #revnumber{text-transform:capitalize}
+#header #revnumber::after{content:"\00a0"}
+#content>h1:first-child:not([class]){color:rgba(0,0,0,.85);border-bottom:1px solid #dddddf;padding-bottom:8px;margin-top:0;padding-top:1rem;margin-bottom:1.25rem}
+#toc{border-bottom:1px solid #e7e7e9;padding-bottom:.5em}
+#toc>ul{margin-left:.125em}
+#toc ul.sectlevel0>li>a{font-style:italic}
+#toc ul.sectlevel0 ul.sectlevel1{margin:.5em 0}
+#toc ul{font-family:"Open Sans","DejaVu Sans",sans-serif;list-style-type:none}
+#toc li{line-height:1.3334;margin-top:.3334em}
+#toc a{text-decoration:none}
+#toc a:active{text-decoration:underline}
+#toctitle{color:#7a2518;font-size:1.2em}
+@media screen and (min-width:768px){#toctitle{font-size:1.375em}
+body.toc2{padding-left:15em;padding-right:0}
+#toc.toc2{margin-top:0!important;background:#f8f8f7;position:fixed;width:15em;left:0;top:0;border-right:1px solid #e7e7e9;border-top-width:0!important;border-bottom-width:0!important;z-index:1000;padding:1.25em 1em;height:100%;overflow:auto}
+#toc.toc2 #toctitle{margin-top:0;margin-bottom:.8rem;font-size:1.2em}
+#toc.toc2>ul{font-size:.9em;margin-bottom:0}
+#toc.toc2 ul ul{margin-left:0;padding-left:1em}
+#toc.toc2 ul.sectlevel0 ul.sectlevel1{padding-left:0;margin-top:.5em;margin-bottom:.5em}
+body.toc2.toc-right{padding-left:0;padding-right:15em}
+body.toc2.toc-right #toc.toc2{border-right-width:0;border-left:1px solid #e7e7e9;left:auto;right:0}}
+@media screen and (min-width:1280px){body.toc2{padding-left:20em;padding-right:0}
+#toc.toc2{width:20em}
+#toc.toc2 #toctitle{font-size:1.375em}
+#toc.toc2>ul{font-size:.95em}
+#toc.toc2 ul ul{padding-left:1.25em}
+body.toc2.toc-right{padding-left:0;padding-right:20em}}
+#content #toc{border-style:solid;border-width:1px;border-color:#e0e0dc;margin-bottom:1.25em;padding:1.25em;background:#f8f8f7;-webkit-border-radius:4px;border-radius:4px}
+#content #toc>:first-child{margin-top:0}
+#content #toc>:last-child{margin-bottom:0}
+#footer{max-width:100%;background:rgba(0,0,0,.8);padding:1.25em}
+#footer-text{color:rgba(255,255,255,.8);line-height:1.44}
+#content{margin-bottom:.625em}
+.sect1{padding-bottom:.625em}
+@media screen and (min-width:768px){#content{margin-bottom:1.25em}
+.sect1{padding-bottom:1.25em}}
+.sect1:last-child{padding-bottom:0}
+.sect1+.sect1{border-top:1px solid #e7e7e9}
+#content h1>a.anchor,h2>a.anchor,h3>a.anchor,#toctitle>a.anchor,.sidebarblock>.content>.title>a.anchor,h4>a.anchor,h5>a.anchor,h6>a.anchor{position:absolute;z-index:1001;width:1.5ex;margin-left:-1.5ex;display:block;text-decoration:none!important;visibility:hidden;text-align:center;font-weight:400}
+#content h1>a.anchor::before,h2>a.anchor::before,h3>a.anchor::before,#toctitle>a.anchor::before,.sidebarblock>.content>.title>a.anchor::before,h4>a.anchor::before,h5>a.anchor::before,h6>a.anchor::before{content:"\00A7";font-size:.85em;display:block;padding-top:.1em}
+#content h1:hover>a.anchor,#content h1>a.anchor:hover,h2:hover>a.anchor,h2>a.anchor:hover,h3:hover>a.anchor,#toctitle:hover>a.anchor,.sidebarblock>.content>.title:hover>a.anchor,h3>a.anchor:hover,#toctitle>a.anchor:hover,.sidebarblock>.content>.title>a.anchor:hover,h4:hover>a.anchor,h4>a.anchor:hover,h5:hover>a.anchor,h5>a.anchor:hover,h6:hover>a.anchor,h6>a.anchor:hover{visibility:visible}
+#content h1>a.link,h2>a.link,h3>a.link,#toctitle>a.link,.sidebarblock>.content>.title>a.link,h4>a.link,h5>a.link,h6>a.link{color:#ba3925;text-decoration:none}
+#content h1>a.link:hover,h2>a.link:hover,h3>a.link:hover,#toctitle>a.link:hover,.sidebarblock>.content>.title>a.link:hover,h4>a.link:hover,h5>a.link:hover,h6>a.link:hover{color:#a53221}
+details,.audioblock,.imageblock,.literalblock,.listingblock,.stemblock,.videoblock{margin-bottom:1.25em}
+details>summary:first-of-type{cursor:pointer;display:list-item;outline:none;margin-bottom:.75em}
+.admonitionblock td.content>.title,.audioblock>.title,.exampleblock>.title,.imageblock>.title,.listingblock>.title,.literalblock>.title,.stemblock>.title,.openblock>.title,.paragraph>.title,.quoteblock>.title,table.tableblock>.title,.verseblock>.title,.videoblock>.title,.dlist>.title,.olist>.title,.ulist>.title,.qlist>.title,.hdlist>.title{text-rendering:optimizeLegibility;text-align:left;font-family:"Noto Serif","DejaVu Serif",serif;font-size:1rem;font-style:italic}
+table.tableblock.fit-content>caption.title{white-space:nowrap;width:0}
+.paragraph.lead>p,#preamble>.sectionbody>[class="paragraph"]:first-of-type p{font-size:1.21875em;line-height:1.6;color:rgba(0,0,0,.85)}
+table.tableblock #preamble>.sectionbody>[class="paragraph"]:first-of-type p{font-size:inherit}
+.admonitionblock>table{border-collapse:separate;border:0;background:none;width:100%}
+.admonitionblock>table td.icon{text-align:center;width:80px}
+.admonitionblock>table td.icon img{max-width:none}
+.admonitionblock>table td.icon .title{font-weight:bold;font-family:"Open Sans","DejaVu Sans",sans-serif;text-transform:uppercase}
+.admonitionblock>table td.content{padding-left:1.125em;padding-right:1.25em;border-left:1px solid #dddddf;color:rgba(0,0,0,.6)}
+.admonitionblock>table td.content>:last-child>:last-child{margin-bottom:0}
+.exampleblock>.content{border-style:solid;border-width:1px;border-color:#e6e6e6;margin-bottom:1.25em;padding:1.25em;background:#fff;-webkit-border-radius:4px;border-radius:4px}
+.exampleblock>.content>:first-child{margin-top:0}
+.exampleblock>.content>:last-child{margin-bottom:0}
+.sidebarblock{border-style:solid;border-width:1px;border-color:#dbdbd6;margin-bottom:1.25em;padding:1.25em;background:#f3f3f2;-webkit-border-radius:4px;border-radius:4px}
+.sidebarblock>:first-child{margin-top:0}
+.sidebarblock>:last-child{margin-bottom:0}
+.sidebarblock>.content>.title{color:#7a2518;margin-top:0;text-align:center}
+.exampleblock>.content>:last-child>:last-child,.exampleblock>.content .olist>ol>li:last-child>:last-child,.exampleblock>.content .ulist>ul>li:last-child>:last-child,.exampleblock>.content .qlist>ol>li:last-child>:last-child,.sidebarblock>.content>:last-child>:last-child,.sidebarblock>.content .olist>ol>li:last-child>:last-child,.sidebarblock>.content .ulist>ul>li:last-child>:last-child,.sidebarblock>.content .qlist>ol>li:last-child>:last-child{margin-bottom:0}
+.literalblock pre,.listingblock>.content>pre{-webkit-border-radius:4px;border-radius:4px;word-wrap:break-word;overflow-x:auto;padding:1em;font-size:.8125em}
+@media screen and (min-width:768px){.literalblock pre,.listingblock>.content>pre{font-size:.90625em}}
+@media screen and (min-width:1280px){.literalblock pre,.listingblock>.content>pre{font-size:1em}}
+.literalblock pre,.listingblock>.content>pre:not(.highlight),.listingblock>.content>pre[class="highlight"],.listingblock>.content>pre[class^="highlight "]{background:#f7f7f8}
+.literalblock.output pre{color:#f7f7f8;background:rgba(0,0,0,.9)}
+.listingblock>.content{position:relative}
+.listingblock code[data-lang]::before{display:none;content:attr(data-lang);position:absolute;font-size:.75em;top:.425rem;right:.5rem;line-height:1;text-transform:uppercase;color:inherit;opacity:.5}
+.listingblock:hover code[data-lang]::before{display:block}
+.listingblock.terminal pre .command::before{content:attr(data-prompt);padding-right:.5em;color:inherit;opacity:.5}
+.listingblock.terminal pre .command:not([data-prompt])::before{content:"$"}
+.listingblock pre.highlightjs{padding:0}
+.listingblock pre.highlightjs>code{padding:1em;-webkit-border-radius:4px;border-radius:4px}
+.listingblock pre.prettyprint{border-width:0}
+.prettyprint{background:#f7f7f8}
+pre.prettyprint .linenums{line-height:1.45;margin-left:2em}
+pre.prettyprint li{background:none;list-style-type:inherit;padding-left:0}
+pre.prettyprint li code[data-lang]::before{opacity:1}
+pre.prettyprint li:not(:first-child) code[data-lang]::before{display:none}
+table.linenotable{border-collapse:separate;border:0;margin-bottom:0;background:none}
+table.linenotable td[class]{color:inherit;vertical-align:top;padding:0;line-height:inherit;white-space:normal}
+table.linenotable td.code{padding-left:.75em}
+table.linenotable td.linenos{border-right:1px solid currentColor;opacity:.35;padding-right:.5em}
+pre.pygments .lineno{border-right:1px solid currentColor;opacity:.35;display:inline-block;margin-right:.75em}
+pre.pygments .lineno::before{content:"";margin-right:-.125em}
+.quoteblock{margin:0 1em 1.25em 1.5em;display:table}
+.quoteblock:not(.excerpt)>.title{margin-left:-1.5em;margin-bottom:.75em}
+.quoteblock blockquote,.quoteblock p{color:rgba(0,0,0,.85);font-size:1.15rem;line-height:1.75;word-spacing:.1em;letter-spacing:0;font-style:italic;text-align:justify}
+.quoteblock blockquote{margin:0;padding:0;border:0}
+.quoteblock blockquote::before{content:"\201c";float:left;font-size:2.75em;font-weight:bold;line-height:.6em;margin-left:-.6em;color:#7a2518;text-shadow:0 1px 2px rgba(0,0,0,.1)}
+.quoteblock blockquote>.paragraph:last-child p{margin-bottom:0}
+.quoteblock .attribution{margin-top:.75em;margin-right:.5ex;text-align:right}
+.verseblock{margin:0 1em 1.25em}
+.verseblock pre{font-family:"Open Sans","DejaVu Sans",sans;font-size:1.15rem;color:rgba(0,0,0,.85);font-weight:300;text-rendering:optimizeLegibility}
+.verseblock pre strong{font-weight:400}
+.verseblock .attribution{margin-top:1.25rem;margin-left:.5ex}
+.quoteblock .attribution,.verseblock .attribution{font-size:.9375em;line-height:1.45;font-style:italic}
+.quoteblock .attribution br,.verseblock .attribution br{display:none}
+.quoteblock .attribution cite,.verseblock .attribution cite{display:block;letter-spacing:-.025em;color:rgba(0,0,0,.6)}
+.quoteblock.abstract blockquote::before,.quoteblock.excerpt blockquote::before,.quoteblock .quoteblock blockquote::before{display:none}
+.quoteblock.abstract blockquote,.quoteblock.abstract p,.quoteblock.excerpt blockquote,.quoteblock.excerpt p,.quoteblock .quoteblock blockquote,.quoteblock .quoteblock p{line-height:1.6;word-spacing:0}
+.quoteblock.abstract{margin:0 1em 1.25em;display:block}
+.quoteblock.abstract>.title{margin:0 0 .375em;font-size:1.15em;text-align:center}
+.quoteblock.excerpt>blockquote,.quoteblock .quoteblock{padding:0 0 .25em 1em;border-left:.25em solid #dddddf}
+.quoteblock.excerpt,.quoteblock .quoteblock{margin-left:0}
+.quoteblock.excerpt blockquote,.quoteblock.excerpt p,.quoteblock .quoteblock blockquote,.quoteblock .quoteblock p{color:inherit;font-size:1.0625rem}
+.quoteblock.excerpt .attribution,.quoteblock .quoteblock .attribution{color:inherit;text-align:left;margin-right:0}
+table.tableblock{max-width:100%;border-collapse:separate}
+p.tableblock:last-child{margin-bottom:0}
+td.tableblock>.content>:last-child{margin-bottom:-1.25em}
+td.tableblock>.content>:last-child.sidebarblock{margin-bottom:0}
+table.tableblock,th.tableblock,td.tableblock{border:0 solid #dedede}
+table.grid-all>thead>tr>.tableblock,table.grid-all>tbody>tr>.tableblock{border-width:0 1px 1px 0}
+table.grid-all>tfoot>tr>.tableblock{border-width:1px 1px 0 0}
+table.grid-cols>*>tr>.tableblock{border-width:0 1px 0 0}
+table.grid-rows>thead>tr>.tableblock,table.grid-rows>tbody>tr>.tableblock{border-width:0 0 1px}
+table.grid-rows>tfoot>tr>.tableblock{border-width:1px 0 0}
+table.grid-all>*>tr>.tableblock:last-child,table.grid-cols>*>tr>.tableblock:last-child{border-right-width:0}
+table.grid-all>tbody>tr:last-child>.tableblock,table.grid-all>thead:last-child>tr>.tableblock,table.grid-rows>tbody>tr:last-child>.tableblock,table.grid-rows>thead:last-child>tr>.tableblock{border-bottom-width:0}
+table.frame-all{border-width:1px}
+table.frame-sides{border-width:0 1px}
+table.frame-topbot,table.frame-ends{border-width:1px 0}
+table.stripes-all tr,table.stripes-odd tr:nth-of-type(odd),table.stripes-even tr:nth-of-type(even),table.stripes-hover tr:hover{background:#f8f8f7}
+th.halign-left,td.halign-left{text-align:left}
+th.halign-right,td.halign-right{text-align:right}
+th.halign-center,td.halign-center{text-align:center}
+th.valign-top,td.valign-top{vertical-align:top}
+th.valign-bottom,td.valign-bottom{vertical-align:bottom}
+th.valign-middle,td.valign-middle{vertical-align:middle}
+table thead th,table tfoot th{font-weight:bold}
+tbody tr th{display:table-cell;line-height:1.6;background:#f7f8f7}
+tbody tr th,tbody tr th p,tfoot tr th,tfoot tr th p{color:rgba(0,0,0,.8);font-weight:bold}
+p.tableblock>code:only-child{background:none;padding:0}
+p.tableblock{font-size:1em}
+ol{margin-left:1.75em}
+ul li ol{margin-left:1.5em}
+dl dd{margin-left:1.125em}
+dl dd:last-child,dl dd:last-child>:last-child{margin-bottom:0}
+ol>li p,ul>li p,ul dd,ol dd,.olist .olist,.ulist .ulist,.ulist .olist,.olist .ulist{margin-bottom:.625em}
+ul.checklist,ul.none,ol.none,ul.no-bullet,ol.no-bullet,ol.unnumbered,ul.unstyled,ol.unstyled{list-style-type:none}
+ul.no-bullet,ol.no-bullet,ol.unnumbered{margin-left:.625em}
+ul.unstyled,ol.unstyled{margin-left:0}
+ul.checklist{margin-left:.625em}
+ul.checklist li>p:first-child>.fa-square-o:first-child,ul.checklist li>p:first-child>.fa-check-square-o:first-child{width:1.25em;font-size:.8em;position:relative;bottom:.125em}
+ul.checklist li>p:first-child>input[type="checkbox"]:first-child{margin-right:.25em}
+ul.inline{display:-ms-flexbox;display:-webkit-box;display:flex;-ms-flex-flow:row wrap;-webkit-flex-flow:row wrap;flex-flow:row wrap;list-style:none;margin:0 0 .625em -1.25em}
+ul.inline>li{margin-left:1.25em}
+.unstyled dl dt{font-weight:400;font-style:normal}
+ol.arabic{list-style-type:decimal}
+ol.decimal{list-style-type:decimal-leading-zero}
+ol.loweralpha{list-style-type:lower-alpha}
+ol.upperalpha{list-style-type:upper-alpha}
+ol.lowerroman{list-style-type:lower-roman}
+ol.upperroman{list-style-type:upper-roman}
+ol.lowergreek{list-style-type:lower-greek}
+.hdlist>table,.colist>table{border:0;background:none}
+.hdlist>table>tbody>tr,.colist>table>tbody>tr{background:none}
+td.hdlist1,td.hdlist2{vertical-align:top;padding:0 .625em}
+td.hdlist1{font-weight:bold;padding-bottom:1.25em}
+.literalblock+.colist,.listingblock+.colist{margin-top:-.5em}
+.colist td:not([class]):first-child{padding:.4em .75em 0;line-height:1;vertical-align:top}
+.colist td:not([class]):first-child img{max-width:none}
+.colist td:not([class]):last-child{padding:.25em 0}
+.thumb,.th{line-height:0;display:inline-block;border:solid 4px #fff;-webkit-box-shadow:0 0 0 1px #ddd;box-shadow:0 0 0 1px #ddd}
+.imageblock.left{margin:.25em .625em 1.25em 0}
+.imageblock.right{margin:.25em 0 1.25em .625em}
+.imageblock>.title{margin-bottom:0}
+.imageblock.thumb,.imageblock.th{border-width:6px}
+.imageblock.thumb>.title,.imageblock.th>.title{padding:0 .125em}
+.image.left,.image.right{margin-top:.25em;margin-bottom:.25em;display:inline-block;line-height:0}
+.image.left{margin-right:.625em}
+.image.right{margin-left:.625em}
+a.image{text-decoration:none;display:inline-block}
+a.image object{pointer-events:none}
+sup.footnote,sup.footnoteref{font-size:.875em;position:static;vertical-align:super}
+sup.footnote a,sup.footnoteref a{text-decoration:none}
+sup.footnote a:active,sup.footnoteref a:active{text-decoration:underline}
+#footnotes{padding-top:.75em;padding-bottom:.75em;margin-bottom:.625em}
+#footnotes hr{width:20%;min-width:6.25em;margin:-.25em 0 .75em;border-width:1px 0 0}
+#footnotes .footnote{padding:0 .375em 0 .225em;line-height:1.3334;font-size:.875em;margin-left:1.2em;margin-bottom:.2em}
+#footnotes .footnote a:first-of-type{font-weight:bold;text-decoration:none;margin-left:-1.05em}
+#footnotes .footnote:last-of-type{margin-bottom:0}
+#content #footnotes{margin-top:-.625em;margin-bottom:0;padding:.75em 0}
+.gist .file-data>table{border:0;background:#fff;width:100%;margin-bottom:0}
+.gist .file-data>table td.line-data{width:99%}
+div.unbreakable{page-break-inside:avoid}
+.big{font-size:larger}
+.small{font-size:smaller}
+.underline{text-decoration:underline}
+.overline{text-decoration:overline}
+.line-through{text-decoration:line-through}
+.aqua{color:#00bfbf}
+.aqua-background{background:#00fafa}
+.black{color:#000}
+.black-background{background:#000}
+.blue{color:#0000bf}
+.blue-background{background:#0000fa}
+.fuchsia{color:#bf00bf}
+.fuchsia-background{background:#fa00fa}
+.gray{color:#606060}
+.gray-background{background:#7d7d7d}
+.green{color:#006000}
+.green-background{background:#007d00}
+.lime{color:#00bf00}
+.lime-background{background:#00fa00}
+.maroon{color:#600000}
+.maroon-background{background:#7d0000}
+.navy{color:#000060}
+.navy-background{background:#00007d}
+.olive{color:#606000}
+.olive-background{background:#7d7d00}
+.purple{color:#600060}
+.purple-background{background:#7d007d}
+.red{color:#bf0000}
+.red-background{background:#fa0000}
+.silver{color:#909090}
+.silver-background{background:#bcbcbc}
+.teal{color:#006060}
+.teal-background{background:#007d7d}
+.white{color:#bfbfbf}
+.white-background{background:#fafafa}
+.yellow{color:#bfbf00}
+.yellow-background{background:#fafa00}
+span.icon>.fa{cursor:default}
+a span.icon>.fa{cursor:inherit}
+.admonitionblock td.icon [class^="fa icon-"]{font-size:2.5em;text-shadow:1px 1px 2px rgba(0,0,0,.5);cursor:default}
+.admonitionblock td.icon .icon-note::before{content:"\f05a";color:#19407c}
+.admonitionblock td.icon .icon-tip::before{content:"\f0eb";text-shadow:1px 1px 2px rgba(155,155,0,.8);color:#111}
+.admonitionblock td.icon .icon-warning::before{content:"\f071";color:#bf6900}
+.admonitionblock td.icon .icon-caution::before{content:"\f06d";color:#bf3400}
+.admonitionblock td.icon .icon-important::before{content:"\f06a";color:#bf0000}
+.conum[data-value]{display:inline-block;color:#fff!important;background:rgba(0,0,0,.8);-webkit-border-radius:100px;border-radius:100px;text-align:center;font-size:.75em;width:1.67em;height:1.67em;line-height:1.67em;font-family:"Open Sans","DejaVu Sans",sans-serif;font-style:normal;font-weight:bold}
+.conum[data-value] *{color:#fff!important}
+.conum[data-value]+b{display:none}
+.conum[data-value]::after{content:attr(data-value)}
+pre .conum[data-value]{position:relative;top:-.125em}
+b.conum *{color:inherit!important}
+.conum:not([data-value]):empty{display:none}
+dt,th.tableblock,td.content,div.footnote{text-rendering:optimizeLegibility}
+h1,h2,p,td.content,span.alt{letter-spacing:-.01em}
+p strong,td.content strong,div.footnote strong{letter-spacing:-.005em}
+p,blockquote,dt,td.content,span.alt{font-size:1.0625rem}
+p{margin-bottom:1.25rem}
+.sidebarblock p,.sidebarblock dt,.sidebarblock td.content,p.tableblock{font-size:1em}
+.exampleblock>.content{background:#fffef7;border-color:#e0e0dc;-webkit-box-shadow:0 1px 4px #e0e0dc;box-shadow:0 1px 4px #e0e0dc}
+.print-only{display:none!important}
+@page{margin:1.25cm .75cm}
+@media print{*{-webkit-box-shadow:none!important;box-shadow:none!important;text-shadow:none!important}
+html{font-size:80%}
+a{color:inherit!important;text-decoration:underline!important}
+a.bare,a[href^="#"],a[href^="mailto:"]{text-decoration:none!important}
+a[href^="http:"]:not(.bare)::after,a[href^="https:"]:not(.bare)::after{content:"(" attr(href) ")";display:inline-block;font-size:.875em;padding-left:.25em}
+abbr[title]::after{content:" (" attr(title) ")"}
+pre,blockquote,tr,img,object,svg{page-break-inside:avoid}
+thead{display:table-header-group}
+svg{max-width:100%}
+p,blockquote,dt,td.content{font-size:1em;orphans:3;widows:3}
+h2,h3,#toctitle,.sidebarblock>.content>.title{page-break-after:avoid}
+#toc,.sidebarblock,.exampleblock>.content{background:none!important}
+#toc{border-bottom:1px solid #dddddf!important;padding-bottom:0!important}
+body.book #header{text-align:center}
+body.book #header>h1:first-child{border:0!important;margin:2.5em 0 1em}
+body.book #header .details{border:0!important;display:block;padding:0!important}
+body.book #header .details span:first-child{margin-left:0!important}
+body.book #header .details br{display:block}
+body.book #header .details br+span::before{content:none!important}
+body.book #toc{border:0!important;text-align:left!important;padding:0!important;margin:0!important}
+body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-break-before:always}
+.listingblock code[data-lang]::before{display:block}
+#footer{padding:0 .9375em}
+.hide-on-print{display:none!important}
+.print-only{display:block!important}
+.hide-for-print{display:none!important}
+.show-for-print{display:inherit!important}}
+@media print,amzn-kf8{#header>h1:first-child{margin-top:1.25rem}
+.sect1{padding:0!important}
+.sect1+.sect1{border:0}
+#footer{background:none}
+#footer-text{color:rgba(0,0,0,.6);font-size:.9em}}
+@media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
+</style>
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_api_documentation">API Documentation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The document explains how all of the commands and subcommands within
+<code>cods</code> work.</p>
+</div>
+<div class="paragraph">
+<p>See also the built-in help.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#the-cods-command">The <code>cods</code> command</a></p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#add"><code>add</code></a>: add a server command for an existing cloud server</p>
+</li>
+<li>
+<p><a href="#help"><code>help</code></a>: interactive help</p>
+</li>
+<li>
+<p><a href="#init"><code>init</code></a>: provision a new server and create a server
+command</p>
+</li>
+<li>
+<p><a href="#update"><code>update</code></a></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><a href="#myserver---a-command-created-by-cods"><code>myserver</code> - A Command
+Created By Cods</a></p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#general-server-commands">General Server Commands</a></p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#autorenew"><code>autorenew</code></a>: setup letsencrypt certificates to
+automatically be renewed</p>
+</li>
+<li>
+<p><a href="#bash-completion"><code>bash-completion</code></a>: generate the bash
+completion script for the command</p>
+</li>
+<li>
+<p><a href="#credentials"><code>credentials</code></a>: view the auto-generated
+credentials for your server</p>
+</li>
+<li>
+<p><a href="#destroy"><code>destroy</code></a>: destroy the local server command</p>
+</li>
+<li>
+<p><a href="#info"><code>info</code></a>: view some general information about your
+server</p>
+</li>
+<li>
+<p><a href="#login"><code>login</code></a>: log in to the server</p>
+</li>
+<li>
+<p><a href="#ping"><code>ping</code></a>: ping the server</p>
+</li>
+<li>
+<p><a href="#pipe"><code>pipe</code></a>: run arbitrary commands non-interactively</p>
+</li>
+<li>
+<p><a href="#ports"><code>ports</code></a>: view the ports that are in-use by the
+applications on your server</p>
+</li>
+<li>
+<p><a href="#reboot"><code>reboot</code></a>: reboot the server</p>
+</li>
+<li>
+<p><a href="#restart"><code>restart</code></a>: restart a specific service running on
+the server</p>
+</li>
+<li>
+<p><a href="#run"><code>run</code></a>: run arbitrary one-off commands on the server</p>
+</li>
+<li>
+<p><a href="#swapon"><code>swapon</code></a>: setup a swapfile</p>
+</li>
+<li>
+<p><a href="#switch-java-version"><code>switch-java-version</code></a>: change the
+default version of java on the server</p>
+</li>
+<li>
+<p><a href="#upload"><code>upload</code></a>: upload a file to the server (will default
+to the user’s home directory if no destination path is specified)</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><a href="#site-commands-for-site-management"><code>site</code> Commands for site
+management</a></p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#build"><code>build</code></a>: re-build a site</p>
+</li>
+<li>
+<p><a href="#create"><code>create</code></a>: create a new site</p>
+</li>
+<li>
+<p><a href="#enablehttps"><code>enablehttps</code></a>: setup a site to be served over
+https</p>
+</li>
+<li>
+<p><a href="#info-1"><code>info</code></a>: view information about the server</p>
+</li>
+<li>
+<p><a href="#list"><code>list</code></a>: view the sites setup on the server</p>
+</li>
+<li>
+<p><a href="#logs"><code>logs</code></a>: view the logs for a python, node, or java site</p>
+</li>
+<li>
+<p><a href="#remove"><code>remove</code></a>: remove an existing site</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><a href="#db-commands-for-database-management"><code>db</code> Commands for
+database management</a></p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#backup"><code>backup</code></a>: make a database backup</p>
+</li>
+<li>
+<p><a href="#create-1"><code>create</code></a>: create a new database and associated
+user</p>
+</li>
+<li>
+<p><a href="#list-1"><code>list</code></a>: list databases that are setup</p>
+</li>
+<li>
+<p><a href="#login-1"><code>login</code></a>: login to production database</p>
+</li>
+<li>
+<p><a href="#remove-1"><code>remove</code></a>: remove an existing database and user</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><a href="#user-commands-for-user-management"><code>user</code> Commands for user
+management</a></p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#add-1"><code>add</code></a>: add a new user</p>
+</li>
+<li>
+<p><a href="#remove-2"><code>remove</code></a>: remove an existing user</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="_the_cods_command">The <code>cods</code> command</h3>
+<div class="sect3">
+<h4 id="_init"><code>init</code></h4>
+<div class="paragraph">
+<p>The <code>init</code> subcommand is used to provision a server and setup a local
+server command. The server must be ``fresh'' (i.e. not setup by any
+other provisioning tools), and you must have root ssh access to the
+server.</p>
+</div>
+<div class="paragraph">
+<p>The name of the server command bust be provided, then any optional
+arguments.</p>
+</div>
+<div class="paragraph">
+<p><strong>Arguments</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>-i</code> or <code>--ip</code>: (optional) the ip address of the server. If not
+provided, you will be prompted for it.</p>
+</li>
+<li>
+<p><code>-u</code> or <code>--user</code>: (optional) the username to setup for yourself on
+the server. If not provided, you will be prompted for it.</p>
+</li>
+<li>
+<p><code>-e</code> or <code>--email</code>: (optional) your email address. If note
+provided, you will be prompted for it.</p>
+</li>
+<li>
+<p><code>--root-user</code>: username of the user that has root access to the
+server. Defaults to <code>root</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Examples</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Create a command named <code>myserver</code></p>
+<div class="literalblock">
+<div class="content">
+<pre>cods init myserver</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You will be prompted for the server’s ip address, a username for
+yourself, and your email address.</p>
+</div>
+</li>
+<li>
+<p>Create a command named <code>myserver</code></p>
+<div class="literalblock">
+<div class="content">
+<pre>cods init myserver --ip 123.123.123.123 --user codeup --email info@codeup.com</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here you will <strong>not</strong> be prompted for the server’s ip address, a username
+for yourself, and your email address because they were provided as
+command line arguments.</p>
+</div>
+</li>
+<li>
+<p>Create a <code>myserver</code> command using a different root user for the
+initial setup</p>
+<div class="literalblock">
+<div class="content">
+<pre>cods init myserver --root-user debian</pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_add"><code>add</code></h4>
+<div class="paragraph">
+<p>The <code>add</code> subcommand is used to create a local server command for an
+existing server. You will need to have ssh access to an existing user
+account on the server.</p>
+</div>
+<div class="paragraph">
+<p>You might use this command if:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>you want to get access to a shared server that your teammate setup and
+gave you an account on</p>
+</li>
+<li>
+<p>you want to be able to access from your desktop pc a server that you
+setup on your laptop</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The name of the server command bust be provided, then any optional
+arguments.</p>
+</div>
+<div class="paragraph">
+<p><strong>Arguments</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>-i</code> or <code>--ip</code>: (optional) the ip address of the server. If not
+provided, you will be prompted for it.</p>
+</li>
+<li>
+<p><code>-u</code> or <code>--user</code>: (optional) the username to setup for yourself on
+the server. If not provided, you will be prompted for it.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Examples</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Create a command named <code>myserver</code></p>
+<div class="literalblock">
+<div class="content">
+<pre>cods add myserver</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You will be prompted for the server’s ip address and your username.</p>
+</div>
+</li>
+<li>
+<p>Create a command named <code>myserver</code></p>
+<div class="literalblock">
+<div class="content">
+<pre>cods init myserver --ip 123.123.123.123 --user codeup --email info@codeup.com</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here you will <strong>not</strong> be prompted for the server’s ip address or your
+username for yourself because they were provided as command line
+arguments.</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_update"><code>update</code></h4>
+<div class="paragraph">
+<p>Updates any existing server commands to the most recent version of the
+<code>cods</code> scripts.</p>
+</div>
+<div class="paragraph">
+<p>You should run this after you update <code>cods</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>cods update</pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_help"><code>help</code></h4>
+<div class="paragraph">
+<p>Launch the interactive help system.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>cods help</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_myserver_a_command_created_by_cods"><code>myserver</code> - A Command Created By Cods</h3>
+<div class="paragraph">
+<p>While <code>cods</code> can create commands with any name, for the rest of this
+document we will assume we are working with a command named
+<code>myserver</code>.</p>
+</div>
+<div class="paragraph">
+<p><code>myserver</code> contains various subcommands for performing different
+activities on the server.</p>
+</div>
+<div class="paragraph">
+<p>To see all the available subcommands, run the <code>myserver</code> command
+without any arguments:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>myserver</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The same applies for the <code>site</code>, <code>user</code>, and <code>db</code> subcommands, to
+see their available subcommands, just run them by themselves:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>myserver site
+myserver db
+myserver user</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Any subcommands that require arguments can be run without arguments to
+see detailed help for the command.</p>
+</div>
+<div class="paragraph">
+<p>All command line arguments have a long form, and most have a short form
+as well. You can pass command line arguments in one of 3 ways:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>-a value
+--arg value
+--arg=value</pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_general_server_commands">General Server Commands</h4>
+<div class="sect4">
+<h5 id="_info"><code>info</code></h5>
+<div class="paragraph">
+<p>Show general information about the server. Another argument can be
+passed to show just the server’s ip address, or just the remote
+username.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Show general information</p>
+<div class="literalblock">
+<div class="content">
+<pre>myserver info</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Show the server’s ip address</p>
+<div class="literalblock">
+<div class="content">
+<pre>myserver info ip</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Show the remote username</p>
+<div class="literalblock">
+<div class="content">
+<pre>myserver info user</pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_login"><code>login</code></h5>
+<div class="paragraph">
+<p>Launch an interactive shell logged in to your server</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>myserver login</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_ports"><code>ports</code></h5>
+<div class="paragraph">
+<p>Show the ports that are currently in use by sites that are setup on the
+server.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>myserver ports</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will output something like the following:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>8000 example.com
+5000 blog.example.com</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Where the number to the left of the domain indicates the port that the
+site’s application is running on.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_ping"><code>ping</code></h5>
+<div class="paragraph">
+<p>Pings the server</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_swapon"><code>swapon</code></h5>
+<div class="paragraph">
+<p>Enable a swap file on the server. You may need to do this if you are
+using a lower-end droplet and are getting out of memory errors.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>myserver swapon</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_autorenew"><code>autorenew</code></h5>
+<div class="paragraph">
+<p>Setup all https certificates to be automatically renewed.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>myserver autorenew</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will setup a cron-job that will have the letsencrypt client renew
+any certificates that need to be renewed.</p>
+</div>
+<div class="paragraph">
+<p>It is safe to run this command multiple timesl if the cron job is
+already setup, it will do nothing.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_reboot"><code>reboot</code></h5>
+<div class="paragraph">
+<p>Reboot the server</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_run"><code>run</code></h5>
+<div class="paragraph">
+<p>Run arbitrary command on the server.</p>
+</div>
+<div class="paragraph">
+<p><strong>Examples</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Edit a file on the server with <code>nano</code></p>
+<div class="literalblock">
+<div class="content">
+<pre>myserver run nano /srv/example.com/application.properties</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Edit the nginx configuration for a site with <code>nano</code></p>
+<div class="literalblock">
+<div class="content">
+<pre>myserver run sudo nano /etc/nginx/sites-available/example.com</pre>
+</div>
+</div>
+</li>
+<li>
+<p>View the running processes on the server</p>
+<div class="literalblock">
+<div class="content">
+<pre>myserver run htop</pre>
+</div>
+</div>
+</li>
+<li>
+<p>View the current time on the server</p>
+<div class="literalblock">
+<div class="content">
+<pre>myserver run date</pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_pipe"><code>pipe</code></h5>
+<div class="paragraph">
+<p>Run a command on the server in a non-interactive environment (a pty will
+<em>not</em> be allocated). This can be useful for transferring binary data to
+the server.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_credentials"><code>credentials</code></h5>
+<div class="paragraph">
+<p>View the credentials file for your server. This file contains all the
+autogenerated usernames and passwords for this server.</p>
+</div>
+<div class="paragraph">
+<p>You can also use this command to view the location of the credentials
+file or modify it.</p>
+</div>
+<div class="paragraph">
+<p><strong>Examples</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>View the autogenerated credentials</p>
+<div class="literalblock">
+<div class="content">
+<pre>myserver credentials</pre>
+</div>
+</div>
+</li>
+<li>
+<p>View the path to the credentials file, i.e. where the file is located
+on your laptop</p>
+<div class="literalblock">
+<div class="content">
+<pre>myserver credentials path</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Edit the credentials file</p>
+<div class="literalblock">
+<div class="content">
+<pre>myserver credentials edit</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The editor that the file is opened in is based on the <code>EDITOR</code>
+environment variable.</p>
+</div>
+</li>
+<li>
+<p>Add another entry to the credentials file</p>
+<div class="literalblock">
+<div class="content">
+<pre>myserver credentials add myuser: password123</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Anything after the word <code>add</code> will be appended to the credentials
+file.</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_destroy"><code>destroy</code></h5>
+<div class="paragraph">
+<p>Remove the server command from your laptop. This command will destroy
+any knowledge <code>cods</code> has about the server locally, including any
+database backups.</p>
+</div>
+<div class="paragraph">
+<p>Before destroying the server, you will need to type a confirmation
+message so that the process cannot happen accidentaly.</p>
+</div>
+<div class="paragraph">
+<p>Note that this <em>will not</em> remove the VPS you created on Digital Ocean
+(or other hosting provider).</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_switch_java_version"><code>switch-java-version</code></h5>
+<div class="paragraph">
+<p>Change the version of java that is running on the server. At the time of
+writing the choices are the 2 LTS java versions, 8 and 11.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>myserver switch-java-version</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You will be presented with a menu where you can choose the number that
+corresponds to the java installation you wish to use.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_bash_completion"><code>bash-completion</code></h5>
+<div class="paragraph">
+<p>Outputs bash shell code that can be used to enable tab completion for
+the <code>myserver</code> command. You shouldn’t really run this command
+directly, but rather, evaluate it’s output.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="paragraph">
+<p>Running the code below will enable tab completion for the current
+terminal session:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>eval "$(myserver bash-completion)"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now type:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>myserver &lt;TAB&gt;&lt;TAB&gt;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You will notice that all subcommands and any command arguments will be
+autocompleted.</p>
+</div>
+<div class="paragraph">
+<p>To make this tab completion persistent, add the line above with <code>eval</code>
+to your <code>~/.bash_profile</code> (or <code>~/.bashrc</code> if you’re on Linux) file.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_upload"><code>upload</code></h5>
+<div class="paragraph">
+<p>Upload a file from your laptop to the server.</p>
+</div>
+<div class="paragraph">
+<p>Optionally specify a destination, otherwise will default to your home
+directory.</p>
+</div>
+<div class="paragraph">
+<p><strong>Arguments</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>-f</code> or <code>--file</code>: path to the file to upload</p>
+</li>
+<li>
+<p><code>-d</code> or <code>--destination</code>: (optional) destination for the file on
+the server</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Examples</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Upload the <code>mycat.png</code> file in your downloads directory to the
+<code>uploads</code> folder within the <code>public</code> directory for <code>example.com</code></p>
+<div class="literalblock">
+<div class="content">
+<pre>myserver upload -f ~/Downloads/mycat.png -d /srv/example.com/public/uploads/mycat.png</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Upload a migration SQL script to your server using a relative file
+path</p>
+<div class="literalblock">
+<div class="content">
+<pre>myserver upload --file=migration.sql</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Upload a seeder SQL script using an absolute file path</p>
+<div class="literalblock">
+<div class="content">
+<pre>myserver upload --file ~/IdeaProjects/blog/seeder.sql</pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_restart"><code>restart</code></h5>
+<div class="paragraph">
+<p>Restart a service that is running on the server.</p>
+</div>
+<div class="paragraph">
+<p><strong>Arguments</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>-s</code> or <code>--service</code>: name of the service to restart</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="paragraph">
+<p>Restart the <code>nginx</code> service</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>myserver restart --service nginx</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_site_commands_for_site_management"><code>site</code> Commands for site management</h4>
+<div class="sect4">
+<h5 id="_create"><code>create</code></h5>
+<div class="paragraph">
+<p>Setup the server to host a new site.</p>
+</div>
+<div class="paragraph">
+<p>You must provide a domain name and a site type.</p>
+</div>
+<div class="paragraph">
+<p>For java, node, and python sites, a port number (that isn’t already in
+use) must be provided.</p>
+</div>
+<div class="paragraph">
+<p><strong>Arguments</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>-d</code> or <code>--domain</code>: domain name of the site to create</p>
+</li>
+<li>
+<p><code>--static</code>: setup a static site</p>
+</li>
+<li>
+<p><code>--java</code>: - setup a java site</p>
+</li>
+<li>
+<p><code>--node</code>: setup a node site</p>
+</li>
+<li>
+<p><code>--python</code>: setup a python site</p>
+</li>
+<li>
+<p><code>--php</code>: setup a php site</p>
+</li>
+<li>
+<p><code>-p</code> or <code>--port</code>: port number that the application will run on</p>
+</li>
+<li>
+<p><code>--spring-boot</code>: (optional) perform extra configuration for a
+spring-boot site</p>
+</li>
+<li>
+<p><code>--enable-https</code>: (optional) enable https after setting up the site
+(see the <code>enablehttps</code> subcommand for more details)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Examples</strong>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>setup a static site on <code>example.com</code></p>
+<div class="literalblock">
+<div class="content">
+<pre>myserver site create -d example.com --static</pre>
+</div>
+</div>
+</li>
+<li>
+<p>setup a spring boot java site that runs on port 8000</p>
+<div class="literalblock">
+<div class="content">
+<pre>myserver site create --domain=example.com --java -p 8000 --spring-boot</pre>
+</div>
+</div>
+</li>
+<li>
+<p>setup a node site on port 3000 and enable https for it</p>
+<div class="literalblock">
+<div class="content">
+<pre>myserver site create --domain=example.com --node --port=3000 --enable-https</pre>
+</div>
+</div>
+</li>
+<li>
+<p>setup a python site on port 5000</p>
+<div class="literalblock">
+<div class="content">
+<pre>myserver site create --domain example.com --python --port 5000</pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_list"><code>list</code></h5>
+<div class="paragraph">
+<p>List the sites that are currently setup on the server.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>myserver site list</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_remove"><code>remove</code></h5>
+<div class="paragraph">
+<p>Remove a site from the server.</p>
+</div>
+<div class="paragraph">
+<p>Confirmation will be required before the site is removed. Note that this
+will <em>not</em> remove any databases associated with the site.</p>
+</div>
+<div class="paragraph">
+<p><strong>Arguments</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>-d</code> or <code>--domain</code> domain name to remove</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>myserver site remove --domain example.com</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_build"><code>build</code></h5>
+<div class="paragraph">
+<p>Trigger a build for a site.</p>
+</div>
+<div class="paragraph">
+<p>This will trigger the same process that runs whenever a new version is
+pushed to your production git remote.</p>
+</div>
+<div class="paragraph">
+<p>This can be useful if, for example, you made a typo when setting up
+database credentials for the site and need to restart the site, but
+didn’t make any changes to the underlying application code.</p>
+</div>
+<div class="paragraph">
+<p><strong>Arguments</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>-d</code> or <code>--domain</code> domain name to trigger the build for</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>myserver site build -d example.com</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_enablehttps"><code>enablehttps</code></h5>
+<div class="paragraph">
+<p>Enable https for a site.</p>
+</div>
+<div class="paragraph">
+<p>Before running this command, you should make sure that the DNS records
+for your domain are configured to point to your server, otherwise this
+command <em>will</em> fail.</p>
+</div>
+<div class="paragraph">
+<p>On running this command, an https certificate will be obtained using
+letsencrypt, and your site will be setup to be served only over https
+(i.e. not http.)</p>
+</div>
+<div class="paragraph">
+<p><strong>Arguments</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>-d</code> or <code>--domain</code>: domain name of the site to enable https for</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>myserver site enablehttps -d example.com</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_info_2"><code>info</code></h5>
+<div class="paragraph">
+<p>Show various information about a site. Optionally, just print the
+deployment remote.</p>
+</div>
+<div class="paragraph">
+<p><strong>Arguments</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>-d</code> or <code>--domain</code>: domain name of the site to show information
+for</p>
+</li>
+<li>
+<p><code>--show-remote</code>: just print the deployment git remote</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Examples</strong></p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>myserver site info -d example.com
+myserver site info --show-remote --domain example.com</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_logs"><code>logs</code></h5>
+<div class="paragraph">
+<p>Show the logs for a site.</p>
+</div>
+<div class="paragraph">
+<p>This command is only useful for java, node, and python site types.</p>
+</div>
+<div class="paragraph">
+<p><strong>Arguments</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>-d</code> or <code>--domain</code>: Name of the domain to check logs for</p>
+</li>
+<li>
+<p><code>-f</code> or <code>--follow</code>: Watch the log file in real-time (press C-c to
+quit)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Examples</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>dump the entire log file for <code>example.com</code> out to your terminal</p>
+<div class="literalblock">
+<div class="content">
+<pre>myserver site logs -d example.com</pre>
+</div>
+</div>
+</li>
+<li>
+<p>watch the log file for example.com in real-time</p>
+<div class="literalblock">
+<div class="content">
+<pre>myserver site logs -d example.com -f</pre>
+</div>
+</div>
+</li>
+<li>
+<p>save the logs for <code>example.com</code> to a file named <code>example.com.log</code></p>
+<div class="literalblock">
+<div class="content">
+<pre>myserver site logs --domain example.com &gt; example.com.log</pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_db_commands_for_database_management"><code>db</code> Commands for database management</h4>
+<div class="paragraph">
+<p>All of the commands here will require your database administrator
+password when run.</p>
+</div>
+<div class="sect4">
+<h5 id="_login_2"><code>login</code></h5>
+<div class="paragraph">
+<p>Login to the database; start an interactive session.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>myserver db login</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_list_2"><code>list</code></h5>
+<div class="paragraph">
+<p>List the existing databases on the server</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>myserver db list</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_create_2"><code>create</code></h5>
+<div class="paragraph">
+<p>Create a database and user that has permissions only on that database.</p>
+</div>
+<div class="paragraph">
+<p>A random password will be generated for the new user and stored in the
+credentials file for the server.</p>
+</div>
+<div class="paragraph">
+<p>After the user is created, the user’s password can again be viewed by
+running:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>myserver credentials</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Arguments</strong></p>
+</div>
+<div class="paragraph">
+<p><code>-n</code> or <code>--name</code>: name of the database to create <code>-u</code> or
+<code>--user</code>: name of the database user to create</p>
+</div>
+<div class="paragraph">
+<p><strong>Examples</strong></p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>myserver db create -n example_db -u example_user
+myserver db create --name=test_db --user=test_user</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_remove_2"><code>remove</code></h5>
+<div class="paragraph">
+<p>Drop a database from the server.</p>
+</div>
+<div class="paragraph">
+<p><strong>Arguments</strong></p>
+</div>
+<div class="paragraph">
+<p><code>-n</code> or <code>--name</code>: name of the database to remove <code>-u</code> or
+<code>--user</code>: name of the user to remove</p>
+</div>
+<div class="paragraph">
+<p><strong>Examples</strong></p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>myserver db remove -n example_db -u example_user
+myserver db remove --name test_db --user test_user</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_backup"><code>backup</code></h5>
+<div class="paragraph">
+<p>Create a backup of a database.</p>
+</div>
+<div class="paragraph">
+<p>The database backup will be stored locally, that is, on your laptop. You
+can specify a path for the database backup or it will default to
+<code>~/.config/cods/myserver/db-backups/DATE-DB-backup.sql</code>. Where
+<code>DATE</code> and <code>DB</code> are replaced with the current date/time and database
+name, respectively.</p>
+</div>
+<div class="paragraph">
+<p><strong>Arguments</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>-n</code> or <code>--name</code>: name of the database to backup</p>
+</li>
+<li>
+<p><code>-o</code> or <code>--outfile</code>: (optional) where to save the sql dump</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Examples</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Save a backup of <code>example_db</code> to the default location</p>
+<div class="literalblock">
+<div class="content">
+<pre>myserver db backup -n example_db</pre>
+</div>
+</div>
+</li>
+<li>
+<p>save a backup of <code>example_db</code> to a location in the home directory</p>
+<div class="literalblock">
+<div class="content">
+<pre>myserver db backup -n example_db -o ~/my-db-dump.sql</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Save a backup of <code>blog_db</code> to a relative path</p>
+<div class="paragraph">
+<p>myserver db backup –name=blog_db –outfile=./src/main/sql/blog-backup.sql</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_commands_for_user_management"><code>user</code> Commands for user management</h4>
+<div class="paragraph">
+<p>This command allows you to grant other humans access to your server</p>
+</div>
+<div class="sect4">
+<h5 id="_add_2"><code>add</code></h5>
+<div class="paragraph">
+<p>Add a new admin user to the server.</p>
+</div>
+<div class="paragraph">
+<p>Users can be added either by:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>specifying a username and a path to the user’s public ssh key</p>
+</li>
+<li>
+<p>specifying a github username, and the user’s public keys will be
+pulled from github</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Arguments</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>-f</code> or <code>--sshkeyfile</code>: path to the new user’s public key</p>
+</li>
+<li>
+<p><code>-u</code> or <code>--username</code>: username for the new user</p>
+</li>
+<li>
+<p><code>--github-username</code>: github username to lookup public keys; will
+also be used as server username</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Examples</strong></p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>myserver user add -u sally -f ~/sallys-ssh-key.pub
+myserver user add --username=sally --sshkeyfile=~/key.pub
+myserver user add --github-username gocodeup</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_remove_3"><code>remove</code></h5>
+<div class="paragraph">
+<p>Remove an existing user from the server.</p>
+</div>
+<div class="paragraph">
+<p><strong>Arguments</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>-u</code> or <code>--username</code>: username of the user to remove</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Examples</strong></p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>myserver user remove -u sally
+myserver user remove --username=sally</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2020-04-15 20:08:56 -0500
+</div>
+</div>
+</body>
+</html>
