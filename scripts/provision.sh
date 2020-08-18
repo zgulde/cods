@@ -24,6 +24,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 heading 'updating + upgrading apt'
 
+apt-mark hold cloud-init
 apt-get update
 apt-get upgrade -y
 apt-get install -y gnupg2 software-properties-common curl # we need this first to setup new repos
