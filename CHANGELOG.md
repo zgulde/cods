@@ -1,3 +1,8 @@
+3.3.1 -- 20200818
+
+- bugfix: don't error out when provisioning due to `cloud-init` package
+- docs: update static site guides
+
 3.3.0 -- 20200206
 
 - bugfix: don't fail silently when creating a database that already exists
