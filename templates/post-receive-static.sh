@@ -38,18 +38,18 @@ if git ls-tree HEAD | cut -f 2 | grep ^.cods$ >/dev/null || git ls-tree HEAD | c
 	git clone $(pwd) $TMP_REPO
 	cd $TMP_REPO
 
-	if [[ -f $SITE_DIR/config ]]; then
-		source $SITE_DIR/config
+	if [[ -f $SITE_DIR/cods-config ]]; then
+		source $SITE_DIR/cods-config
 		if [[ ! -z "$source" ]] && [[ ! -z "$destination" ]]; then
-			log "Found configuration file: '${SITE_DIR}/config'!"
+			log "Found configuration file: '${SITE_DIR}/cods-config'!"
 			log "Copying $source file to $destination..."
 			cp $SITE_DIR/$source $TMP_REPO/$destination
 		else
-			log "Configuration file found '${SITE_DIR}/config', but \$source and \$destination are not set."
+			log "Configuration file found '${SITE_DIR}/cods-config', but \$source and \$destination are not set."
 			log 'Nothing copied. Continuing...'
 		fi
 	else
-		log "No configuration file ($SITE_DIR/config) found. Continuing..."
+		log "No configuration file ($SITE_DIR/cods-config) found. Continuing..."
 	fi
 
 	if [[ -f cods.sh ]] ; then
