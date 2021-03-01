@@ -1,3 +1,7 @@
+3.3.2 -- 2021-02-28
+
+- bugfix: rename cods config file to `cods-config` (see 61bd079)
+
 3.3.1 -- 20200818
 
 - bugfix: don't error out when provisioning due to `cloud-init` package
