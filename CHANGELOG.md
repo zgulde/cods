@@ -1,4 +1,8 @@
-3.3.2 -- 2021-02-28
+3.3.3 -- 20210301
+
+- bugfix: rename cods config file to `cods-config`
+
+3.3.2 -- 20210228
 
 - bugfix: rename cods config file to `cods-config` (see 61bd079)
 
