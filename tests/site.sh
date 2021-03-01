@@ -57,11 +57,11 @@ stat=$(stat --format='%G' /srv/test.com/public)
 	egrep 'server_name\s*test.com' /etc/nginx/sites-available/test.com
 ) >/dev/null || fail 'Expected to nginx config to be setup correctly'
 
-[[ -f /srv/test.com/config ]] || fail 'Expected to find a config file for test.com'
+[[ -f /srv/test.com/cods-config ]] || fail 'Expected to find a cods-config file for test.com'
 (
-	grep '^source=application.properties$' /srv/test.com/config &&\
-	grep '^destination=src/main/resources/application.properties$' /srv/test.com/config
-) >/dev/null || fail 'Expected to find config file pre-modified for a spring-boot app'
+	grep '^source=application.properties$' /srv/test.com/cods-config &&\
+	grep '^destination=src/main/resources/application.properties$' /srv/test.com/cods-config
+) >/dev/null || fail 'Expected to find cods-config file pre-modified for a spring-boot app'
 
 [[ -d /srv/test.com/repo.git ]] || fail 'Expected to find a repository for test.com'
 [[ -x /srv/test.com/repo.git/hooks/post-receive ]] ||\
@@ -139,7 +139,7 @@ egrep 'listen\s*443;' /etc/nginx/sites-available/test.com >/dev/null &&\
 egrep 'server_name\s*test.com' /etc/nginx/sites-available/test.com ||\
 	fail "Expected to see a server name of test.com, instead found '$(grep server_name)'"
 
-[[ -f /srv/test.com/config ]] || fail 'Expected to find /srv/test.com/config file'
+[[ -f /srv/test.com/cods-config ]] || fail 'Expected to find /srv/test.com/cods-config file'
 [[ -d /srv/test.com/repo.git ]] || fail 'Expected to find a repository for test.com'
 [[ -x /srv/test.com/repo.git/hooks/post-receive ]] ||\
 	fail 'Expected to find an executable post-receive hook'
