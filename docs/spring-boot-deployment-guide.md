@@ -184,7 +184,7 @@ as a `jar` and run it.
     to the server
 
     ```
-    cd ~/IdeaProjects/springboot-blog
+    # run this from the root of your spring boot project
     myserver upload --file src/main/resources/application.properties --destination /srv/example.com/application.properties
     ```
 
