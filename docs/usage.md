@@ -331,7 +331,7 @@ same as the port that you pass when you run the above command to create the node
 site.
 
 A git remote will be created for you, and a `post-receive` hook will be setup so
-that when you push the `master` branch to the remote on the server:
+that when you push the `main` (or `master`) branch to the remote on the server:
 
 1. The new version of the code is checked out, replacing the old version
 1. If a file named `cods.sh` exists at the root of the project, it will be
@@ -426,7 +426,7 @@ myserver site create --php --domain my-php-site.com
 ```
 
 A git remote will be created for you, and a `post-receive` hook will be setup so
-that when you push the `master` branch to the remote on the server:
+that when you push the `main` (or `master`) branch to the remote on the server:
 
 1. The new version of the code is checked out, replacing the old version.
 1. If a file named `cods.sh` exists at the root of the project, it will be

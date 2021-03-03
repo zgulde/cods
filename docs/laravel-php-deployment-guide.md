@@ -17,7 +17,7 @@
     ```
     myserver site info -d php-site.com
     # add the git remote
-    git push production master
+    git push production main
     ```
 
 1. Login to finalize setup

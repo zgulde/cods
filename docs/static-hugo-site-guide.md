@@ -110,5 +110,5 @@ remove whatever is currently there, and replace it with the contents of the
 Now that everything is in place, simply push to production to deploy your site:
 
 ```
-git push production master
+git push production main
 ```

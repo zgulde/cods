@@ -20,7 +20,7 @@ trap cleanup EXIT
 # only deploy to the master branch
 while read old new ref; do
     branch=$(git rev-parse --symbolic --abbrev-ref $ref)
-    if [[ $branch != "master" ]]; then
+    if [[ $branch != "master" && $branch != "main" ]]; then
         log "'$branch' is not 'master'. A build is only triggered when pushing the master branch."
 		log "'$branch' was successfully pushed, but project was not built."
 		log

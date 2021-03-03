@@ -56,7 +56,7 @@ you want to deploy.
 
     ```
     git remote add origin ...
-    git push origin master
+    git push origin main
     ```
 
 ## Create The Site
@@ -85,7 +85,7 @@ Either way after running the command to add the production remote, go ahead and
 push:
 
 ```
-git push production master
+git push production main
 ```
 
 After pushing, you should see your site live!

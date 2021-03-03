@@ -67,7 +67,7 @@ Deploying a java spring-boot database backed blog application:
     Will give you a copy-pastable command to add a `production` remote. Then:
 
     ```
-    git push production master
+    git push production main
     ```
 
     And you site will build and be live!
@@ -89,7 +89,7 @@ Deploying a java spring-boot database backed blog application:
     Will give you a copy-pastable command to add a `production` remote. Then:
 
     ```
-    git push production master
+    git push production main
     ```
 
     And the contents of your repo will be live on your domain!
@@ -116,7 +116,7 @@ Deploying a java spring-boot database backed blog application:
     Will give you a copy-pastable command to add a `production` remote. Then:
 
     ```
-    git push production master
+    git push production main
     ```
 
     And the contents of your repo will be live on your domain!
@@ -155,7 +155,7 @@ Deploying a java spring-boot database backed blog application:
     Will give you a copy-pastable command to add a `production` remote. Then:
 
     ```
-    git push production master
+    git push production main
     ```
 
     And the contents of your repo will be live on your domain!

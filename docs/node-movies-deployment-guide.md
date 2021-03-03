@@ -107,7 +107,7 @@ Then make sure all your changes are added and committed, then push to
 production:
 
 ```sh
-git push origin master
+git push origin main
 ```
 
 When you push, you'll see the `cods.sh` script running, then you should see

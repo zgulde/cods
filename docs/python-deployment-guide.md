@@ -190,7 +190,7 @@ a new version.
 1. Push to `production` deploy your code
 
     ```
-    git push production master
+    git push production main
     ```
 
     You should see the code from your `cods.sh` file run whenever you push to

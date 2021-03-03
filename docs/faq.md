@@ -35,10 +35,10 @@ All the example command below assume your server management command is named
 Short answer: add, commit, and push to your deployment remote.
 
 If you are working by yourself, simply add and commit your code (possibly merge
-a branch into `master`), and push to the production remote.
+a branch into `main`), and push to the production remote.
 
 If you are working on a team project, you should pull down the most recent
-version of the master branch locally, and push that to your production remote.
+version of the main branch locally, and push that to your production remote.
 
 ## Do I need to create a new server (droplet) for every site I want to host?
 

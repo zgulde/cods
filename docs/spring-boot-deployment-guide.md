@@ -219,7 +219,7 @@ as a `jar` and run it.
     production
 
     ```
-    git push production master
+    git push production main
     ```
 
 ## Debugging
