@@ -188,6 +188,33 @@ show_info() {
 
 }
 
+port_forward() {
+	while [[ $# -gt 0 ]] ; do
+		arg=$1 ; shift
+		case $arg in
+			-l|--local) local=$1 ; shift;;
+			--local=*) local=${arg#*=};;
+			-r|--remote) remote=$1 ; shift;;
+			--remote=*) remote="${arg#*=}";;
+			*) echo "Unknown argument: $arg" ; exit 1;;
+		esac
+	done
+	if [[ -z "$local" || -z "$remote" ]] ; then
+		cat <<-.
+		Forward a local port to a remote port on the server.
+
+		-l|--local <port>  -- local port
+		-r|--remote <port> -- remote port
+
+		Examples:
+		    $(basename "$0") port-forward -l 8080 -r 8989
+		.
+		die
+    fi
+
+	ssh -NTR $local:$ip:$remote $user@$ip
+}
+
 show_usage() {
 	cat <<-help_message
 	$(basename "$0") -- command for server management
@@ -214,6 +241,7 @@ show_usage() {
 	    destroy     -- destroy the server
 	    tmux        -- attach to an existing, or create a new tmux session
 
+	    port-forward        -- forward local to remote ports
 	    switch-java-version -- switch the default version of java on the server
 	    bash-completion     -- generate bash tab completion script
 
@@ -274,6 +302,8 @@ case $command in
 	ports)     show_ports;;
 	tmux)      ssh -t $user@$ip 'tmux a || tmux';;
 	destroy)   destroy_server;;
+
+	port-forward) port_forward "$@";;
 
 	switch-java-version)
 		ssh -t $user@$ip sudo update-alternatives --config java
